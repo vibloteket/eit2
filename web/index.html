@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eit 2</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #080c14;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="wasm_exec.js"></script>
+    <script>
+      const go = new Go();
+      WebAssembly.instantiateStreaming(fetch("eit2.wasm"), go.importObject)
+        .then((result) => go.run(result.instance))
+        .catch((error) => {
+          document.body.textContent = `Could not start Eit 2: ${error}`;
+        });
+    </script>
+  </body>
+</html>
