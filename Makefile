@@ -20,7 +20,7 @@ build:
 build-web:
 	mkdir -p dist/web
 	GOOS=js GOARCH=wasm go build -trimpath -o dist/web/eit2.wasm ./cmd/eit2
-	cp web/index.html dist/web/index.html
+	cp web/index.html web/favicon.svg web/favicon-32.png dist/web/
 	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" dist/web/wasm_exec.js
 
 check: lint test build build-web
