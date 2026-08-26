@@ -203,12 +203,12 @@ func startButton() imageRect { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
 
 func touchButtons() []button {
 	return []button{
-		{Rect: imageRect{X: 45, Y: 235, W: 145, H: 115}, Label: "←", Do: actionLeft},
-		{Rect: imageRect{X: 205, Y: 235, W: 145, H: 115}, Label: "→", Do: actionRight},
-		{Rect: imageRect{X: 125, Y: 370, W: 145, H: 115}, Label: "↓", Do: actionDown},
-		{Rect: imageRect{X: 930, Y: 235, W: 145, H: 115}, Label: "↺", Do: actionCCW},
-		{Rect: imageRect{X: 1090, Y: 235, W: 145, H: 115}, Label: "↻", Do: actionCW},
-		{Rect: imageRect{X: 970, Y: 370, W: 225, H: 115}, Label: "DROP", Do: actionDrop},
+		{Rect: imageRect{X: 45, Y: 270, W: 145, H: 120}, Label: "LEFT", Do: actionLeft},
+		{Rect: imageRect{X: 205, Y: 270, W: 145, H: 120}, Label: "RIGHT", Do: actionRight},
+		{Rect: imageRect{X: 125, Y: 570, W: 145, H: 120}, Label: "DOWN", Do: actionDown},
+		{Rect: imageRect{X: 930, Y: 270, W: 145, H: 120}, Label: "CCW", Do: actionCCW},
+		{Rect: imageRect{X: 1090, Y: 270, W: 145, H: 120}, Label: "CW", Do: actionCW},
+		{Rect: imageRect{X: 970, Y: 570, W: 225, H: 120}, Label: "DROP", Do: actionDrop},
 	}
 }
 
@@ -316,10 +316,10 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	for _, point := range core.PieceCells(next) {
 		drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
 	}
-	drawText(screen, "STORED", g.face(20), 1020, 170, muted)
-	drawText(screen, "—", g.face(30), 1020, 202, white)
-	drawText(screen, "EFFECTS", g.face(20), 1020, 545, muted)
-	drawText(screen, "None", g.face(22), 1020, 575, white)
+	drawText(screen, "STORED", g.face(20), 1020, 150, muted)
+	drawText(screen, "—", g.face(30), 1020, 180, white)
+	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
+	drawText(screen, "None", g.face(22), 1020, 242, white)
 	if game.GameOver {
 		drawCenteredText(screen, "GAME OVER", g.face(54), logicalWidth/2, 275, white)
 	}
@@ -327,11 +327,40 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		r := control.Rect
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), panel)
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), 4, accent)
-		size := 46.0
-		if control.Do == actionDrop {
-			size = 28
+		drawControlIcon(screen, control, g.face(22))
+	}
+}
+
+func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTextFace) {
+	r := control.Rect
+	cx, cy := float64(r.X+r.W/2), float64(r.Y+r.H/2)
+	switch control.Do {
+	case actionLeft:
+		ebitenutil.DrawLine(screen, cx+28, cy, cx-25, cy, white)
+		ebitenutil.DrawLine(screen, cx-25, cy, cx-2, cy-22, white)
+		ebitenutil.DrawLine(screen, cx-25, cy, cx-2, cy+22, white)
+	case actionRight:
+		ebitenutil.DrawLine(screen, cx-28, cy, cx+25, cy, white)
+		ebitenutil.DrawLine(screen, cx+25, cy, cx+2, cy-22, white)
+		ebitenutil.DrawLine(screen, cx+25, cy, cx+2, cy+22, white)
+	case actionDown:
+		ebitenutil.DrawLine(screen, cx, cy-25, cx, cy+25, white)
+		ebitenutil.DrawLine(screen, cx, cy+25, cx-22, cy+2, white)
+		ebitenutil.DrawLine(screen, cx, cy+25, cx+22, cy+2, white)
+	case actionCCW, actionCW:
+		// A blocky circular arrow avoids relying on a font glyph that might be
+		// absent on mobile browsers.
+		ebitenutil.DrawCircle(screen, cx, cy, 28, white)
+		ebitenutil.DrawCircle(screen, cx, cy, 19, panel)
+		if control.Do == actionCCW {
+			ebitenutil.DrawLine(screen, cx-35, cy-22, cx-10, cy-28, white)
+			ebitenutil.DrawLine(screen, cx-35, cy-22, cx-26, cy+2, white)
+		} else {
+			ebitenutil.DrawLine(screen, cx+35, cy-22, cx+10, cy-28, white)
+			ebitenutil.DrawLine(screen, cx+35, cy-22, cx+26, cy+2, white)
 		}
-		drawCenteredText(screen, control.Label, g.face(size), float64(r.X+r.W/2), float64(r.Y+28), white)
+	case actionDrop:
+		drawCenteredText(screen, "DROP", labelFace, cx, cy-14, white)
 	}
 }
 
