@@ -203,11 +203,11 @@ func startButton() imageRect { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
 
 func touchButtons() []button {
 	return []button{
-		{Rect: imageRect{X: 45, Y: 270, W: 145, H: 120}, Label: "LEFT", Do: actionLeft},
-		{Rect: imageRect{X: 205, Y: 270, W: 145, H: 120}, Label: "RIGHT", Do: actionRight},
+		{Rect: imageRect{X: 45, Y: 420, W: 145, H: 120}, Label: "LEFT", Do: actionLeft},
+		{Rect: imageRect{X: 205, Y: 420, W: 145, H: 120}, Label: "RIGHT", Do: actionRight},
 		{Rect: imageRect{X: 125, Y: 570, W: 145, H: 120}, Label: "DOWN", Do: actionDown},
-		{Rect: imageRect{X: 930, Y: 270, W: 145, H: 120}, Label: "CCW", Do: actionCCW},
-		{Rect: imageRect{X: 1090, Y: 270, W: 145, H: 120}, Label: "CW", Do: actionCW},
+		{Rect: imageRect{X: 930, Y: 420, W: 145, H: 120}, Label: "CCW", Do: actionCCW},
+		{Rect: imageRect{X: 1090, Y: 420, W: 145, H: 120}, Label: "CW", Do: actionCW},
 		{Rect: imageRect{X: 970, Y: 570, W: 225, H: 120}, Label: "DROP", Do: actionDrop},
 	}
 }
