@@ -10,6 +10,7 @@ const (
 	RotateCCW
 	RotateCW
 	HardDrop
+	UseAntidote
 )
 
 // ShouldRepeat reports whether a held action should fire on this tick.

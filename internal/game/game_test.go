@@ -150,6 +150,35 @@ func TestAntidoteSpecialActivatesWhenItsRowClears(t *testing.T) {
 	}
 }
 
+func TestBlindSpecialQueuesTargetEffect(t *testing.T) {
+	g := New(13)
+	g.activateSpecial(SpecialBlind)
+	specials := g.ConsumeSpecials()
+	if len(specials) != 1 || specials[0] != SpecialBlind {
+		t.Fatalf("queued specials = %v", specials)
+	}
+	if len(g.ConsumeSpecials()) != 0 {
+		t.Fatal("special was not consumed")
+	}
+}
+
+func TestAntidoteClearsBlindEffect(t *testing.T) {
+	g := New(14)
+	g.ApplySpecial(SpecialBlind)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.Blind || g.Antidotes != 0 {
+		t.Fatalf("blind=%v antidotes=%d", g.Blind, g.Antidotes)
+	}
+}
+
+func TestAntidoteIsNotSpentWithoutEffect(t *testing.T) {
+	g := New(15)
+	g.Antidotes = 1
+	if g.UseAntidote() || g.Antidotes != 1 {
+		t.Fatal("antidote should only be spent on an active negative effect")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

@@ -34,6 +34,7 @@ func (m *Match) Tick() {
 		player.Tick()
 	}
 	m.routeGarbage()
+	m.routeSpecials()
 	m.UpdateStatus()
 }
 
@@ -46,6 +47,17 @@ func (m *Match) routeGarbage() {
 		target := m.Target(attacker)
 		if target >= 0 && target < len(m.Players) && !m.Players[target].GameOver {
 			m.Players[target].AddGarbage(rows)
+		}
+	}
+}
+
+func (m *Match) routeSpecials() {
+	for attacker, player := range m.Players {
+		for _, special := range player.ConsumeSpecials() {
+			target := m.Target(attacker)
+			if target >= 0 && target < len(m.Players) && !m.Players[target].GameOver {
+				m.Players[target].ApplySpecial(special)
+			}
 		}
 	}
 }

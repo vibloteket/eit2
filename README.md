@@ -26,9 +26,10 @@ Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.
 Clearing four rows sends two incomplete garbage rows to the selected target,
 matching the original game's basic multiplayer attack. The first two special
-blocks are implemented: Antidote is stored when collected, while Clear empties
-the collector's board. Android is deliberately deferred; native Linux and web
-are the active targets.
+blocks are implemented: Antidote is stored when collected, Clear empties the
+collector's board, and Blind hides the selected target's Next preview until an
+Antidote is used. Android is deliberately deferred; native Linux and web are
+the active targets.
 
 ## Develop
 

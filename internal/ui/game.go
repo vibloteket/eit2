@@ -52,6 +52,7 @@ const (
 	actionCCW   = controls.RotateCCW
 	actionCW    = controls.RotateCW
 	actionDrop  = controls.HardDrop
+	actionAnti  = controls.UseAntidote
 )
 
 type button struct {
@@ -208,6 +209,9 @@ func (g *Game) updatePlay() {
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			keyboardPlayer.HardDrop()
 		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+			keyboardPlayer.UseAntidote()
+		}
 	}
 	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
 	if touchPlayer == nil {
@@ -297,6 +301,9 @@ func (g *Game) updateGamepads() {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopRight) {
 			g.match.CycleTarget(playerIndex)
 		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopLeft) {
+			g.players[playerIndex].UseAntidote()
+		}
 	}
 }
 
@@ -340,6 +347,8 @@ func apply(game *core.Game, action action) {
 		game.Rotate(1)
 	case actionDrop:
 		game.HardDrop()
+	case actionAnti:
+		game.UseAntidote()
 	}
 }
 
@@ -361,7 +370,8 @@ func touchButtons() []button {
 		{Rect: imageRect{X: 125, Y: 570, W: 145, H: 120}, Label: "DOWN", Do: actionDown},
 		{Rect: imageRect{X: 930, Y: 420, W: 145, H: 120}, Label: "CCW", Do: actionCCW},
 		{Rect: imageRect{X: 1090, Y: 420, W: 145, H: 120}, Label: "CW", Do: actionCW},
-		{Rect: imageRect{X: 970, Y: 570, W: 225, H: 120}, Label: "DROP", Do: actionDrop},
+		{Rect: imageRect{X: 970, Y: 570, W: 150, H: 120}, Label: "DROP", Do: actionDrop},
+		{Rect: imageRect{X: 1135, Y: 570, W: 100, H: 120}, Label: "ANTI", Do: actionAnti},
 	}
 }
 
@@ -471,9 +481,13 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	drawText(screen, fmt.Sprintf("LEVEL  %d", game.Lines/5), g.face(25), 45, 160, white)
 
 	drawText(screen, "NEXT", g.face(22), 1020, 48, muted)
-	next := core.Piece{Kind: game.NextKind}
-	for _, point := range core.PieceCells(next) {
-		drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
+	if game.Blind {
+		drawText(screen, "?", g.face(54), 1040, 76, white)
+	} else {
+		next := core.Piece{Kind: game.NextKind}
+		for _, point := range core.PieceCells(next) {
+			drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
+		}
 	}
 	drawText(screen, "STORED", g.face(20), 1020, 150, muted)
 	stored := "—"
@@ -482,7 +496,11 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	}
 	drawText(screen, stored, g.face(22), 1020, 180, white)
 	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
-	drawText(screen, "None", g.face(22), 1020, 242, white)
+	effects := "None"
+	if game.Blind {
+		effects = "Blind"
+	}
+	drawText(screen, effects, g.face(22), 1020, 242, white)
 
 	pause := pauseButton()
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)
@@ -534,8 +552,12 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		}
 		hudX := boardX + boardW + 12
 		drawText(screen, "NEXT", g.face(14), float64(hudX), 80, muted)
-		for _, point := range core.PieceCells(core.Piece{Kind: game.NextKind}) {
-			drawCell(screen, hudX+point.X*14, 102+point.Y*14, 14, game.NextKind+1)
+		if game.Blind {
+			drawText(screen, "?", g.face(28), float64(hudX+10), 105, white)
+		} else {
+			for _, point := range core.PieceCells(core.Piece{Kind: game.NextKind}) {
+				drawCell(screen, hudX+point.X*14, 102+point.Y*14, 14, game.NextKind+1)
+			}
 		}
 		drawText(screen, "TARGET", g.face(14), float64(hudX), 185, muted)
 		target := "—"
@@ -619,6 +641,8 @@ func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTex
 		}
 	case actionDrop:
 		drawCenteredText(screen, "DROP", labelFace, cx, cy-14, white)
+	case actionAnti:
+		drawCenteredText(screen, "ANTI", labelFace, cx, cy-14, white)
 	}
 }
 
@@ -629,6 +653,8 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "A"
 	case core.SpecialClear:
 		label = "C"
+	case core.SpecialBlind:
+		label = "B"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)

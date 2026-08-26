@@ -18,6 +18,7 @@ const (
 	SpecialNone Special = iota
 	SpecialAntidote
 	SpecialClear
+	SpecialBlind
 )
 
 type Piece struct {
@@ -59,6 +60,8 @@ type Game struct {
 	Lines          int
 	GameOver       bool
 	Antidotes      int
+	Blind          bool
+	pendingSpecial []Special
 	pendingGarbage int
 	random         *rand.Rand
 	fallTick       int
@@ -315,8 +318,11 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	if g.random.IntN(2) == 1 {
+	switch g.random.IntN(3) {
+	case 1:
 		special = SpecialClear
+	case 2:
+		special = SpecialBlind
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -334,7 +340,37 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
+	case SpecialBlind:
+		g.pendingSpecial = append(g.pendingSpecial, SpecialBlind)
 	}
+}
+
+// QueueSpecial adds an outgoing effect for the selected target.
+func (g *Game) QueueSpecial(special Special) {
+	if special != SpecialNone {
+		g.pendingSpecial = append(g.pendingSpecial, special)
+	}
+}
+
+func (g *Game) ConsumeSpecials() []Special {
+	result := append([]Special(nil), g.pendingSpecial...)
+	g.pendingSpecial = g.pendingSpecial[:0]
+	return result
+}
+
+func (g *Game) ApplySpecial(special Special) {
+	if special == SpecialBlind {
+		g.Blind = true
+	}
+}
+
+func (g *Game) UseAntidote() bool {
+	if g.Antidotes == 0 || !g.Blind {
+		return false
+	}
+	g.Antidotes--
+	g.Blind = false
+	return true
 }
 
 func (g *Game) clearLines() (int, []Special) {

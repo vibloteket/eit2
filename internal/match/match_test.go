@@ -1,6 +1,10 @@
 package match
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/vibloteket/eit2/internal/game"
+)
 
 func TestInitialTargetsPointToNextPlayer(t *testing.T) {
 	m := New(4)
@@ -55,6 +59,18 @@ func TestGarbageRoutesToSelectedTarget(t *testing.T) {
 				t.Fatal("non-target received garbage")
 			}
 		}
+	}
+}
+
+func TestSpecialRoutesToSelectedTarget(t *testing.T) {
+	m := New(3)
+	m.Players[0].QueueSpecial(game.SpecialBlind)
+	m.routeSpecials()
+	if !m.Players[1].Blind {
+		t.Fatal("selected target did not receive blind")
+	}
+	if m.Players[2].Blind {
+		t.Fatal("non-target received blind")
 	}
 }
 
