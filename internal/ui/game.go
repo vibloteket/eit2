@@ -71,6 +71,7 @@ type Game struct {
 	touchIDs    []ebiten.TouchID
 	pressedIDs  []ebiten.TouchID
 	heldActions map[action]int
+	padHeld     map[int]map[action]int
 	fontSource  *text.GoTextFaceSource
 	view        view
 	players     []*core.Game
@@ -86,6 +87,7 @@ func NewGame() *Game {
 	return &Game{
 		fontSource:  fontSource,
 		heldActions: make(map[action]int),
+		padHeld:     make(map[int]map[action]int),
 		touchDevice: lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
 }
@@ -139,6 +141,7 @@ func (g *Game) start() {
 	}
 	g.paused = false
 	clear(g.heldActions)
+	clear(g.padHeld)
 	g.view = viewPlay
 }
 
@@ -162,15 +165,17 @@ func (g *Game) updatePlay() {
 		return
 	}
 	player := g.players[0]
+	g.updateGamepads()
+	soloGameOver := len(g.players) == 1 && player.GameOver
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if g.handlePlayMenuPointer(x, y, player.GameOver) {
+		if g.handlePlayMenuPointer(x, y, soloGameOver) {
 			return
 		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if g.handlePlayMenuPointer(x, y, player.GameOver) {
+		if g.handlePlayMenuPointer(x, y, soloGameOver) {
 			return
 		}
 	}
@@ -178,28 +183,34 @@ func (g *Game) updatePlay() {
 		g.paused = !g.paused
 		clear(g.heldActions)
 	}
-	if g.paused || player.GameOver {
+	if g.paused || soloGameOver {
 		return
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		player.Move(-1)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		player.Move(1)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
-		if ebiten.Tick()%2 == 0 {
-			player.StepDown()
+	if keyboardPlayer := g.playerForDevice(lobby.DeviceKeyboard); keyboardPlayer != nil {
+		if inpututil.IsKeyJustPressed(ebiten.KeyLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			keyboardPlayer.Move(-1)
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+			keyboardPlayer.Move(1)
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
+			if ebiten.Tick()%2 == 0 {
+				keyboardPlayer.StepDown()
+			}
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+			keyboardPlayer.Rotate(-1)
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
+			keyboardPlayer.Rotate(1)
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+			keyboardPlayer.HardDrop()
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-		player.Rotate(-1)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		player.Rotate(1)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		player.HardDrop()
+	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
+	if touchPlayer == nil {
+		touchPlayer = player
 	}
 	activeActions := make(map[action]bool)
 	for _, id := range g.touchIDs {
@@ -218,7 +229,7 @@ func (g *Game) updatePlay() {
 	for action := range activeActions {
 		ticks := g.heldActions[action]
 		if controls.ShouldRepeat(action, ticks) {
-			apply(player, action)
+			apply(touchPlayer, action)
 		}
 		g.heldActions[action] = ticks + 1
 	}
@@ -226,11 +237,65 @@ func (g *Game) updatePlay() {
 		x, y := ebiten.CursorPosition()
 		for _, control := range touchButtons() {
 			if control.Rect.contains(x, y) {
-				apply(player, control.Do)
+				apply(touchPlayer, control.Do)
 			}
 		}
 	}
-	player.Tick()
+	for _, current := range g.players {
+		current.Tick()
+	}
+}
+
+func (g *Game) playerForDevice(kind lobby.DeviceKind) *core.Game {
+	for i, slot := range g.Lobby.Slots {
+		if slot.Device.Kind == kind && i < len(g.players) {
+			return g.players[i]
+		}
+	}
+	return nil
+}
+
+func (g *Game) updateGamepads() {
+	for playerIndex, slot := range g.Lobby.Slots {
+		if slot.Device.Kind != lobby.DeviceGamepad || playerIndex >= len(g.players) {
+			continue
+		}
+		id := ebiten.GamepadID(slot.Device.ID)
+		active := map[action]bool{
+			actionLeft:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftLeft),
+			actionRight: ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftRight),
+			actionDown:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftBottom),
+		}
+		held := g.padHeld[playerIndex]
+		if held == nil {
+			held = make(map[action]int)
+			g.padHeld[playerIndex] = held
+		}
+		for action := range held {
+			if !active[action] {
+				delete(held, action)
+			}
+		}
+		for action := range active {
+			if !active[action] {
+				continue
+			}
+			ticks := held[action]
+			if controls.ShouldRepeat(action, ticks) {
+				apply(g.players[playerIndex], action)
+			}
+			held[action] = ticks + 1
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightLeft) {
+			g.players[playerIndex].Rotate(-1)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
+			g.players[playerIndex].Rotate(1)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
+			g.players[playerIndex].HardDrop()
+		}
+	}
 }
 
 func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
@@ -374,6 +439,11 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	if len(g.players) == 0 {
 		return
 	}
+	if len(g.players) > 1 {
+		g.drawCouch(screen)
+		g.drawMatchOverlay(screen)
+		return
+	}
 	game := g.players[0]
 	const cell = 27
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
@@ -423,24 +493,76 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		drawControlIcon(screen, control, g.face(22), fill)
 	}
 
-	if g.paused || game.GameOver {
-		ebitenutil.DrawRect(screen, 385, 235, 510, 230, color.RGBA{R: 8, G: 12, B: 20, A: 238})
-		title := "PAUSED"
-		if game.GameOver {
-			title = "GAME OVER"
-		}
-		drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
-		restart, back := menuButtons(game.GameOver)
-		if g.paused {
-			resume := resumeButton()
-			ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
-			drawCenteredText(screen, "RESUME", g.face(19), float64(resume.X+resume.W/2), float64(resume.Y+22), background)
-		}
-		ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), panel)
-		ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), panel)
-		drawCenteredText(screen, "RESTART", g.face(19), float64(restart.X+restart.W/2), float64(restart.Y+22), white)
-		drawCenteredText(screen, "LOBBY", g.face(19), float64(back.X+back.W/2), float64(back.Y+22), white)
+	g.drawMatchOverlay(screen)
+}
+
+func (g *Game) drawCouch(screen *ebiten.Image) {
+	count := len(g.players)
+	const gap = 12
+	areaWidth := (logicalWidth - 40 - gap*(count-1)) / count
+	cell := (logicalHeight - 125) / core.BoardHeight
+	if areaWidth*2/3/core.BoardWidth < cell {
+		cell = areaWidth * 2 / 3 / core.BoardWidth
 	}
+	for i, game := range g.players {
+		x := 20 + i*(areaWidth+gap)
+		boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
+		boardX, boardY := x+8, 72
+		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(22), float64(x+8), 20, white)
+		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(16), float64(x+48), 25, muted)
+		ebitenutil.DrawRect(screen, float64(boardX-3), float64(boardY-3), float64(boardW+6), float64(boardH+6), muted)
+		ebitenutil.DrawRect(screen, float64(boardX), float64(boardY), float64(boardW), float64(boardH), panel)
+		for y, row := range game.Board {
+			for bx, value := range row {
+				if value != 0 {
+					drawCell(screen, boardX+bx*cell, boardY+y*cell, cell, value)
+				}
+			}
+		}
+		for _, point := range game.Cells(game.Active) {
+			if point.Y >= 0 {
+				drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
+			}
+		}
+		hudX := boardX + boardW + 12
+		drawText(screen, "NEXT", g.face(14), float64(hudX), 80, muted)
+		for _, point := range core.PieceCells(core.Piece{Kind: game.NextKind}) {
+			drawCell(screen, hudX+point.X*14, 102+point.Y*14, 14, game.NextKind+1)
+		}
+		drawText(screen, "TARGET", g.face(14), float64(hudX), 185, muted)
+		drawText(screen, "—", g.face(20), float64(hudX), 210, white)
+		drawText(screen, "STORED", g.face(14), float64(hudX), 260, muted)
+		drawText(screen, "—", g.face(20), float64(hudX), 285, white)
+		if game.GameOver {
+			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
+		}
+	}
+	pause := pauseButton()
+	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)
+	drawCenteredText(screen, "PAUSE", g.face(18), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
+}
+
+func (g *Game) drawMatchOverlay(screen *ebiten.Image) {
+	gameOver := len(g.players) == 1 && g.players[0].GameOver
+	if !g.paused && !gameOver {
+		return
+	}
+	ebitenutil.DrawRect(screen, 385, 235, 510, 230, color.RGBA{R: 8, G: 12, B: 20, A: 238})
+	title := "PAUSED"
+	if gameOver {
+		title = "GAME OVER"
+	}
+	drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
+	restart, back := menuButtons(gameOver)
+	if g.paused {
+		resume := resumeButton()
+		ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
+		drawCenteredText(screen, "RESUME", g.face(19), float64(resume.X+resume.W/2), float64(resume.Y+22), background)
+	}
+	ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), panel)
+	ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), panel)
+	drawCenteredText(screen, "RESTART", g.face(19), float64(restart.X+restart.W/2), float64(restart.Y+22), white)
+	drawCenteredText(screen, "LOBBY", g.face(19), float64(back.X+back.W/2), float64(back.Y+22), white)
 }
 
 func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTextFace, fill color.RGBA) {

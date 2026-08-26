@@ -22,8 +22,9 @@ This initial technical spike proves the project structure and its first targets:
 - independent random piece selection, retaining the original game's possibility
   of lucky and unlucky streaks.
 
-Multiplayer interaction and special blocks are not implemented yet. Android is
-deliberately deferred; native Linux and web are the active targets.
+Two to four joined players now receive separate boards and device-routed input;
+multiplayer attacks, targeting and special blocks are not implemented yet.
+Android is deliberately deferred; native Linux and web are the active targets.
 
 ## Develop
 
