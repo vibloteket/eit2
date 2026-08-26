@@ -24,8 +24,10 @@ This initial technical spike proves the project structure and its first targets:
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.
-Multiplayer attacks and special blocks are not implemented yet. Android is
-deliberately deferred; native Linux and web are the active targets.
+Clearing four rows sends two incomplete garbage rows to the selected target,
+matching the original game's basic multiplayer attack. Special blocks are not
+implemented yet. Android is deliberately deferred; native Linux and web are the
+active targets.
 
 ## Develop
 

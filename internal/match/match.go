@@ -33,7 +33,21 @@ func (m *Match) Tick() {
 	for _, player := range m.Players {
 		player.Tick()
 	}
+	m.routeGarbage()
 	m.UpdateStatus()
+}
+
+func (m *Match) routeGarbage() {
+	for attacker, player := range m.Players {
+		rows := player.ConsumeGarbage()
+		if rows == 0 {
+			continue
+		}
+		target := m.Target(attacker)
+		if target >= 0 && target < len(m.Players) && !m.Players[target].GameOver {
+			m.Players[target].AddGarbage(rows)
+		}
+	}
 }
 
 func (m *Match) CycleTarget(player int) int {

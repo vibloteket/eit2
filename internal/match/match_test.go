@@ -34,6 +34,30 @@ func TestEliminatedTargetIsReassigned(t *testing.T) {
 	}
 }
 
+func TestGarbageRoutesToSelectedTarget(t *testing.T) {
+	m := New(3)
+	m.Players[0].QueueAttack(2)
+	m.routeGarbage()
+	occupied := 0
+	for _, row := range m.Players[1].Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 18 {
+		t.Fatalf("target garbage cells = %d, want 18", occupied)
+	}
+	for _, row := range m.Players[2].Board {
+		for _, value := range row {
+			if value != 0 {
+				t.Fatal("non-target received garbage")
+			}
+		}
+	}
+}
+
 func TestLastAlivePlayerWins(t *testing.T) {
 	m := New(3)
 	m.Players[0].GameOver = true

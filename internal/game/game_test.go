@@ -78,6 +78,46 @@ func TestGravitySpeedsUpWithLevel(t *testing.T) {
 	}
 }
 
+func TestFourLineClearEarnsTwoGarbageRows(t *testing.T) {
+	g := New(6)
+	for y := BoardHeight - 4; y < BoardHeight; y++ {
+		for x := 1; x < BoardWidth; x++ {
+			g.Board[y][x] = 1
+		}
+	}
+	g.Active = Piece{Kind: 0, Rotation: 1, X: -2, Y: BoardHeight - 4}
+	g.lock()
+	if got := g.ConsumeGarbage(); got != 2 {
+		t.Fatalf("garbage = %d, want 2", got)
+	}
+	if got := g.ConsumeGarbage(); got != 0 {
+		t.Fatalf("garbage was not consumed: %d", got)
+	}
+}
+
+func TestGarbageRowHasOneHole(t *testing.T) {
+	g := New(7)
+	g.AddGarbage(1)
+	occupied := 0
+	for _, value := range g.Board[BoardHeight-1] {
+		if value != 0 {
+			occupied++
+		}
+	}
+	if occupied != BoardWidth-1 {
+		t.Fatalf("garbage occupied cells = %d", occupied)
+	}
+}
+
+func TestGarbageAboveFullStackEndsGame(t *testing.T) {
+	g := New(8)
+	g.Board[0][0] = 1
+	g.AddGarbage(1)
+	if !g.GameOver {
+		t.Fatal("full stack should be eliminated by garbage")
+	}
+}
+
 func TestFullLineClearsAndScores(t *testing.T) {
 	g := New(2)
 	for x := 0; x < BoardWidth; x++ {

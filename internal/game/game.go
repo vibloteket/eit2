@@ -43,15 +43,16 @@ var shapes = [7][4][4]Point{
 }
 
 type Game struct {
-	Board    [BoardHeight][BoardWidth]int
-	Active   Piece
-	NextKind int
-	Score    int
-	Lines    int
-	GameOver bool
-	random   *rand.Rand
-	fallTick int
-	lockTick int
+	Board          [BoardHeight][BoardWidth]int
+	Active         Piece
+	NextKind       int
+	Score          int
+	Lines          int
+	GameOver       bool
+	pendingGarbage int
+	random         *rand.Rand
+	fallTick       int
+	lockTick       int
 }
 
 func New(seed uint64) *Game {
@@ -211,7 +212,64 @@ func (g *Game) lock() {
 	g.Lines += cleared
 	scores := [...]int{0, 40, 100, 300, 1200}
 	g.Score += scores[cleared] * (level + 1)
+	if cleared == 4 {
+		g.pendingGarbage += 2
+	}
 	g.Spawn()
+}
+
+// QueueAttack adds outgoing garbage rows. Besides four-line clears, later
+// special-block effects can use the same match-facing mechanism.
+func (g *Game) QueueAttack(rows int) {
+	if rows > 0 {
+		g.pendingGarbage += rows
+	}
+}
+
+// ConsumeGarbage returns and clears rows earned by line clears. In original
+// Eit, clearing four rows attacks the selected opponent with two rows.
+func (g *Game) ConsumeGarbage() int {
+	rows := g.pendingGarbage
+	g.pendingGarbage = 0
+	return rows
+}
+
+// AddGarbage adds incomplete rows immediately above the current stack, matching
+// the original game's disruptive top-of-stack attack rather than pushing the
+// entire board upward from the bottom.
+func (g *Game) AddGarbage(rows int) {
+	for range rows {
+		row := BoardHeight - 1
+		for y := 0; y < BoardHeight; y++ {
+			occupied := false
+			for x := 0; x < BoardWidth; x++ {
+				if g.Board[y][x] != 0 {
+					occupied = true
+					break
+				}
+			}
+			if occupied {
+				row = y - 1
+				break
+			}
+		}
+		if row < 0 {
+			g.GameOver = true
+			return
+		}
+		hole := g.random.IntN(BoardWidth)
+		for x := 0; x < BoardWidth; x++ {
+			if x != hole {
+				g.Board[row][x] = 1 + g.random.IntN(len(shapes))
+			}
+		}
+		for _, cell := range g.Cells(g.Active) {
+			if cell.Y == row && g.Board[cell.Y][cell.X] != 0 {
+				g.GameOver = true
+				return
+			}
+		}
+	}
 }
 
 func (g *Game) clearLines() int {
