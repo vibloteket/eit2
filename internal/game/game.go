@@ -12,6 +12,14 @@ const (
 
 type Point struct{ X, Y int }
 
+type Special int
+
+const (
+	SpecialNone Special = iota
+	SpecialAntidote
+	SpecialClear
+)
+
 type Piece struct {
 	Kind     int
 	Rotation int
@@ -44,15 +52,18 @@ var shapes = [7][4][4]Point{
 
 type Game struct {
 	Board          [BoardHeight][BoardWidth]int
+	Specials       [BoardHeight][BoardWidth]Special
 	Active         Piece
 	NextKind       int
 	Score          int
 	Lines          int
 	GameOver       bool
+	Antidotes      int
 	pendingGarbage int
 	random         *rand.Rand
 	fallTick       int
 	lockTick       int
+	specialTick    int
 }
 
 func New(seed uint64) *Game {
@@ -165,6 +176,13 @@ func (g *Game) Tick() {
 	} else {
 		g.lockTick = 0
 	}
+	g.specialTick++
+	if g.specialTick == 22*60 {
+		g.removeSpecial()
+	} else if g.specialTick >= 30*60 {
+		g.spawnSpecial()
+		g.specialTick = 0
+	}
 	g.fallTick++
 	if g.fallTick >= g.GravityTicks() {
 		g.StepDown()
@@ -207,13 +225,16 @@ func (g *Game) lock() {
 		}
 		g.Board[cell.Y][cell.X] = g.Active.Kind + 1
 	}
-	cleared := g.clearLines()
+	cleared, activated := g.clearLines()
 	level := g.Lines / 5
 	g.Lines += cleared
 	scores := [...]int{0, 40, 100, 300, 1200}
 	g.Score += scores[cleared] * (level + 1)
 	if cleared == 4 {
 		g.pendingGarbage += 2
+	}
+	for _, special := range activated {
+		g.activateSpecial(special)
 	}
 	g.Spawn()
 }
@@ -272,9 +293,54 @@ func (g *Game) AddGarbage(rows int) {
 	}
 }
 
-func (g *Game) clearLines() int {
+func (g *Game) SpawnSpecial(special Special, point Point) bool {
+	if special == SpecialNone || point.X < 0 || point.X >= BoardWidth || point.Y < 0 || point.Y >= BoardHeight || g.Board[point.Y][point.X] == 0 {
+		return false
+	}
+	g.removeSpecial()
+	g.Specials[point.Y][point.X] = special
+	return true
+}
+
+func (g *Game) spawnSpecial() {
+	occupied := make([]Point, 0)
+	for y, row := range g.Board {
+		for x, value := range row {
+			if value != 0 {
+				occupied = append(occupied, Point{X: x, Y: y})
+			}
+		}
+	}
+	if len(occupied) == 0 {
+		return
+	}
+	special := SpecialAntidote
+	if g.random.IntN(2) == 1 {
+		special = SpecialClear
+	}
+	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
+}
+
+func (g *Game) removeSpecial() {
+	g.Specials = [BoardHeight][BoardWidth]Special{}
+}
+
+func (g *Game) activateSpecial(special Special) {
+	switch special {
+	case SpecialAntidote:
+		if g.Antidotes < 4 {
+			g.Antidotes++
+		}
+	case SpecialClear:
+		g.Board = [BoardHeight][BoardWidth]int{}
+		g.Specials = [BoardHeight][BoardWidth]Special{}
+	}
+}
+
+func (g *Game) clearLines() (int, []Special) {
 	write := BoardHeight - 1
 	cleared := 0
+	activated := make([]Special, 0)
 	for read := BoardHeight - 1; read >= 0; read-- {
 		full := true
 		for x := 0; x < BoardWidth; x++ {
@@ -285,14 +351,21 @@ func (g *Game) clearLines() int {
 		}
 		if full {
 			cleared++
+			for _, special := range g.Specials[read] {
+				if special != SpecialNone {
+					activated = append(activated, special)
+				}
+			}
 			continue
 		}
 		g.Board[write] = g.Board[read]
+		g.Specials[write] = g.Specials[read]
 		write--
 	}
 	for write >= 0 {
 		g.Board[write] = [BoardWidth]int{}
+		g.Specials[write] = [BoardWidth]Special{}
 		write--
 	}
-	return cleared
+	return cleared, activated
 }

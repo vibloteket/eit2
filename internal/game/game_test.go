@@ -123,13 +123,63 @@ func TestFullLineClearsAndScores(t *testing.T) {
 	for x := 0; x < BoardWidth; x++ {
 		g.Board[BoardHeight-1][x] = 1
 	}
-	if cleared := g.clearLines(); cleared != 1 {
+	if cleared, _ := g.clearLines(); cleared != 1 {
 		t.Fatalf("cleared = %d", cleared)
 	}
 	for x := 0; x < BoardWidth; x++ {
 		if g.Board[BoardHeight-1][x] != 0 {
 			t.Fatal("bottom line was not cleared")
 		}
+	}
+}
+
+func TestAntidoteSpecialActivatesWhenItsRowClears(t *testing.T) {
+	g := New(10)
+	for x := 0; x < BoardWidth; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	if !g.SpawnSpecial(SpecialAntidote, Point{X: 3, Y: BoardHeight - 1}) {
+		t.Fatal("could not place special")
+	}
+	_, activated := g.clearLines()
+	for _, special := range activated {
+		g.activateSpecial(special)
+	}
+	if g.Antidotes != 1 {
+		t.Fatalf("antidotes = %d", g.Antidotes)
+	}
+}
+
+func TestClearSpecialEmptiesBoard(t *testing.T) {
+	g := New(11)
+	for x := 0; x < BoardWidth; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	g.Board[BoardHeight-2][0] = 2
+	g.SpawnSpecial(SpecialClear, Point{X: 3, Y: BoardHeight - 1})
+	_, activated := g.clearLines()
+	for _, special := range activated {
+		g.activateSpecial(special)
+	}
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 {
+				t.Fatal("clear special left occupied cell")
+			}
+		}
+	}
+}
+
+func TestSpecialMovesDownWithRowsAboveClearedLine(t *testing.T) {
+	g := New(12)
+	for x := 0; x < BoardWidth; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	g.Board[BoardHeight-2][0] = 2
+	g.SpawnSpecial(SpecialAntidote, Point{X: 0, Y: BoardHeight - 2})
+	g.clearLines()
+	if g.Specials[BoardHeight-1][0] != SpecialAntidote {
+		t.Fatal("special did not fall with its block")
 	}
 }
 

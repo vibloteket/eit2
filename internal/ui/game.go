@@ -456,6 +456,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		for x, value := range row {
 			if value != 0 {
 				drawCell(screen, boardX+x*cell, boardY+y*cell, cell, value)
+				drawSpecial(screen, boardX+x*cell, boardY+y*cell, cell, game.Specials[y][x], g.face(float64(cell-5)))
 			}
 		}
 	}
@@ -475,7 +476,11 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
 	}
 	drawText(screen, "STORED", g.face(20), 1020, 150, muted)
-	drawText(screen, "—", g.face(30), 1020, 180, white)
+	stored := "—"
+	if game.Antidotes > 0 {
+		stored = fmt.Sprintf("Antidote × %d", game.Antidotes)
+	}
+	drawText(screen, stored, g.face(22), 1020, 180, white)
 	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
 	drawText(screen, "None", g.face(22), 1020, 242, white)
 
@@ -518,6 +523,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 			for bx, value := range row {
 				if value != 0 {
 					drawCell(screen, boardX+bx*cell, boardY+y*cell, cell, value)
+					drawSpecial(screen, boardX+bx*cell, boardY+y*cell, cell, game.Specials[y][bx], g.face(float64(cell-4)))
 				}
 			}
 		}
@@ -538,7 +544,11 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		}
 		drawText(screen, target, g.face(20), float64(hudX), 210, white)
 		drawText(screen, "STORED", g.face(14), float64(hudX), 260, muted)
-		drawText(screen, "—", g.face(20), float64(hudX), 285, white)
+		stored := "—"
+		if game.Antidotes > 0 {
+			stored = fmt.Sprintf("A × %d", game.Antidotes)
+		}
+		drawText(screen, stored, g.face(17), float64(hudX), 285, white)
 		if game.GameOver {
 			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
 		}
@@ -609,6 +619,19 @@ func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTex
 		}
 	case actionDrop:
 		drawCenteredText(screen, "DROP", labelFace, cx, cy-14, white)
+	}
+}
+
+func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, face *text.GoTextFace) {
+	label := ""
+	switch special {
+	case core.SpecialAntidote:
+		label = "A"
+	case core.SpecialClear:
+		label = "C"
+	}
+	if label != "" {
+		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
 	}
 }
 
