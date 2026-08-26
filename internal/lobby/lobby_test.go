@@ -30,15 +30,14 @@ func TestJoinIsIdempotent(t *testing.T) {
 	}
 }
 
-func TestCanStartWithTwoPlayers(t *testing.T) {
+func TestCanStartWithOnePlayer(t *testing.T) {
 	var l Lobby
-	l.Join(pad(1))
 	if l.CanStart() {
-		t.Fatal("one player should not start")
+		t.Fatal("empty lobby should not start")
 	}
-	l.Join(pad(2))
+	l.Join(pad(1))
 	if !l.CanStart() {
-		t.Fatal("two players should start")
+		t.Fatal("one player should be allowed to start")
 	}
 }
 

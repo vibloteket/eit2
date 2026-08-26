@@ -10,6 +10,7 @@ type DeviceKind string
 const (
 	DeviceKeyboard DeviceKind = "keyboard"
 	DeviceGamepad  DeviceKind = "gamepad"
+	DeviceTouch    DeviceKind = "touch"
 )
 
 type Device struct {
@@ -55,5 +56,5 @@ func (l *Lobby) Leave(device Device) bool {
 }
 
 func (l *Lobby) CanStart() bool {
-	return len(l.Slots) >= 2
+	return len(l.Slots) >= 1
 }

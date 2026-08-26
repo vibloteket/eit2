@@ -1,0 +1,63 @@
+package game
+
+import "testing"
+
+func TestPieceCannotMoveThroughWall(t *testing.T) {
+	g := New(1)
+	for g.Move(-1) {
+	}
+	for _, cell := range g.Cells(g.Active) {
+		if cell.X < 0 {
+			t.Fatalf("cell outside board: %+v", cell)
+		}
+	}
+}
+
+func TestHardDropLocksPieceAndSpawnsNext(t *testing.T) {
+	g := New(1)
+	first := g.Active
+	g.HardDrop()
+	occupied := 0
+	for _, row := range g.Board {
+		for _, cell := range row {
+			if cell != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 4 {
+		t.Fatalf("occupied = %d", occupied)
+	}
+	if g.Active == first {
+		t.Fatal("next piece was not spawned")
+	}
+}
+
+func TestFullLineClearsAndScores(t *testing.T) {
+	g := New(2)
+	for x := 0; x < BoardWidth; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	if cleared := g.clearLines(); cleared != 1 {
+		t.Fatalf("cleared = %d", cleared)
+	}
+	for x := 0; x < BoardWidth; x++ {
+		if g.Board[BoardHeight-1][x] != 0 {
+			t.Fatal("bottom line was not cleared")
+		}
+	}
+}
+
+func TestSameSeedProducesSamePieces(t *testing.T) {
+	a, b := New(42), New(42)
+	for range 20 {
+		if a.Active.Kind != b.Active.Kind {
+			t.Fatal("seeded sequence differs")
+		}
+		a.HardDrop()
+		b.HardDrop()
+		if a.GameOver || b.GameOver {
+			break
+		}
+	}
+}

@@ -12,11 +12,14 @@ This initial technical spike proves the project structure and its first targets:
 - native Linux build;
 - browser/WebAssembly build;
 - deterministic tests for assigning up to four input devices;
-- a 16:9 lobby showing four player slots;
-- keyboard and standard gamepad join input.
+- a 16:9 lobby showing four player slots and allowing solo play;
+- keyboard, standard gamepad and touch join input;
+- a first playable solo falling-block core with movement, rotation, gravity,
+  hard drop, line clearing and scoring;
+- large touch controls for mobile testing.
 
-There is no gameplay yet. Android is deliberately deferred; native Linux and
-web are the active targets.
+Multiplayer interaction and special blocks are not implemented yet. Android is
+deliberately deferred; native Linux and web are the active targets.
 
 ## Develop
 
@@ -28,9 +31,14 @@ make check
 make run
 ```
 
-In the lobby, press the standard south/A button on a gamepad to join. Enter or
-Space joins one keyboard player. Browsers only expose connected gamepads after
-the user has interacted with them.
+In the lobby, press the standard south/A button on a gamepad to join. On a
+phone, tap once to join and then tap **Start**. Enter/Space joins or starts a
+keyboard player. Browsers only expose connected gamepads after the user has
+interacted with them.
+
+The first player can play with arrow keys or A/D, Q/W, S and Space. On touch
+screens, use the six controls along the bottom for left, right, down, both
+rotation directions and hard drop.
 
 ## Build outputs
 

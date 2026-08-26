@@ -1,7 +1,7 @@
 # Eit 2
 
 ## Purpose
-- TV-first falling-block game for 2–4 simultaneous local players.
+- TV-first falling-block game for 1–4 local players, focused on simultaneous couch multiplayer with a real solo practice mode.
 
 ## Stack
 - Language/runtime: Go 1.26+
@@ -27,6 +27,7 @@
 ## Notes for future agents
 - Keep gameplay rules independent of Ebitengine and physical input APIs.
 - Controller-first means all menus must eventually work without keyboard/mouse.
-- Support 2–4 simultaneous local players on one screen.
+- Support 1–4 local players on one screen; solo play is a supported practice/exploration mode.
+- Keep touch as a lightweight input adapter for browser-based mobile testing.
 - Do not add Android build complexity until Linux and web targets are stable.
 - Do not copy legacy assets without checking their licensing status.
