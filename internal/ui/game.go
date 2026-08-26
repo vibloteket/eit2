@@ -164,20 +164,14 @@ func (g *Game) updatePlay() {
 	player := g.players[0]
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if pauseButton().contains(x, y) {
-			g.paused = !g.paused
-			clear(g.heldActions)
+		if g.handlePlayMenuPointer(x, y, player.GameOver) {
 			return
 		}
-		if g.paused || player.GameOver {
-			if restartButton().contains(x, y) {
-				g.restart()
-				return
-			}
-			if lobbyButton().contains(x, y) {
-				g.backToLobby()
-				return
-			}
+	}
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		x, y := ebiten.CursorPosition()
+		if g.handlePlayMenuPointer(x, y, player.GameOver) {
+			return
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
@@ -239,6 +233,31 @@ func (g *Game) updatePlay() {
 	player.Tick()
 }
 
+func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
+	if g.paused || gameOver {
+		if g.paused && resumeButton().contains(x, y) {
+			g.paused = false
+			clear(g.heldActions)
+			return true
+		}
+		if restartButton().contains(x, y) {
+			g.restart()
+			return true
+		}
+		if lobbyButton().contains(x, y) {
+			g.backToLobby()
+			return true
+		}
+		return true // The modal menu consumes all pointer input.
+	}
+	if pauseButton().contains(x, y) {
+		g.paused = true
+		clear(g.heldActions)
+		return true
+	}
+	return false
+}
+
 func apply(game *core.Game, action action) {
 	switch action {
 	case actionLeft:
@@ -257,9 +276,10 @@ func apply(game *core.Game, action action) {
 }
 
 func startButton() imageRect   { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
-func pauseButton() imageRect   { return imageRect{X: 790, Y: 30, W: 160, H: 62} }
-func restartButton() imageRect { return imageRect{X: 455, Y: 340, W: 180, H: 72} }
-func lobbyButton() imageRect   { return imageRect{X: 650, Y: 340, W: 180, H: 72} }
+func pauseButton() imageRect   { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func resumeButton() imageRect  { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
+func restartButton() imageRect { return imageRect{X: 560, Y: 340, W: 160, H: 72} }
+func lobbyButton() imageRect   { return imageRect{X: 745, Y: 340, W: 160, H: 72} }
 
 func touchButtons() []button {
 	return []button{
@@ -384,11 +404,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	pause := pauseButton()
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), 4, accent)
-	pauseLabel := "PAUSE"
-	if g.paused {
-		pauseLabel = "RESUME"
-	}
-	drawCenteredText(screen, pauseLabel, g.face(20), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
+	drawCenteredText(screen, "PAUSE", g.face(20), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
 
 	for _, control := range touchButtons() {
 		r := control.Rect
@@ -410,10 +426,15 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
 		restart := restartButton()
 		back := lobbyButton()
-		ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), accent)
+		if g.paused {
+			resume := resumeButton()
+			ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
+			drawCenteredText(screen, "RESUME", g.face(19), float64(resume.X+resume.W/2), float64(resume.Y+22), background)
+		}
+		ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), panel)
 		ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), panel)
-		drawCenteredText(screen, "RESTART", g.face(20), float64(restart.X+restart.W/2), float64(restart.Y+22), background)
-		drawCenteredText(screen, "LOBBY", g.face(20), float64(back.X+back.W/2), float64(back.Y+22), white)
+		drawCenteredText(screen, "RESTART", g.face(19), float64(restart.X+restart.W/2), float64(restart.Y+22), white)
+		drawCenteredText(screen, "LOBBY", g.face(19), float64(back.X+back.W/2), float64(back.Y+22), white)
 	}
 }
 
