@@ -240,11 +240,12 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 			clear(g.heldActions)
 			return true
 		}
-		if restartButton().contains(x, y) {
+		restart, back := menuButtons(gameOver)
+		if restart.contains(x, y) {
 			g.restart()
 			return true
 		}
-		if lobbyButton().contains(x, y) {
+		if back.contains(x, y) {
 			g.backToLobby()
 			return true
 		}
@@ -275,11 +276,16 @@ func apply(game *core.Game, action action) {
 	}
 }
 
-func startButton() imageRect   { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
-func pauseButton() imageRect   { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
-func resumeButton() imageRect  { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
-func restartButton() imageRect { return imageRect{X: 560, Y: 340, W: 160, H: 72} }
-func lobbyButton() imageRect   { return imageRect{X: 745, Y: 340, W: 160, H: 72} }
+func startButton() imageRect  { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
+func pauseButton() imageRect  { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func resumeButton() imageRect { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
+
+func menuButtons(gameOver bool) (restart, back imageRect) {
+	if gameOver {
+		return imageRect{X: 455, Y: 340, W: 180, H: 72}, imageRect{X: 650, Y: 340, W: 180, H: 72}
+	}
+	return imageRect{X: 560, Y: 340, W: 160, H: 72}, imageRect{X: 745, Y: 340, W: 160, H: 72}
+}
 
 func touchButtons() []button {
 	return []button{
@@ -424,8 +430,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 			title = "GAME OVER"
 		}
 		drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
-		restart := restartButton()
-		back := lobbyButton()
+		restart, back := menuButtons(game.GameOver)
 		if g.paused {
 			resume := resumeButton()
 			ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
