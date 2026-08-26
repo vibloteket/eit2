@@ -44,6 +44,7 @@ var shapes = [7][4][4]Point{
 type Game struct {
 	Board    [BoardHeight][BoardWidth]int
 	Active   Piece
+	NextKind int
 	Score    int
 	Lines    int
 	GameOver bool
@@ -52,12 +53,16 @@ type Game struct {
 }
 
 func New(seed uint64) *Game {
-	g := &Game{random: rand.New(rand.NewPCG(seed, seed^0x9e3779b97f4a7c15))}
+	g := &Game{random: rand.New(rand.NewPCG(seed, seed^0x9e3779b97f4a7c15)), NextKind: -1}
 	g.Spawn()
 	return g
 }
 
 func (g *Game) Cells(piece Piece) [4]Point {
+	return PieceCells(piece)
+}
+
+func PieceCells(piece Piece) [4]Point {
 	var cells [4]Point
 	for i, point := range shapes[piece.Kind][piece.Rotation%4] {
 		cells[i] = Point{X: piece.X + point.X, Y: piece.Y + point.Y}
@@ -78,7 +83,12 @@ func (g *Game) valid(piece Piece) bool {
 }
 
 func (g *Game) Spawn() {
-	g.Active = Piece{Kind: g.random.IntN(len(shapes)), X: 3, Y: -1}
+	kind := g.NextKind
+	if kind < 0 {
+		kind = g.random.IntN(len(shapes))
+	}
+	g.Active = Piece{Kind: kind, X: 3, Y: -1}
+	g.NextKind = g.random.IntN(len(shapes))
 	if !g.valid(g.Active) {
 		g.GameOver = true
 	}

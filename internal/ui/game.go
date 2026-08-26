@@ -202,16 +202,14 @@ func apply(game *core.Game, action action) {
 func startButton() imageRect { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
 
 func touchButtons() []button {
-	const y, h, gap, w = 585, 110, 10, 190
-	labels := []struct {
-		label string
-		do    action
-	}{{"LEFT", actionLeft}, {"RIGHT", actionRight}, {"DOWN", actionDown}, {"ROTATE ↺", actionCCW}, {"ROTATE ↻", actionCW}, {"DROP", actionDrop}}
-	buttons := make([]button, len(labels))
-	for i, item := range labels {
-		buttons[i] = button{Rect: imageRect{X: 20 + i*(w+gap), Y: y, W: w, H: h}, Label: item.label, Do: item.do}
+	return []button{
+		{Rect: imageRect{X: 45, Y: 235, W: 145, H: 115}, Label: "←", Do: actionLeft},
+		{Rect: imageRect{X: 205, Y: 235, W: 145, H: 115}, Label: "→", Do: actionRight},
+		{Rect: imageRect{X: 125, Y: 370, W: 145, H: 115}, Label: "↓", Do: actionDown},
+		{Rect: imageRect{X: 930, Y: 235, W: 145, H: 115}, Label: "↺", Do: actionCCW},
+		{Rect: imageRect{X: 1090, Y: 235, W: 145, H: 115}, Label: "↻", Do: actionCW},
+		{Rect: imageRect{X: 970, Y: 370, W: 225, H: 115}, Label: "DROP", Do: actionDrop},
 	}
-	return buttons
 }
 
 func (g *Game) face(size float64) *text.GoTextFace {
@@ -291,9 +289,9 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		return
 	}
 	game := g.players[0]
-	const cell = 23
+	const cell = 27
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
-	boardX, boardY := (logicalWidth-boardW)/2, 45
+	boardX, boardY := (logicalWidth-boardW)/2, 40
 	ebitenutil.DrawRect(screen, float64(boardX-5), float64(boardY-5), float64(boardW+10), float64(boardH+10), muted)
 	ebitenutil.DrawRect(screen, float64(boardX), float64(boardY), float64(boardW), float64(boardH), panel)
 	for y, row := range game.Board {
@@ -308,8 +306,20 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 			drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
 		}
 	}
-	drawText(screen, fmt.Sprintf("SCORE  %d", game.Score), g.face(28), float64(boardX+boardW+35), 85, white)
-	drawText(screen, fmt.Sprintf("LINES  %d", game.Lines), g.face(28), float64(boardX+boardW+35), 128, white)
+	drawText(screen, "PLAYER 1", g.face(27), 45, 48, white)
+	drawText(screen, fmt.Sprintf("SCORE  %d", game.Score), g.face(25), 45, 88, white)
+	drawText(screen, fmt.Sprintf("LINES  %d", game.Lines), g.face(25), 45, 124, white)
+	drawText(screen, fmt.Sprintf("LEVEL  %d", game.Lines/5), g.face(25), 45, 160, white)
+
+	drawText(screen, "NEXT", g.face(22), 1020, 48, muted)
+	next := core.Piece{Kind: game.NextKind}
+	for _, point := range core.PieceCells(next) {
+		drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
+	}
+	drawText(screen, "STORED", g.face(20), 1020, 170, muted)
+	drawText(screen, "—", g.face(30), 1020, 202, white)
+	drawText(screen, "EFFECTS", g.face(20), 1020, 545, muted)
+	drawText(screen, "None", g.face(22), 1020, 575, white)
 	if game.GameOver {
 		drawCenteredText(screen, "GAME OVER", g.face(54), logicalWidth/2, 275, white)
 	}
@@ -317,7 +327,11 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		r := control.Rect
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), panel)
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), 4, accent)
-		drawCenteredText(screen, control.Label, g.face(24), float64(r.X+r.W/2), float64(r.Y+34), white)
+		size := 46.0
+		if control.Do == actionDrop {
+			size = 28
+		}
+		drawCenteredText(screen, control.Label, g.face(size), float64(r.X+r.W/2), float64(r.Y+28), white)
 	}
 }
 

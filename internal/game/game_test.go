@@ -48,6 +48,15 @@ func TestFullLineClearsAndScores(t *testing.T) {
 	}
 }
 
+func TestNextPieceIsKnownBeforeSpawn(t *testing.T) {
+	g := New(9)
+	next := g.NextKind
+	g.HardDrop()
+	if g.Active.Kind != next {
+		t.Fatalf("active kind = %d, wanted previewed %d", g.Active.Kind, next)
+	}
+}
+
 func TestSameSeedProducesSamePieces(t *testing.T) {
 	a, b := New(42), New(42)
 	for range 20 {
