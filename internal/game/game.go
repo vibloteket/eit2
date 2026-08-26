@@ -19,6 +19,7 @@ const (
 	SpecialAntidote
 	SpecialClear
 	SpecialBlind
+	SpecialInverse
 )
 
 type Piece struct {
@@ -61,6 +62,7 @@ type Game struct {
 	GameOver       bool
 	Antidotes      int
 	Blind          bool
+	Inverse        bool
 	pendingSpecial []Special
 	pendingGarbage int
 	random         *rand.Rand
@@ -111,6 +113,14 @@ func (g *Game) Spawn() {
 	}
 }
 
+// MoveInput applies player-directed horizontal movement, including effects.
+func (g *Game) MoveInput(dx int) bool {
+	if g.Inverse {
+		dx = -dx
+	}
+	return g.Move(dx)
+}
+
 func (g *Game) Move(dx int) bool {
 	if g.GameOver {
 		return false
@@ -123,6 +133,14 @@ func (g *Game) Move(dx int) bool {
 	g.Active = candidate
 	g.resetLockDelayIfAirborne()
 	return true
+}
+
+// RotateInput applies player-directed rotation, including effects.
+func (g *Game) RotateInput(direction int) bool {
+	if g.Inverse {
+		direction = -direction
+	}
+	return g.Rotate(direction)
 }
 
 func (g *Game) Rotate(direction int) bool {
@@ -318,11 +336,13 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(3) {
+	switch g.random.IntN(4) {
 	case 1:
 		special = SpecialClear
 	case 2:
 		special = SpecialBlind
+	case 3:
+		special = SpecialInverse
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -340,8 +360,8 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind:
-		g.pendingSpecial = append(g.pendingSpecial, SpecialBlind)
+	case SpecialBlind, SpecialInverse:
+		g.pendingSpecial = append(g.pendingSpecial, special)
 	}
 }
 
@@ -359,17 +379,25 @@ func (g *Game) ConsumeSpecials() []Special {
 }
 
 func (g *Game) ApplySpecial(special Special) {
-	if special == SpecialBlind {
+	switch special {
+	case SpecialBlind:
 		g.Blind = true
+	case SpecialInverse:
+		g.Inverse = true
 	}
 }
 
+func (g *Game) HasNegativeEffect() bool {
+	return g.Blind || g.Inverse
+}
+
 func (g *Game) UseAntidote() bool {
-	if g.Antidotes == 0 || !g.Blind {
+	if g.Antidotes == 0 || !g.HasNegativeEffect() {
 		return false
 	}
 	g.Antidotes--
 	g.Blind = false
+	g.Inverse = false
 	return true
 }
 

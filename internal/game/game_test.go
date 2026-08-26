@@ -162,6 +162,29 @@ func TestBlindSpecialQueuesTargetEffect(t *testing.T) {
 	}
 }
 
+func TestInverseReversesPlayerMovementAndRotation(t *testing.T) {
+	g := New(16)
+	g.ApplySpecial(SpecialInverse)
+	startX := g.Active.X
+	if !g.MoveInput(-1) || g.Active.X != startX+1 {
+		t.Fatalf("inverse left moved x from %d to %d", startX, g.Active.X)
+	}
+	startRotation := g.Active.Rotation
+	if !g.RotateInput(1) || g.Active.Rotation != (startRotation+3)%4 {
+		t.Fatalf("inverse CW rotation = %d", g.Active.Rotation)
+	}
+}
+
+func TestAntidoteClearsAllNegativeEffects(t *testing.T) {
+	g := New(17)
+	g.ApplySpecial(SpecialBlind)
+	g.ApplySpecial(SpecialInverse)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.Blind || g.Inverse || g.Antidotes != 0 {
+		t.Fatalf("blind=%v inverse=%v antidotes=%d", g.Blind, g.Inverse, g.Antidotes)
+	}
+}
+
 func TestAntidoteClearsBlindEffect(t *testing.T) {
 	g := New(14)
 	g.ApplySpecial(SpecialBlind)

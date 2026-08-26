@@ -190,10 +190,10 @@ func (g *Game) updatePlay() {
 	}
 	if keyboardPlayer := g.playerForDevice(lobby.DeviceKeyboard); keyboardPlayer != nil {
 		if inpututil.IsKeyJustPressed(ebiten.KeyLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			keyboardPlayer.Move(-1)
+			keyboardPlayer.MoveInput(-1)
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-			keyboardPlayer.Move(1)
+			keyboardPlayer.MoveInput(1)
 		}
 		if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 			if ebiten.Tick()%2 == 0 {
@@ -201,10 +201,10 @@ func (g *Game) updatePlay() {
 			}
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-			keyboardPlayer.Rotate(-1)
+			keyboardPlayer.RotateInput(-1)
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
-			keyboardPlayer.Rotate(1)
+			keyboardPlayer.RotateInput(1)
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			keyboardPlayer.HardDrop()
@@ -290,10 +290,10 @@ func (g *Game) updateGamepads() {
 			held[action] = ticks + 1
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightLeft) {
-			g.players[playerIndex].Rotate(-1)
+			g.players[playerIndex].RotateInput(-1)
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
-			g.players[playerIndex].Rotate(1)
+			g.players[playerIndex].RotateInput(1)
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			g.players[playerIndex].HardDrop()
@@ -336,15 +336,15 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 func apply(game *core.Game, action action) {
 	switch action {
 	case actionLeft:
-		game.Move(-1)
+		game.MoveInput(-1)
 	case actionRight:
-		game.Move(1)
+		game.MoveInput(1)
 	case actionDown:
 		game.StepDown()
 	case actionCCW:
-		game.Rotate(-1)
+		game.RotateInput(-1)
 	case actionCW:
-		game.Rotate(1)
+		game.RotateInput(1)
 	case actionDrop:
 		game.HardDrop()
 	case actionAnti:
@@ -496,10 +496,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	}
 	drawText(screen, stored, g.face(22), 1020, 180, white)
 	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
-	effects := "None"
-	if game.Blind {
-		effects = "Blind"
-	}
+	effects := effectLabel(game)
 	drawText(screen, effects, g.face(22), 1020, 242, white)
 
 	pause := pauseButton()
@@ -565,12 +562,14 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 			target = fmt.Sprintf("P%d", targetIndex+1)
 		}
 		drawText(screen, target, g.face(20), float64(hudX), 210, white)
-		drawText(screen, "STORED", g.face(14), float64(hudX), 260, muted)
+		drawText(screen, "EFFECTS", g.face(13), float64(hudX), 245, muted)
+		drawText(screen, effectLabel(game), g.face(13), float64(hudX), 264, white)
+		drawText(screen, "STORED", g.face(14), float64(hudX), 300, muted)
 		stored := "—"
 		if game.Antidotes > 0 {
 			stored = fmt.Sprintf("A × %d", game.Antidotes)
 		}
-		drawText(screen, stored, g.face(17), float64(hudX), 285, white)
+		drawText(screen, stored, g.face(17), float64(hudX), 323, white)
 		if game.GameOver {
 			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
 		}
@@ -646,6 +645,19 @@ func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTex
 	}
 }
 
+func effectLabel(game *core.Game) string {
+	switch {
+	case game.Blind && game.Inverse:
+		return "Blind · Inverse"
+	case game.Blind:
+		return "Blind"
+	case game.Inverse:
+		return "Inverse"
+	default:
+		return "None"
+	}
+}
+
 func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, face *text.GoTextFace) {
 	label := ""
 	switch special {
@@ -655,6 +667,8 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "C"
 	case core.SpecialBlind:
 		label = "B"
+	case core.SpecialInverse:
+		label = "I"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
