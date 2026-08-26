@@ -66,6 +66,15 @@ func TestHardDropBypassesLockDelay(t *testing.T) {
 	}
 }
 
+func TestGravitySpeedsUpWithLevel(t *testing.T) {
+	g := New(5)
+	initial := g.GravityTicks()
+	g.Lines = 5
+	if g.GravityTicks() >= initial {
+		t.Fatalf("level 1 gravity = %d, initial = %d", g.GravityTicks(), initial)
+	}
+}
+
 func TestFullLineClearsAndScores(t *testing.T) {
 	g := New(2)
 	for x := 0; x < BoardWidth; x++ {

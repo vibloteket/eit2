@@ -165,10 +165,23 @@ func (g *Game) Tick() {
 		g.lockTick = 0
 	}
 	g.fallTick++
-	if g.fallTick >= 30 {
+	if g.fallTick >= g.GravityTicks() {
 		g.StepDown()
 		g.fallTick = 0
 	}
+}
+
+func (g *Game) GravityTicks() int {
+	// Original Eit starts around 500 ms and speeds up by a factor of 1.07 per
+	// level. Ebitengine updates at 60 ticks/second.
+	ticks := 30
+	for level := 0; level < g.Lines/5; level++ {
+		ticks = ticks * 100 / 107
+	}
+	if ticks < 3 {
+		return 3
+	}
+	return ticks
 }
 
 func (g *Game) grounded() bool {

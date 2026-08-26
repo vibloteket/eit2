@@ -17,6 +17,8 @@ This initial technical spike proves the project structure and its first targets:
 - a first playable solo falling-block core with movement, rotation, gravity,
   soft/hard drop, a short lock delay, line clearing and scoring;
 - multi-touch controls with hold/repeat and visual pressed feedback;
+- pause/resume, restart, lobby return and a usable game-over flow;
+- level-based gravity following the original Eit acceleration;
 - independent random piece selection, retaining the original game's possibility
   of lucky and unlucky streaks.
 

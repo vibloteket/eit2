@@ -74,6 +74,7 @@ type Game struct {
 	fontSource  *text.GoTextFaceSource
 	view        view
 	players     []*core.Game
+	paused      bool
 	touchDevice lobby.Device
 }
 
@@ -136,19 +137,56 @@ func (g *Game) start() {
 	for i := range g.players {
 		g.players[i] = core.New(uint64(i + 1))
 	}
+	g.paused = false
+	clear(g.heldActions)
 	g.view = viewPlay
+}
+
+func (g *Game) restart() {
+	g.start()
+}
+
+func (g *Game) backToLobby() {
+	g.paused = false
+	clear(g.heldActions)
+	g.view = viewLobby
 }
 
 func (g *Game) updatePlay() {
 	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		g.view = viewLobby
+		g.backToLobby()
 		return
 	}
 	if len(g.players) == 0 {
 		return
 	}
 	player := g.players[0]
+	for _, id := range g.pressedIDs {
+		x, y := ebiten.TouchPosition(id)
+		if pauseButton().contains(x, y) {
+			g.paused = !g.paused
+			clear(g.heldActions)
+			return
+		}
+		if g.paused || player.GameOver {
+			if restartButton().contains(x, y) {
+				g.restart()
+				return
+			}
+			if lobbyButton().contains(x, y) {
+				g.backToLobby()
+				return
+			}
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		g.paused = !g.paused
+		clear(g.heldActions)
+	}
+	if g.paused || player.GameOver {
+		return
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
 		player.Move(-1)
 	}
@@ -218,7 +256,10 @@ func apply(game *core.Game, action action) {
 	}
 }
 
-func startButton() imageRect { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
+func startButton() imageRect   { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
+func pauseButton() imageRect   { return imageRect{X: 790, Y: 30, W: 160, H: 62} }
+func restartButton() imageRect { return imageRect{X: 455, Y: 340, W: 180, H: 72} }
+func lobbyButton() imageRect   { return imageRect{X: 650, Y: 340, W: 180, H: 72} }
 
 func touchButtons() []button {
 	return []button{
@@ -339,9 +380,16 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	drawText(screen, "—", g.face(30), 1020, 180, white)
 	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
 	drawText(screen, "None", g.face(22), 1020, 242, white)
-	if game.GameOver {
-		drawCenteredText(screen, "GAME OVER", g.face(54), logicalWidth/2, 275, white)
+
+	pause := pauseButton()
+	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)
+	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), 4, accent)
+	pauseLabel := "PAUSE"
+	if g.paused {
+		pauseLabel = "RESUME"
 	}
+	drawCenteredText(screen, pauseLabel, g.face(20), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
+
 	for _, control := range touchButtons() {
 		r := control.Rect
 		fill := panel
@@ -351,6 +399,21 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), fill)
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), 4, accent)
 		drawControlIcon(screen, control, g.face(22), fill)
+	}
+
+	if g.paused || game.GameOver {
+		ebitenutil.DrawRect(screen, 385, 235, 510, 230, color.RGBA{R: 8, G: 12, B: 20, A: 238})
+		title := "PAUSED"
+		if game.GameOver {
+			title = "GAME OVER"
+		}
+		drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
+		restart := restartButton()
+		back := lobbyButton()
+		ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), accent)
+		ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), panel)
+		drawCenteredText(screen, "RESTART", g.face(20), float64(restart.X+restart.W/2), float64(restart.Y+22), background)
+		drawCenteredText(screen, "LOBBY", g.face(20), float64(back.X+back.W/2), float64(back.Y+22), white)
 	}
 }
 
