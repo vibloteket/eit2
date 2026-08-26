@@ -14,6 +14,7 @@ import (
 	"github.com/vibloteket/eit2/internal/controls"
 	core "github.com/vibloteket/eit2/internal/game"
 	"github.com/vibloteket/eit2/internal/lobby"
+	matchcore "github.com/vibloteket/eit2/internal/match"
 )
 
 const (
@@ -75,6 +76,7 @@ type Game struct {
 	fontSource  *text.GoTextFaceSource
 	view        view
 	players     []*core.Game
+	match       *matchcore.Match
 	paused      bool
 	touchDevice lobby.Device
 }
@@ -135,10 +137,8 @@ func (g *Game) updateLobby() {
 }
 
 func (g *Game) start() {
-	g.players = make([]*core.Game, len(g.Lobby.Slots))
-	for i := range g.players {
-		g.players[i] = core.New(uint64(i + 1))
-	}
+	g.match = matchcore.New(len(g.Lobby.Slots))
+	g.players = g.match.Players
 	g.paused = false
 	clear(g.heldActions)
 	clear(g.padHeld)
@@ -167,15 +167,16 @@ func (g *Game) updatePlay() {
 	player := g.players[0]
 	g.updateGamepads()
 	soloGameOver := len(g.players) == 1 && player.GameOver
+	matchOver := g.match != nil && g.match.Over
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if g.handlePlayMenuPointer(x, y, soloGameOver) {
+		if g.handlePlayMenuPointer(x, y, soloGameOver || matchOver) {
 			return
 		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if g.handlePlayMenuPointer(x, y, soloGameOver) {
+		if g.handlePlayMenuPointer(x, y, soloGameOver || matchOver) {
 			return
 		}
 	}
@@ -183,7 +184,7 @@ func (g *Game) updatePlay() {
 		g.paused = !g.paused
 		clear(g.heldActions)
 	}
-	if g.paused || soloGameOver {
+	if g.paused || soloGameOver || matchOver {
 		return
 	}
 	if keyboardPlayer := g.playerForDevice(lobby.DeviceKeyboard); keyboardPlayer != nil {
@@ -241,9 +242,7 @@ func (g *Game) updatePlay() {
 			}
 		}
 	}
-	for _, current := range g.players {
-		current.Tick()
-	}
+	g.match.Tick()
 }
 
 func (g *Game) playerForDevice(kind lobby.DeviceKind) *core.Game {
@@ -294,6 +293,9 @@ func (g *Game) updateGamepads() {
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			g.players[playerIndex].HardDrop()
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopRight) {
+			g.match.CycleTarget(playerIndex)
 		}
 	}
 }
@@ -530,11 +532,20 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 			drawCell(screen, hudX+point.X*14, 102+point.Y*14, 14, game.NextKind+1)
 		}
 		drawText(screen, "TARGET", g.face(14), float64(hudX), 185, muted)
-		drawText(screen, "—", g.face(20), float64(hudX), 210, white)
+		target := "—"
+		if targetIndex := g.match.Target(i); targetIndex >= 0 {
+			target = fmt.Sprintf("P%d", targetIndex+1)
+		}
+		drawText(screen, target, g.face(20), float64(hudX), 210, white)
 		drawText(screen, "STORED", g.face(14), float64(hudX), 260, muted)
 		drawText(screen, "—", g.face(20), float64(hudX), 285, white)
 		if game.GameOver {
 			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
+		}
+		for attacker := range g.players {
+			if g.match.Target(attacker) == i {
+				ebitenutil.DrawRect(screen, float64(boardX-6), float64(boardY-6), float64(boardW+12), 4, pieceColors[attacker%7+1])
+			}
 		}
 	}
 	pause := pauseButton()
@@ -544,16 +555,19 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 
 func (g *Game) drawMatchOverlay(screen *ebiten.Image) {
 	gameOver := len(g.players) == 1 && g.players[0].GameOver
-	if !g.paused && !gameOver {
+	matchOver := g.match != nil && g.match.Over
+	if !g.paused && !gameOver && !matchOver {
 		return
 	}
 	ebitenutil.DrawRect(screen, 385, 235, 510, 230, color.RGBA{R: 8, G: 12, B: 20, A: 238})
 	title := "PAUSED"
 	if gameOver {
 		title = "GAME OVER"
+	} else if matchOver && g.match.Winner >= 0 {
+		title = fmt.Sprintf("PLAYER %d WINS", g.match.Winner+1)
 	}
 	drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
-	restart, back := menuButtons(gameOver)
+	restart, back := menuButtons(gameOver || matchOver)
 	if g.paused {
 		resume := resumeButton()
 		ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
