@@ -172,9 +172,9 @@ func (g *Game) Tick() {
 }
 
 func (g *Game) GravityTicks() int {
-	// Original Eit starts around 500 ms and speeds up by a factor of 1.07 per
-	// level. Ebitengine updates at 60 ticks/second.
-	ticks := 30
+	// Start at a relaxed 750 ms for level 0, then keep the original Eit
+	// acceleration factor of 1.07 per level. Ebitengine updates at 60 Hz.
+	ticks := 45
 	for level := 0; level < g.Lines/5; level++ {
 		ticks = ticks * 100 / 107
 	}

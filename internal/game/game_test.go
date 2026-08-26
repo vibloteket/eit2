@@ -69,6 +69,9 @@ func TestHardDropBypassesLockDelay(t *testing.T) {
 func TestGravitySpeedsUpWithLevel(t *testing.T) {
 	g := New(5)
 	initial := g.GravityTicks()
+	if initial != 45 {
+		t.Fatalf("level 0 gravity = %d, wanted 45 ticks", initial)
+	}
 	g.Lines = 5
 	if g.GravityTicks() >= initial {
 		t.Fatalf("level 1 gravity = %d, initial = %d", g.GravityTicks(), initial)
