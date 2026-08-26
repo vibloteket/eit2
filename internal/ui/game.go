@@ -11,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"golang.org/x/image/font/gofont/goregular"
 
+	"github.com/vibloteket/eit2/internal/controls"
 	core "github.com/vibloteket/eit2/internal/game"
 	"github.com/vibloteket/eit2/internal/lobby"
 )
@@ -41,15 +42,15 @@ const (
 	viewPlay
 )
 
-type action int
+type action = controls.Action
 
 const (
-	actionLeft action = iota
-	actionRight
-	actionDown
-	actionCCW
-	actionCW
-	actionDrop
+	actionLeft  = controls.Left
+	actionRight = controls.Right
+	actionDown  = controls.Down
+	actionCCW   = controls.RotateCCW
+	actionCW    = controls.RotateCW
+	actionDrop  = controls.HardDrop
 )
 
 type button struct {
@@ -69,6 +70,7 @@ type Game struct {
 	gamepadIDs  []ebiten.GamepadID
 	touchIDs    []ebiten.TouchID
 	pressedIDs  []ebiten.TouchID
+	heldActions map[action]int
 	fontSource  *text.GoTextFaceSource
 	view        view
 	players     []*core.Game
@@ -82,6 +84,7 @@ func NewGame() *Game {
 	}
 	return &Game{
 		fontSource:  fontSource,
+		heldActions: make(map[action]int),
 		touchDevice: lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
 }
@@ -137,6 +140,7 @@ func (g *Game) start() {
 }
 
 func (g *Game) updatePlay() {
+	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.view = viewLobby
 		return
@@ -151,8 +155,10 @@ func (g *Game) updatePlay() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		player.Move(1)
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		player.StepDown()
+	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
+		if ebiten.Tick()%2 == 0 {
+			player.StepDown()
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 		player.Rotate(-1)
@@ -163,13 +169,26 @@ func (g *Game) updatePlay() {
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		player.HardDrop()
 	}
-	for _, id := range g.pressedIDs {
+	activeActions := make(map[action]bool)
+	for _, id := range g.touchIDs {
 		x, y := ebiten.TouchPosition(id)
 		for _, control := range touchButtons() {
 			if control.Rect.contains(x, y) {
-				apply(player, control.Do)
+				activeActions[control.Do] = true
 			}
 		}
+	}
+	for action := range g.heldActions {
+		if !activeActions[action] {
+			delete(g.heldActions, action)
+		}
+	}
+	for action := range activeActions {
+		ticks := g.heldActions[action]
+		if controls.ShouldRepeat(action, ticks) {
+			apply(player, action)
+		}
+		g.heldActions[action] = ticks + 1
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
@@ -325,13 +344,17 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	}
 	for _, control := range touchButtons() {
 		r := control.Rect
-		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), panel)
+		fill := panel
+		if g.heldActions[control.Do] > 0 {
+			fill = color.RGBA{R: 35, G: 73, B: 76, A: 255}
+		}
+		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), fill)
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), 4, accent)
-		drawControlIcon(screen, control, g.face(22))
+		drawControlIcon(screen, control, g.face(22), fill)
 	}
 }
 
-func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTextFace) {
+func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTextFace, fill color.RGBA) {
 	r := control.Rect
 	cx, cy := float64(r.X+r.W/2), float64(r.Y+r.H/2)
 	switch control.Do {
@@ -351,7 +374,7 @@ func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTex
 		// A blocky circular arrow avoids relying on a font glyph that might be
 		// absent on mobile browsers.
 		ebitenutil.DrawCircle(screen, cx, cy, 28, white)
-		ebitenutil.DrawCircle(screen, cx, cy, 19, panel)
+		ebitenutil.DrawCircle(screen, cx, cy, 19, fill)
 		if control.Do == actionCCW {
 			ebitenutil.DrawLine(screen, cx-35, cy-22, cx-10, cy-28, white)
 			ebitenutil.DrawLine(screen, cx-35, cy-22, cx-26, cy+2, white)

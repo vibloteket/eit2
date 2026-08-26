@@ -15,8 +15,10 @@ This initial technical spike proves the project structure and its first targets:
 - a 16:9 lobby showing four player slots and allowing solo play;
 - keyboard, standard gamepad and touch join input;
 - a first playable solo falling-block core with movement, rotation, gravity,
-  hard drop, line clearing and scoring;
-- large touch controls for mobile testing.
+  soft/hard drop, a short lock delay, line clearing and scoring;
+- multi-touch controls with hold/repeat and visual pressed feedback;
+- independent random piece selection, retaining the original game's possibility
+  of lucky and unlucky streaks.
 
 Multiplayer interaction and special blocks are not implemented yet. Android is
 deliberately deferred; native Linux and web are the active targets.

@@ -33,6 +33,39 @@ func TestHardDropLocksPieceAndSpawnsNext(t *testing.T) {
 	}
 }
 
+func TestGroundedPieceWaitsForLockDelay(t *testing.T) {
+	g := New(3)
+	for g.StepDown() {
+	}
+	landed := g.Active
+	for range LockDelayTicks - 1 {
+		g.Tick()
+	}
+	if g.Active != landed {
+		t.Fatal("piece locked before lock delay elapsed")
+	}
+	g.Tick()
+	if g.Active == landed {
+		t.Fatal("piece did not lock after lock delay")
+	}
+}
+
+func TestHardDropBypassesLockDelay(t *testing.T) {
+	g := New(4)
+	g.HardDrop()
+	occupied := 0
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 4 {
+		t.Fatalf("occupied after hard drop = %d", occupied)
+	}
+}
+
 func TestFullLineClearsAndScores(t *testing.T) {
 	g := New(2)
 	for x := 0; x < BoardWidth; x++ {

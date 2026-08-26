@@ -5,8 +5,9 @@ package game
 import "math/rand/v2"
 
 const (
-	BoardWidth  = 10
-	BoardHeight = 22
+	BoardWidth     = 10
+	BoardHeight    = 22
+	LockDelayTicks = 24 // 0.4 seconds at 60 updates/second
 )
 
 type Point struct{ X, Y int }
@@ -50,6 +51,7 @@ type Game struct {
 	GameOver bool
 	random   *rand.Rand
 	fallTick int
+	lockTick int
 }
 
 func New(seed uint64) *Game {
@@ -104,6 +106,7 @@ func (g *Game) Move(dx int) bool {
 		return false
 	}
 	g.Active = candidate
+	g.resetLockDelayIfAirborne()
 	return true
 }
 
@@ -118,6 +121,7 @@ func (g *Game) Rotate(direction int) bool {
 		kicked.X += kick
 		if g.valid(kicked) {
 			g.Active = kicked
+			g.resetLockDelayIfAirborne()
 			return true
 		}
 	}
@@ -132,20 +136,33 @@ func (g *Game) StepDown() bool {
 	candidate.Y++
 	if g.valid(candidate) {
 		g.Active = candidate
+		g.lockTick = 0
 		return true
 	}
-	g.lock()
 	return false
 }
 
 func (g *Game) HardDrop() {
+	if g.GameOver {
+		return
+	}
 	for g.StepDown() {
 	}
+	g.lock()
 }
 
 func (g *Game) Tick() {
 	if g.GameOver {
 		return
+	}
+	if g.grounded() {
+		g.lockTick++
+		if g.lockTick >= LockDelayTicks {
+			g.lock()
+			return
+		}
+	} else {
+		g.lockTick = 0
 	}
 	g.fallTick++
 	if g.fallTick >= 30 {
@@ -154,7 +171,21 @@ func (g *Game) Tick() {
 	}
 }
 
+func (g *Game) grounded() bool {
+	candidate := g.Active
+	candidate.Y++
+	return !g.valid(candidate)
+}
+
+func (g *Game) resetLockDelayIfAirborne() {
+	if !g.grounded() {
+		g.lockTick = 0
+	}
+}
+
 func (g *Game) lock() {
+	g.lockTick = 0
+	g.fallTick = 0
 	for _, cell := range g.Cells(g.Active) {
 		if cell.Y < 0 {
 			g.GameOver = true
