@@ -11,14 +11,22 @@ type Match struct {
 	Winner  int // -1 while there is no winner
 }
 
+// New creates a deterministic match for tests and recorded scenarios.
 func New(playerCount int) *Match {
+	return NewSeeded(playerCount, 1)
+}
+
+// NewSeeded creates a reproducible match while giving every player a distinct
+// random stream derived from the match seed.
+func NewSeeded(playerCount int, seed uint64) *Match {
 	m := &Match{
 		Players: make([]*core.Game, playerCount),
 		Targets: make([]int, playerCount),
 		Winner:  -1,
 	}
 	for i := range m.Players {
-		m.Players[i] = core.New(uint64(i + 1))
+		playerSeed := seed + uint64(i)*0x9e3779b97f4a7c15
+		m.Players[i] = core.New(playerSeed)
 	}
 	for i := range m.Targets {
 		m.Targets[i] = m.nextAlive(i, i)

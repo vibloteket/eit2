@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -139,7 +140,7 @@ func (g *Game) updateLobby() {
 }
 
 func (g *Game) start() {
-	g.match = matchcore.New(len(g.Lobby.Slots))
+	g.match = matchcore.NewSeeded(len(g.Lobby.Slots), uint64(time.Now().UnixNano()))
 	g.players = g.match.Players
 	g.paused = false
 	clear(g.heldActions)

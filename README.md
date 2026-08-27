@@ -25,7 +25,9 @@ This initial technical spike proves the project structure and its first targets:
 - pause/resume, restart, lobby return and a usable game-over flow;
 - level-based gravity following the original Eit acceleration;
 - independent random piece selection, retaining the original game's possibility
-  of lucky and unlucky streaks.
+  of lucky and unlucky streaks;
+- a fresh production seed for every match, while tests and recorded scenarios
+  keep explicit reproducible seeds.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.

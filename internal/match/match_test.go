@@ -6,6 +6,29 @@ import (
 	"github.com/vibloteket/eit2/internal/game"
 )
 
+func TestSeededMatchesAreReproducible(t *testing.T) {
+	a := NewSeeded(2, 12345)
+	b := NewSeeded(2, 12345)
+	for i := range a.Players {
+		if a.Players[i].Active.Kind != b.Players[i].Active.Kind || a.Players[i].NextKind != b.Players[i].NextKind {
+			t.Fatalf("player %d seeded state differs", i)
+		}
+	}
+}
+
+func TestPlayersUseDistinctRandomStreams(t *testing.T) {
+	m := NewSeeded(4, 99)
+	same := true
+	for i := 1; i < len(m.Players); i++ {
+		if m.Players[i].Active.Kind != m.Players[0].Active.Kind || m.Players[i].NextKind != m.Players[0].NextKind {
+			same = false
+		}
+	}
+	if same {
+		t.Fatal("all players started with the same random stream")
+	}
+}
+
 func TestInitialTargetsPointToNextPlayer(t *testing.T) {
 	m := New(4)
 	want := []int{1, 2, 3, 0}
