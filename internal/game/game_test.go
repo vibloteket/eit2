@@ -488,6 +488,36 @@ func TestRingBuildsHollowPatternBottomUp(t *testing.T) {
 	}
 }
 
+func TestBlinkAlternatesActivePieceVisibility(t *testing.T) {
+	g := New(35)
+	g.ApplySpecial(SpecialBlink)
+	if !g.Blink || !g.BlinkVisible {
+		t.Fatal("blink did not start visible")
+	}
+	for range 6 {
+		g.Tick()
+	}
+	if g.BlinkVisible {
+		t.Fatal("blink did not hide after six ticks")
+	}
+	for range 6 {
+		g.Tick()
+	}
+	if !g.BlinkVisible {
+		t.Fatal("blink did not become visible again")
+	}
+}
+
+func TestMiniAndBlinkAreClearedByAntidote(t *testing.T) {
+	g := New(36)
+	g.ApplySpecial(SpecialMini)
+	g.ApplySpecial(SpecialBlink)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.Mini || g.Blink {
+		t.Fatalf("mini=%v blink=%v", g.Mini, g.Blink)
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

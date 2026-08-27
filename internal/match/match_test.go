@@ -185,6 +185,19 @@ func TestRingRoutesToTarget(t *testing.T) {
 	}
 }
 
+func TestMiniAndBlinkRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialMini)
+	m.Players[0].QueueSpecial(game.SpecialBlink)
+	m.routeSpecials()
+	if !m.Players[1].Mini || !m.Players[1].Blink {
+		t.Fatal("selected target did not receive Mini and Blink")
+	}
+	if m.Players[0].Mini || m.Players[0].Blink {
+		t.Fatal("attacker received its own Mini or Blink")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

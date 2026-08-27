@@ -30,6 +30,8 @@ const (
 	SpecialSwitch   // Swaps placed structures with the selected target.
 	SpecialPacket   // Sends one garbage row per cleared row for 20 seconds.
 	SpecialRing     // Builds a hollow ring on the selected target.
+	SpecialMini     // Renders the selected target's settled blocks smaller.
+	SpecialBlink    // Makes the selected target's active piece blink.
 )
 
 type patternCell struct {
@@ -86,6 +88,10 @@ type Game struct {
 	FasterStacks         int
 	SlowerBonus          int
 	PacketTicks          int
+	Mini                 bool
+	Blink                bool
+	BlinkVisible         bool
+	blinkTick            int
 	pendingSpecial       []Special
 	pendingGarbage       int
 	random               *rand.Rand
@@ -217,6 +223,16 @@ func (g *Game) Tick() {
 	g.advancePattern()
 	if g.PacketTicks > 0 {
 		g.PacketTicks--
+	}
+	if g.Blink {
+		g.blinkTick++
+		if g.blinkTick >= 6 {
+			g.BlinkVisible = !g.BlinkVisible
+			g.blinkTick = 0
+		}
+	} else {
+		g.BlinkVisible = true
+		g.blinkTick = 0
 	}
 	if g.grounded() {
 		g.lockTick++
@@ -374,7 +390,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(14) {
+	switch g.random.IntN(16) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -401,6 +417,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialPacket
 	case 13:
 		special = SpecialRing
+	case 14:
+		special = SpecialMini
+	case 15:
+		special = SpecialBlink
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 	seconds := 18 + len(occupied)/10
@@ -428,7 +448,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing, SpecialMini, SpecialBlink:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -471,6 +491,11 @@ func (g *Game) ApplySpecial(special Special) {
 		g.FlipBoard()
 	case SpecialRing:
 		g.addRing()
+	case SpecialMini:
+		g.Mini = true
+	case SpecialBlink:
+		g.Blink = true
+		g.BlinkVisible = true
 	}
 }
 
@@ -627,7 +652,7 @@ func (g *Game) removeRandomHalf() {
 }
 
 func (g *Game) HasActiveEffect() bool {
-	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0
+	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0 || g.Mini || g.Blink
 }
 
 func (g *Game) UseAntidote() bool {
@@ -640,6 +665,10 @@ func (g *Game) UseAntidote() bool {
 	g.FasterStacks = 0
 	g.SlowerBonus = 0
 	g.PacketTicks = 0
+	g.Mini = false
+	g.Blink = false
+	g.BlinkVisible = true
+	g.blinkTick = 0
 	return true
 }
 

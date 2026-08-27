@@ -42,8 +42,9 @@ the target, Turtle/Slower slows the collector, Bridge adds two disruption rows,
 Question removes half of the target's placed blocks, Stair builds a diagonal,
 Fill packs the target's lower ten rows, Flip vertically reverses the target's
 settled structure, Switch exchanges settled structures, Packet sends one row
-per line cleared for 20 seconds, and Ring builds a hollow ring on the target.
-Pattern attacks animate from the bottom upward; they never overwrite the active piece, which instead settles on
+per line cleared for 20 seconds, Ring builds a hollow ring, Mini shrinks settled
+blocks visually, and Blink flashes the active piece. Pattern attacks animate
+from the bottom upward; they never overwrite the active piece, which instead settles on
 the newly created structure using normal lock delay. One Antidote clears all active
 effects, including helpful Slower stacks, making its
 use a tactical trade-off. Solo mode targets Self for special effects so every

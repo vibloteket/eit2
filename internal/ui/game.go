@@ -468,14 +468,16 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	for y, row := range game.Board {
 		for x, value := range row {
 			if value != 0 {
-				drawCell(screen, boardX+x*cell, boardY+y*cell, cell, value)
+				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini)
 				drawSpecial(screen, boardX+x*cell, boardY+y*cell, cell, game.Specials[y][x], g.face(float64(cell-5)))
 			}
 		}
 	}
-	for _, point := range game.Cells(game.Active) {
-		if point.Y >= 0 {
-			drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
+	if !game.Blink || game.BlinkVisible {
+		for _, point := range game.Cells(game.Active) {
+			if point.Y >= 0 {
+				drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
+			}
 		}
 	}
 	drawText(screen, "PLAYER 1", g.face(27), 45, 48, white)
@@ -542,14 +544,16 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		for y, row := range game.Board {
 			for bx, value := range row {
 				if value != 0 {
-					drawCell(screen, boardX+bx*cell, boardY+y*cell, cell, value)
+					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini)
 					drawSpecial(screen, boardX+bx*cell, boardY+y*cell, cell, game.Specials[y][bx], g.face(float64(cell-4)))
 				}
 			}
 		}
-		for _, point := range game.Cells(game.Active) {
-			if point.Y >= 0 {
-				drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
+		if !game.Blink || game.BlinkVisible {
+			for _, point := range game.Cells(game.Active) {
+				if point.Y >= 0 {
+					drawCell(screen, boardX+point.X*cell, boardY+point.Y*cell, cell, game.Active.Kind+1)
+				}
 			}
 		}
 		hudX := boardX + boardW + 12
@@ -673,6 +677,12 @@ func effectLabel(game *core.Game) string {
 	if game.PacketTicks > 0 {
 		appendEffect("Packet")
 	}
+	if game.Mini {
+		appendEffect("Mini")
+	}
+	if game.Blink {
+		appendEffect("Blink")
+	}
 	if label == "" {
 		return "None"
 	}
@@ -710,10 +720,25 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "P"
 	case core.SpecialRing:
 		label = "R"
+	case core.SpecialMini:
+		label = "M"
+	case core.SpecialBlink:
+		label = "BK"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
 	}
+}
+
+func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini bool) {
+	if mini {
+		miniSize := max(4, size*2/5)
+		x += (size - miniSize) / 2
+		y += (size - miniSize) / 2
+		drawCell(screen, x, y, miniSize, value)
+		return
+	}
+	drawCell(screen, x, y, size, value)
 }
 
 func drawCell(screen *ebiten.Image, x, y, size, value int) {
