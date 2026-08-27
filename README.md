@@ -46,8 +46,9 @@ settled structure, Switch exchanges settled structures, Packet sends one row
 per line cleared for 20 seconds, Ring builds a hollow ring, Mini shrinks settled
 blocks visually, Blink flashes the active piece, SZ restricts upcoming pieces
 to S/Z, Trans/Ice makes settled blocks translucent, Castle replaces the board
-with the original castle silhouette, Color/Blackout darkens settled blocks,
-Rumble shakes a selection of settled blocks, and Background changes the target's
+with the original castle silhouette, Color/Blackout darkens the whole playfield
+except for a circular spotlight around the active piece, Rumble shakes a
+selection of settled blocks, and Background changes the target's
 playfield colour. Pattern attacks animate from the bottom upward; they never overwrite the active piece, which instead settles on
 the newly created structure using normal lock delay. One Antidote clears all active
 effects, including helpful Slower stacks, making its

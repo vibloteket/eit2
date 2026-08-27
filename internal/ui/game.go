@@ -10,6 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font/gofont/goregular"
 
 	"github.com/vibloteket/eit2/internal/controls"
@@ -468,7 +469,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	for y, row := range game.Board {
 		for x, value := range row {
 			if value != 0 {
-				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini, game.Trans, game.Blackout)
+				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
 				drawSpecial(screen, boardX+x*cell, boardY+y*cell, cell, game.Specials[y][x], g.face(float64(cell-5)))
 			}
 		}
@@ -480,6 +481,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 			}
 		}
 	}
+	drawBlackout(screen, game, boardX, boardY, boardW, boardH, cell)
 	drawText(screen, "PLAYER 1", g.face(27), 45, 48, white)
 	drawText(screen, fmt.Sprintf("SCORE  %d", game.Score), g.face(25), 45, 88, white)
 	drawText(screen, fmt.Sprintf("LINES  %d", game.Lines), g.face(25), 45, 124, white)
@@ -564,7 +566,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		for y, row := range game.Board {
 			for bx, value := range row {
 				if value != 0 {
-					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini, game.Trans, game.Blackout)
+					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
 					drawSpecial(screen, boardX+bx*cell, boardY+y*cell, cell, game.Specials[y][bx], g.face(float64(cell-4)))
 				}
 			}
@@ -576,6 +578,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 				}
 			}
 		}
+		drawBlackout(screen, game, boardX, boardY, boardW, boardH, cell)
 		hudX := boardX + boardW + 12
 		drawText(screen, "NEXT", g.face(14), float64(hudX), 80, muted)
 		if game.Blind {
@@ -781,7 +784,36 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 	}
 }
 
-func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, translucent, blackout bool) {
+func drawBlackout(screen *ebiten.Image, game *core.Game, boardX, boardY, boardW, boardH, cell int) {
+	if !game.Blackout {
+		return
+	}
+	mask := ebiten.NewImage(boardW, boardH)
+	mask.Fill(color.RGBA{A: 235})
+	cells := game.Cells(game.Active)
+	var centerX, centerY float32
+	visible := 0
+	for _, point := range cells {
+		if point.Y >= 0 {
+			centerX += float32(point.X*cell + cell/2)
+			centerY += float32(point.Y*cell + cell/2)
+			visible++
+		}
+	}
+	if visible > 0 {
+		centerX /= float32(visible)
+		centerY /= float32(visible)
+		op := &ebiten.DrawImageOptions{Blend: ebiten.BlendDestinationOut}
+		spotlight := ebiten.NewImage(boardW, boardH)
+		vector.FillCircle(spotlight, centerX, centerY, float32(cell)*2.8, color.White, true)
+		mask.DrawImage(spotlight, op)
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(boardX), float64(boardY))
+	screen.DrawImage(mask, op)
+}
+
+func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, translucent bool) {
 	if mini {
 		miniSize := max(4, size*2/5)
 		x += (size - miniSize) / 2
@@ -789,9 +821,6 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, transluc
 		size = miniSize
 	}
 	colour := pieceColors[value]
-	if blackout {
-		colour = color.RGBA{R: 16, G: 20, B: 29, A: 255}
-	}
 	if translucent {
 		colour.A = 72
 	}
@@ -799,7 +828,7 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, transluc
 }
 
 func drawCell(screen *ebiten.Image, x, y, size, value int) {
-	drawSettledCell(screen, x, y, size, value, false, false, false)
+	drawSettledCell(screen, x, y, size, value, false, false)
 }
 
 func (g *Game) Layout(_, _ int) (int, int) {
