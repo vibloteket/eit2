@@ -404,18 +404,19 @@ func (g *Game) ApplySpecial(special Special) {
 	}
 }
 
-func (g *Game) HasNegativeEffect() bool {
-	return g.Blind || g.Inverse || g.FasterStacks > 0
+func (g *Game) HasActiveEffect() bool {
+	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0
 }
 
 func (g *Game) UseAntidote() bool {
-	if g.Antidotes == 0 || !g.HasNegativeEffect() {
+	if g.Antidotes == 0 || !g.HasActiveEffect() {
 		return false
 	}
 	g.Antidotes--
 	g.Blind = false
 	g.Inverse = false
 	g.FasterStacks = 0
+	g.SlowerBonus = 0
 	return true
 }
 

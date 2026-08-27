@@ -81,6 +81,10 @@ func TestFasterAndSlowerChangeGravity(t *testing.T) {
 	if g.GravityTicks() != base+1 {
 		t.Fatalf("slower gravity = %d, want %d", g.GravityTicks(), base+1)
 	}
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.SlowerBonus != 0 || g.GravityTicks() != base {
+		t.Fatal("antidote did not remove Slower")
+	}
 }
 
 func TestFasterStacksLikeOriginal(t *testing.T) {
@@ -217,6 +221,17 @@ func TestAntidoteClearsBlindEffect(t *testing.T) {
 	g.Antidotes = 1
 	if !g.UseAntidote() || g.Blind || g.Antidotes != 0 {
 		t.Fatalf("blind=%v antidotes=%d", g.Blind, g.Antidotes)
+	}
+}
+
+func TestAntidoteClearsMixedPositiveAndNegativeEffects(t *testing.T) {
+	g := New(20)
+	g.ApplySpecial(SpecialBlind)
+	g.ApplySpecial(SpecialFaster)
+	g.activateSpecial(SpecialSlower)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.Blind || g.FasterStacks != 0 || g.SlowerBonus != 0 {
+		t.Fatalf("blind=%v faster=%d slower=%d", g.Blind, g.FasterStacks, g.SlowerBonus)
 	}
 }
 
