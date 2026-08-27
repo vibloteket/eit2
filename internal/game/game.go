@@ -307,7 +307,11 @@ func (g *Game) Tick() {
 	}
 	if g.Blink {
 		g.blinkTick++
-		if g.blinkTick >= 6 {
+		phaseTicks := 6 // visible for 0.1 seconds
+		if !g.BlinkVisible {
+			phaseTicks = 18 // hidden for 0.3 seconds
+		}
+		if g.blinkTick >= phaseTicks {
 			g.BlinkVisible = !g.BlinkVisible
 			g.blinkTick = 0
 		}

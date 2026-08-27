@@ -519,11 +519,15 @@ func TestBlinkAlternatesActivePieceVisibility(t *testing.T) {
 	if g.BlinkVisible {
 		t.Fatal("blink did not hide after six ticks")
 	}
-	for range 6 {
+	for range 17 {
 		g.Tick()
 	}
+	if g.BlinkVisible {
+		t.Fatal("blink became visible before the longer hidden phase elapsed")
+	}
+	g.Tick()
 	if !g.BlinkVisible {
-		t.Fatal("blink did not become visible again")
+		t.Fatal("blink did not become visible after 18 hidden ticks")
 	}
 }
 
