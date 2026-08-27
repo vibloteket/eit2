@@ -32,8 +32,10 @@ reverses the target's horizontal movement and rotation, Rabbit/Faster speeds up
 the target, Turtle/Slower slows the collector, Bridge adds two disruption rows
 to the target, and Question removes half of the target's placed blocks. One
 Antidote clears all active effects, including helpful Slower stacks, making its
-use a tactical trade-off. Android is deliberately deferred; native Linux and
-web are the active targets.
+use a tactical trade-off. Solo mode targets Self for special effects so every
+special can be tested, while ordinary four-line garbage attacks remain disabled
+without opponents. Android is deliberately deferred; native Linux and web are
+the active targets.
 
 ## Develop
 

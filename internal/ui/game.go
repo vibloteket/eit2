@@ -489,15 +489,17 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 			drawCell(screen, 1020+point.X*24, 82+point.Y*24, 24, game.NextKind+1)
 		}
 	}
-	drawText(screen, "STORED", g.face(20), 1020, 150, muted)
+	drawText(screen, "TARGET", g.face(20), 1020, 150, muted)
+	drawText(screen, "SELF", g.face(22), 1020, 178, white)
+	drawText(screen, "STORED", g.face(20), 1020, 215, muted)
 	stored := "—"
 	if game.Antidotes > 0 {
 		stored = fmt.Sprintf("Antidote × %d", game.Antidotes)
 	}
-	drawText(screen, stored, g.face(22), 1020, 180, white)
-	drawText(screen, "EFFECTS", g.face(20), 1020, 215, muted)
+	drawText(screen, stored, g.face(22), 1020, 243, white)
+	drawText(screen, "EFFECTS", g.face(20), 1020, 280, muted)
 	effects := effectLabel(game)
-	drawText(screen, effects, g.face(22), 1020, 242, white)
+	drawText(screen, effects, g.face(22), 1020, 307, white)
 
 	pause := pauseButton()
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)

@@ -131,11 +131,39 @@ func TestLastAlivePlayerWins(t *testing.T) {
 	}
 }
 
+func TestSoloTargetsSelfForSpecials(t *testing.T) {
+	m := New(1)
+	if m.Target(0) != 0 {
+		t.Fatalf("solo target = %d, want self", m.Target(0))
+	}
+	m.Players[0].QueueSpecial(game.SpecialBlind)
+	m.routeSpecials()
+	if !m.Players[0].Blind {
+		t.Fatal("solo target special did not hit self")
+	}
+}
+
+func TestSoloGarbageAttackHasNoRecipient(t *testing.T) {
+	m := New(1)
+	m.Players[0].QueueAttack(2)
+	m.routeGarbage()
+	for _, row := range m.Players[0].Board {
+		for _, value := range row {
+			if value != 0 {
+				t.Fatal("solo four-line garbage attacked self")
+			}
+		}
+	}
+}
+
 func TestSoloDoesNotDeclareMultiplayerWinner(t *testing.T) {
 	m := New(1)
 	m.Players[0].GameOver = true
 	m.UpdateStatus()
 	if m.Over || m.Winner != -1 {
 		t.Fatalf("solo match over=%v winner=%d", m.Over, m.Winner)
+	}
+	if m.Target(0) != -1 {
+		t.Fatal("eliminated solo player should have no target")
 	}
 }

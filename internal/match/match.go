@@ -41,7 +41,7 @@ func (m *Match) Tick() {
 func (m *Match) routeGarbage() {
 	for attacker, player := range m.Players {
 		rows := player.ConsumeGarbage()
-		if rows == 0 {
+		if rows == 0 || len(m.Players) == 1 {
 			continue
 		}
 		target := m.Target(attacker)
@@ -55,6 +55,9 @@ func (m *Match) routeSpecials() {
 	for attacker, player := range m.Players {
 		for _, special := range player.ConsumeSpecials() {
 			target := m.Target(attacker)
+			if len(m.Players) == 1 {
+				target = attacker
+			}
 			if target >= 0 && target < len(m.Players) && !m.Players[target].GameOver {
 				m.Players[target].ApplySpecial(special)
 			}
@@ -78,6 +81,9 @@ func (m *Match) Target(player int) int {
 	if player < 0 || player >= len(m.Targets) {
 		return -1
 	}
+	if len(m.Players) == 1 && !m.Players[player].GameOver {
+		return player
+	}
 	return m.Targets[player]
 }
 
@@ -99,6 +105,10 @@ func (m *Match) UpdateStatus() {
 			m.Targets[i] = -1
 			continue
 		}
+		if len(m.Players) == 1 {
+			m.Targets[i] = i
+			continue
+		}
 		target := m.Targets[i]
 		if target < 0 || target >= len(m.Players) || m.Players[target].GameOver || target == i {
 			m.Targets[i] = m.nextAlive(i, i)
@@ -108,6 +118,9 @@ func (m *Match) UpdateStatus() {
 
 func (m *Match) nextAlive(player, after int) int {
 	if len(m.Players) < 2 {
+		if len(m.Players) == 1 && player == 0 && !m.Players[0].GameOver {
+			return 0
+		}
 		return -1
 	}
 	for offset := 1; offset <= len(m.Players); offset++ {
