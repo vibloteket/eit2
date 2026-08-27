@@ -486,6 +486,13 @@ func TestRingBuildsHollowPatternBottomUp(t *testing.T) {
 	if g.Board[11][3] == 0 || g.Board[11][6] == 0 {
 		t.Fatal("ring top missing")
 	}
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 && value != 8 {
+				t.Fatalf("ring contains non-grey value %d", value)
+			}
+		}
+	}
 }
 
 func TestBlinkAlternatesActivePieceVisibility(t *testing.T) {
@@ -565,6 +572,13 @@ func TestCastleClearsBoardAndBuildsBottomUp(t *testing.T) {
 	advanceAllPatternRows(g)
 	if g.Board[11][1] == 0 || g.Board[11][2] == 0 || g.Board[11][4] == 0 || g.Board[11][7] == 0 || g.Board[11][8] == 0 {
 		t.Fatal("castle battlements missing")
+	}
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 && value != 8 {
+				t.Fatalf("castle contains non-grey value %d", value)
+			}
+		}
 	}
 }
 

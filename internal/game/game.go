@@ -94,6 +94,7 @@ const (
 type patternCell struct {
 	X        int
 	Occupied bool
+	Value    int // 0 chooses a random standard colour; 8 is construction grey.
 }
 
 type patternRow struct {
@@ -707,7 +708,7 @@ func (g *Game) addCastle() {
 		}
 		cells := make([]patternCell, 0, BoardWidth)
 		for x := 0; x < BoardWidth; x++ {
-			cells = append(cells, patternCell{X: x, Occupied: occupied[x]})
+			cells = append(cells, patternCell{X: x, Occupied: occupied[x], Value: 8})
 		}
 		rows = append(rows, patternRow{Y: y, Cells: cells})
 	}
@@ -737,7 +738,7 @@ func (g *Game) addRing() {
 		}
 		cells := make([]patternCell, 0, BoardWidth)
 		for x := 0; x < BoardWidth; x++ {
-			cells = append(cells, patternCell{X: x, Occupied: occupied[x]})
+			cells = append(cells, patternCell{X: x, Occupied: occupied[x], Value: 8})
 		}
 		rows = append(rows, patternRow{Y: y, Cells: cells})
 	}
@@ -768,7 +769,11 @@ func (g *Game) advancePattern() {
 		}
 		g.Specials[row.Y][cell.X] = SpecialNone
 		if cell.Occupied {
-			g.Board[row.Y][cell.X] = 1 + g.random.IntN(len(shapes))
+			value := cell.Value
+			if value == 0 {
+				value = 1 + g.random.IntN(len(shapes))
+			}
+			g.Board[row.Y][cell.X] = value
 		} else {
 			g.Board[row.Y][cell.X] = 0
 		}
