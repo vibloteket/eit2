@@ -20,6 +20,8 @@ const (
 	SpecialClear
 	SpecialBlind
 	SpecialInverse
+	SpecialFaster // Rabbit: speeds up the selected target.
+	SpecialSlower // Turtle: slows down the collector.
 )
 
 type Piece struct {
@@ -63,6 +65,8 @@ type Game struct {
 	Antidotes      int
 	Blind          bool
 	Inverse        bool
+	FasterStacks   int
+	SlowerBonus    int
 	pendingSpecial []Special
 	pendingGarbage int
 	random         *rand.Rand
@@ -218,6 +222,10 @@ func (g *Game) GravityTicks() int {
 	for level := 0; level < g.Lines/5; level++ {
 		ticks = ticks * 100 / 107
 	}
+	for range g.FasterStacks {
+		ticks = ticks * 3 / 4
+	}
+	ticks += g.SlowerBonus
 	if ticks < 3 {
 		return 3
 	}
@@ -336,13 +344,17 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(4) {
+	switch g.random.IntN(6) {
 	case 1:
 		special = SpecialClear
 	case 2:
 		special = SpecialBlind
 	case 3:
 		special = SpecialInverse
+	case 4:
+		special = SpecialFaster
+	case 5:
+		special = SpecialSlower
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -360,8 +372,11 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse:
+	case SpecialBlind, SpecialInverse, SpecialFaster:
 		g.pendingSpecial = append(g.pendingSpecial, special)
+	case SpecialSlower:
+		// Original Eit's Turtle is a small permanent slowdown for the collector.
+		g.SlowerBonus++
 	}
 }
 
@@ -384,11 +399,13 @@ func (g *Game) ApplySpecial(special Special) {
 		g.Blind = true
 	case SpecialInverse:
 		g.Inverse = true
+	case SpecialFaster:
+		g.FasterStacks++
 	}
 }
 
 func (g *Game) HasNegativeEffect() bool {
-	return g.Blind || g.Inverse
+	return g.Blind || g.Inverse || g.FasterStacks > 0
 }
 
 func (g *Game) UseAntidote() bool {
@@ -398,6 +415,7 @@ func (g *Game) UseAntidote() bool {
 	g.Antidotes--
 	g.Blind = false
 	g.Inverse = false
+	g.FasterStacks = 0
 	return true
 }
 

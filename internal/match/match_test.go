@@ -74,6 +74,18 @@ func TestSpecialRoutesToSelectedTarget(t *testing.T) {
 	}
 }
 
+func TestFasterRoutesToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialFaster)
+	m.routeSpecials()
+	if m.Players[1].FasterStacks != 1 {
+		t.Fatal("selected target did not receive Faster")
+	}
+	if m.Players[0].FasterStacks != 0 {
+		t.Fatal("attacker received its own Faster")
+	}
+}
+
 func TestLastAlivePlayerWins(t *testing.T) {
 	m := New(3)
 	m.Players[0].GameOver = true

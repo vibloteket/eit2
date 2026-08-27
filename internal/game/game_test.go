@@ -66,6 +66,32 @@ func TestHardDropBypassesLockDelay(t *testing.T) {
 	}
 }
 
+func TestFasterAndSlowerChangeGravity(t *testing.T) {
+	g := New(18)
+	base := g.GravityTicks()
+	g.ApplySpecial(SpecialFaster)
+	if g.GravityTicks() != base*3/4 {
+		t.Fatalf("faster gravity = %d, want %d", g.GravityTicks(), base*3/4)
+	}
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.FasterStacks != 0 || g.GravityTicks() != base {
+		t.Fatal("antidote did not remove Faster")
+	}
+	g.activateSpecial(SpecialSlower)
+	if g.GravityTicks() != base+1 {
+		t.Fatalf("slower gravity = %d, want %d", g.GravityTicks(), base+1)
+	}
+}
+
+func TestFasterStacksLikeOriginal(t *testing.T) {
+	g := New(19)
+	g.ApplySpecial(SpecialFaster)
+	g.ApplySpecial(SpecialFaster)
+	if g.FasterStacks != 2 || g.GravityTicks() != 24 {
+		t.Fatalf("stacks=%d gravity=%d", g.FasterStacks, g.GravityTicks())
+	}
+}
+
 func TestGravitySpeedsUpWithLevel(t *testing.T) {
 	g := New(5)
 	initial := g.GravityTicks()

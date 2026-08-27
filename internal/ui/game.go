@@ -646,16 +646,29 @@ func drawControlIcon(screen *ebiten.Image, control button, labelFace *text.GoTex
 }
 
 func effectLabel(game *core.Game) string {
-	switch {
-	case game.Blind && game.Inverse:
-		return "Blind · Inverse"
-	case game.Blind:
-		return "Blind"
-	case game.Inverse:
-		return "Inverse"
-	default:
+	label := ""
+	appendEffect := func(effect string) {
+		if label != "" {
+			label += " · "
+		}
+		label += effect
+	}
+	if game.Blind {
+		appendEffect("Blind")
+	}
+	if game.Inverse {
+		appendEffect("Inverse")
+	}
+	if game.FasterStacks > 0 {
+		appendEffect("Faster")
+	}
+	if game.SlowerBonus > 0 {
+		appendEffect("Slower")
+	}
+	if label == "" {
 		return "None"
 	}
+	return label
 }
 
 func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, face *text.GoTextFace) {
@@ -669,6 +682,10 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "B"
 	case core.SpecialInverse:
 		label = "I"
+	case core.SpecialFaster:
+		label = "F"
+	case core.SpecialSlower:
+		label = "S"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)

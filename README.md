@@ -27,10 +27,11 @@ cycleable targets, elimination retargeting and a last-player-standing winner.
 Clearing four rows sends two incomplete garbage rows to the selected target,
 matching the original game's basic multiplayer attack. The first two special
 blocks are implemented: Antidote is stored when collected, Clear empties the
-collector's board, Blind hides the selected target's Next preview, and Inverse
-reverses the target's horizontal movement and rotation. One Antidote clears all
-active negative effects. Android is deliberately deferred; native Linux and web
-are the active targets.
+collector's board, Blind hides the selected target's Next preview, Inverse
+reverses the target's horizontal movement and rotation, Rabbit/Faster speeds up
+the target, and Turtle/Slower slows the collector. One Antidote clears all
+active negative target effects. Android is deliberately deferred; native Linux
+and web are the active targets.
 
 ## Develop
 
