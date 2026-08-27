@@ -670,6 +670,9 @@ func effectLabel(game *core.Game) string {
 	if game.SlowerBonus > 0 {
 		appendEffect("Slower")
 	}
+	if game.PacketTicks > 0 {
+		appendEffect("Packet")
+	}
 	if label == "" {
 		return "None"
 	}
@@ -703,6 +706,10 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "FP"
 	case core.SpecialSwitch:
 		label = "SW"
+	case core.SpecialPacket:
+		label = "P"
+	case core.SpecialRing:
+		label = "R"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)

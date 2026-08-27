@@ -176,6 +176,15 @@ func TestSoloSwitchIsNoOp(t *testing.T) {
 	}
 }
 
+func TestRingRoutesToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialRing)
+	m.routeSpecials()
+	if m.Players[1].PendingPatternRows() != 10 {
+		t.Fatal("selected target did not queue Ring")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

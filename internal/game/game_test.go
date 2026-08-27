@@ -396,6 +396,52 @@ func TestSwapExchangesOnlySettledBoards(t *testing.T) {
 	}
 }
 
+func TestPacketSendsOneGarbageRowPerClearedLine(t *testing.T) {
+	g := New(30)
+	g.PacketTicks = 20 * 60
+	for x := 0; x < BoardWidth; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	g.Active = Piece{Kind: 1, X: 3, Y: 0}
+	g.lock()
+	if got := g.ConsumeGarbage(); got != 1 {
+		t.Fatalf("packet garbage = %d, want 1", got)
+	}
+}
+
+func TestPacketExpiresAndAntidoteClearsIt(t *testing.T) {
+	g := New(31)
+	g.PacketTicks = 2
+	g.Tick()
+	g.Tick()
+	if g.PacketTicks != 0 {
+		t.Fatalf("packet ticks = %d", g.PacketTicks)
+	}
+	g.PacketTicks = 100
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.PacketTicks != 0 {
+		t.Fatal("antidote did not clear Packet")
+	}
+}
+
+func TestRingBuildsHollowPatternBottomUp(t *testing.T) {
+	g := New(32)
+	g.ApplySpecial(SpecialRing)
+	if g.PendingPatternRows() != 10 {
+		t.Fatalf("ring rows = %d", g.PendingPatternRows())
+	}
+	advanceAllPatternRows(g)
+	if g.Board[20][3] == 0 || g.Board[20][6] == 0 || g.Board[20][4] == 0 {
+		t.Fatal("ring bottom missing")
+	}
+	if g.Board[17][0] == 0 || g.Board[17][9] == 0 || g.Board[17][5] != 0 {
+		t.Fatal("ring side or hollow center incorrect")
+	}
+	if g.Board[11][3] == 0 || g.Board[11][6] == 0 {
+		t.Fatal("ring top missing")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

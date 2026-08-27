@@ -28,6 +28,8 @@ const (
 	SpecialFill     // Fills the selected target's lower ten rows with one hole each.
 	SpecialFlip     // Vertically flips the selected target's placed structure.
 	SpecialSwitch   // Swaps placed structures with the selected target.
+	SpecialPacket   // Sends one garbage row per cleared row for 20 seconds.
+	SpecialRing     // Builds a hollow ring on the selected target.
 )
 
 type patternCell struct {
@@ -83,6 +85,7 @@ type Game struct {
 	Inverse        bool
 	FasterStacks   int
 	SlowerBonus    int
+	PacketTicks    int
 	pendingSpecial []Special
 	pendingGarbage int
 	random         *rand.Rand
@@ -211,6 +214,9 @@ func (g *Game) Tick() {
 		return
 	}
 	g.advancePattern()
+	if g.PacketTicks > 0 {
+		g.PacketTicks--
+	}
 	if g.grounded() {
 		g.lockTick++
 		if g.lockTick >= LockDelayTicks {
@@ -278,6 +284,9 @@ func (g *Game) lock() {
 	g.Lines += cleared
 	scores := [...]int{0, 40, 100, 300, 1200}
 	g.Score += scores[cleared] * (level + 1)
+	if g.PacketTicks > 0 {
+		g.pendingGarbage += cleared
+	}
 	if cleared == 4 {
 		g.pendingGarbage += 2
 	}
@@ -363,7 +372,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(12) {
+	switch g.random.IntN(14) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -386,6 +395,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialFlip
 	case 11:
 		special = SpecialSwitch
+	case 12:
+		special = SpecialPacket
+	case 13:
+		special = SpecialRing
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -403,11 +416,13 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
 		g.SlowerBonus++
+	case SpecialPacket:
+		g.PacketTicks = 20 * 60
 	}
 }
 
@@ -442,6 +457,8 @@ func (g *Game) ApplySpecial(special Special) {
 		g.addFill()
 	case SpecialFlip:
 		g.FlipBoard()
+	case SpecialRing:
+		g.addRing()
 	}
 }
 
@@ -514,6 +531,35 @@ func (g *Game) addFill() {
 	g.queuePattern(rows)
 }
 
+func (g *Game) addRing() {
+	// Hollow oval based on the original Ring coordinates, queued bottom-up.
+	occupiedByY := map[int][]int{
+		20: {3, 4, 5, 6},
+		19: {1, 2, 7, 8},
+		18: {1, 8},
+		17: {0, 9},
+		16: {0, 9},
+		15: {0, 9},
+		14: {0, 9},
+		13: {1, 8},
+		12: {1, 2, 7, 8},
+		11: {3, 4, 5, 6},
+	}
+	rows := make([]patternRow, 0, len(occupiedByY))
+	for y := 20; y >= 11; y-- {
+		occupied := make(map[int]bool)
+		for _, x := range occupiedByY[y] {
+			occupied[x] = true
+		}
+		cells := make([]patternCell, 0, BoardWidth)
+		for x := 0; x < BoardWidth; x++ {
+			cells = append(cells, patternCell{X: x, Occupied: occupied[x]})
+		}
+		rows = append(rows, patternRow{Y: y, Cells: cells})
+	}
+	g.queuePattern(rows)
+}
+
 func (g *Game) advancePattern() {
 	if len(g.patternRows) == 0 {
 		return
@@ -569,7 +615,7 @@ func (g *Game) removeRandomHalf() {
 }
 
 func (g *Game) HasActiveEffect() bool {
-	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0
+	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0
 }
 
 func (g *Game) UseAntidote() bool {
@@ -581,6 +627,7 @@ func (g *Game) UseAntidote() bool {
 	g.Inverse = false
 	g.FasterStacks = 0
 	g.SlowerBonus = 0
+	g.PacketTicks = 0
 	return true
 }
 
