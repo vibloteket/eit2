@@ -24,6 +24,8 @@ const (
 	SpecialSlower   // Turtle: slows down the collector.
 	SpecialBridge   // Adds two disruptive rows to the selected target.
 	SpecialQuestion // Removes half of the selected target's placed blocks.
+	SpecialStair    // Builds a diagonal staircase on the selected target.
+	SpecialFill     // Fills the selected target's lower ten rows with one hole each.
 )
 
 type Piece struct {
@@ -346,7 +348,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(8) {
+	switch g.random.IntN(10) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -361,6 +363,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialBridge
 	case 7:
 		special = SpecialQuestion
+	case 8:
+		special = SpecialStair
+	case 9:
+		special = SpecialFill
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -378,7 +384,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -411,6 +417,52 @@ func (g *Game) ApplySpecial(special Special) {
 		g.AddGarbage(2)
 	case SpecialQuestion:
 		g.removeRandomHalf()
+	case SpecialStair:
+		g.addStair()
+	case SpecialFill:
+		g.addFill()
+	}
+}
+
+func (g *Game) setPatternCell(x, y int, occupied bool) {
+	if !occupied {
+		g.Board[y][x] = 0
+		g.Specials[y][x] = SpecialNone
+		return
+	}
+	g.Board[y][x] = 1 + g.random.IntN(len(shapes))
+	g.Specials[y][x] = SpecialNone
+}
+
+func (g *Game) addStair() {
+	// Ported from the original pattern: one diagonal block per row, with the
+	// neighbouring cells explicitly cleared so the staircase stays readable.
+	g.setPatternCell(0, 21, true)
+	g.setPatternCell(1, 21, false)
+	for x := 1; x <= 8; x++ {
+		y := 21 - x
+		g.setPatternCell(x-1, y, false)
+		g.setPatternCell(x, y, true)
+		g.setPatternCell(x+1, y, false)
+	}
+	g.setPatternCell(8, 12, false)
+	g.setPatternCell(9, 12, true)
+	g.checkActiveCollision()
+}
+
+func (g *Game) addFill() {
+	for y := 21; y >= 12; y-- {
+		hole := g.random.IntN(BoardWidth)
+		for x := 0; x < BoardWidth; x++ {
+			g.setPatternCell(x, y, x != hole)
+		}
+	}
+	g.checkActiveCollision()
+}
+
+func (g *Game) checkActiveCollision() {
+	if !g.valid(g.Active) {
+		g.GameOver = true
 	}
 }
 

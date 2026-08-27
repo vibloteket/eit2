@@ -284,6 +284,42 @@ func TestQuestionRemovesHalfOfPlacedBlocks(t *testing.T) {
 	}
 }
 
+func TestStairBuildsDiagonalPattern(t *testing.T) {
+	g := New(23)
+	g.ApplySpecial(SpecialStair)
+	for x := 0; x <= 9; x++ {
+		y := 21 - x
+		if g.Board[y][x] == 0 {
+			t.Fatalf("stair missing block at (%d,%d)", x, y)
+		}
+	}
+}
+
+func TestFillAddsTenRowsWithOneHoleEach(t *testing.T) {
+	g := New(24)
+	g.ApplySpecial(SpecialFill)
+	for y := 12; y <= 21; y++ {
+		occupied := 0
+		for _, value := range g.Board[y] {
+			if value != 0 {
+				occupied++
+			}
+		}
+		if occupied != BoardWidth-1 {
+			t.Fatalf("row %d has %d blocks, want %d", y, occupied, BoardWidth-1)
+		}
+	}
+}
+
+func TestFillCanEliminatePlayerOnCollision(t *testing.T) {
+	g := New(25)
+	g.Active = Piece{Kind: 1, X: 3, Y: 12}
+	g.ApplySpecial(SpecialFill)
+	if !g.GameOver {
+		t.Fatal("fill collision should eliminate player")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

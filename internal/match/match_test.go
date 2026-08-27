@@ -109,6 +109,29 @@ func TestBridgeAndQuestionRouteToTarget(t *testing.T) {
 	}
 }
 
+func TestStairAndFillRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialStair)
+	m.routeSpecials()
+	if m.Players[1].Board[21][0] == 0 || m.Players[1].Board[12][9] == 0 {
+		t.Fatal("selected target did not receive Stair")
+	}
+	m = New(2)
+	m.Players[0].QueueSpecial(game.SpecialFill)
+	m.routeSpecials()
+	occupied := 0
+	for _, row := range m.Players[1].Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 90 {
+		t.Fatalf("selected target received %d Fill blocks, want 90", occupied)
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)
