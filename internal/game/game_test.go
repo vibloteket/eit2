@@ -163,6 +163,52 @@ func TestFullLineClearsAndScores(t *testing.T) {
 	}
 }
 
+func TestSpecialSpawnIsSkippedOnEmptyBoard(t *testing.T) {
+	g := New(33)
+	g.spawnSpecial()
+	if g.SpecialLifetimeTicks() != 0 {
+		t.Fatalf("empty-board lifetime = %d", g.SpecialLifetimeTicks())
+	}
+	for _, row := range g.Specials {
+		for _, special := range row {
+			if special != SpecialNone {
+				t.Fatal("special spawned on empty board")
+			}
+		}
+	}
+}
+
+func TestSpecialLifetimeScalesWithOccupiedBlocks(t *testing.T) {
+	tests := []struct {
+		blocks  int
+		seconds int
+	}{{1, 18}, {10, 19}, {30, 21}, {80, 26}, {120, 30}, {180, 30}}
+	for _, test := range tests {
+		g := New(uint64(100 + test.blocks))
+		for i := 0; i < test.blocks && i < BoardWidth*BoardHeight; i++ {
+			g.Board[i/BoardWidth][i%BoardWidth] = 1
+		}
+		g.spawnSpecial()
+		if got := g.SpecialLifetimeTicks(); got != test.seconds*60 {
+			t.Errorf("%d blocks: lifetime = %d ticks, want %d", test.blocks, got, test.seconds*60)
+		}
+	}
+}
+
+func TestSpecialExpiresAtItsSpawnLifetime(t *testing.T) {
+	g := New(34)
+	for x := 0; x < 10; x++ {
+		g.Board[BoardHeight-1][x] = 1
+	}
+	g.spawnSpecial()
+	lifetime := g.SpecialLifetimeTicks()
+	g.specialTick = lifetime - 1
+	g.Tick()
+	if g.SpecialLifetimeTicks() != 0 {
+		t.Fatal("special did not expire at fixed spawn lifetime")
+	}
+}
+
 func TestAntidoteSpecialActivatesWhenItsRowClears(t *testing.T) {
 	g := New(10)
 	for x := 0; x < BoardWidth; x++ {

@@ -27,7 +27,9 @@ This initial technical spike proves the project structure and its first targets:
 - independent random piece selection, retaining the original game's possibility
   of lucky and unlucky streaks;
 - a fresh production seed for every match, while tests and recorded scenarios
-  keep explicit reproducible seeds.
+  keep explicit reproducible seeds;
+- specials skip their spawn cycle on an empty board and otherwise remain for
+  18 seconds plus one second per ten settled blocks, capped at 30 seconds.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.

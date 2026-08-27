@@ -73,27 +73,28 @@ var shapes = [7][4][4]Point{
 }
 
 type Game struct {
-	Board          [BoardHeight][BoardWidth]int
-	Specials       [BoardHeight][BoardWidth]Special
-	Active         Piece
-	NextKind       int
-	Score          int
-	Lines          int
-	GameOver       bool
-	Antidotes      int
-	Blind          bool
-	Inverse        bool
-	FasterStacks   int
-	SlowerBonus    int
-	PacketTicks    int
-	pendingSpecial []Special
-	pendingGarbage int
-	random         *rand.Rand
-	fallTick       int
-	lockTick       int
-	specialTick    int
-	patternTick    int
-	patternRows    []patternRow
+	Board                [BoardHeight][BoardWidth]int
+	Specials             [BoardHeight][BoardWidth]Special
+	Active               Piece
+	NextKind             int
+	Score                int
+	Lines                int
+	GameOver             bool
+	Antidotes            int
+	Blind                bool
+	Inverse              bool
+	FasterStacks         int
+	SlowerBonus          int
+	PacketTicks          int
+	pendingSpecial       []Special
+	pendingGarbage       int
+	random               *rand.Rand
+	fallTick             int
+	lockTick             int
+	specialTick          int
+	specialLifetimeTicks int
+	patternTick          int
+	patternRows          []patternRow
 }
 
 func New(seed uint64) *Game {
@@ -227,9 +228,10 @@ func (g *Game) Tick() {
 		g.lockTick = 0
 	}
 	g.specialTick++
-	if g.specialTick == 22*60 {
+	if g.specialLifetimeTicks > 0 && g.specialTick >= g.specialLifetimeTicks {
 		g.removeSpecial()
-	} else if g.specialTick >= 30*60 {
+	}
+	if g.specialTick >= 30*60 {
 		g.spawnSpecial()
 		g.specialTick = 0
 	}
@@ -401,10 +403,20 @@ func (g *Game) spawnSpecial() {
 		special = SpecialRing
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
+	seconds := 18 + len(occupied)/10
+	if seconds > 30 {
+		seconds = 30
+	}
+	g.specialLifetimeTicks = seconds * 60
 }
 
 func (g *Game) removeSpecial() {
 	g.Specials = [BoardHeight][BoardWidth]Special{}
+	g.specialLifetimeTicks = 0
+}
+
+func (g *Game) SpecialLifetimeTicks() int {
+	return g.specialLifetimeTicks
 }
 
 func (g *Game) activateSpecial(special Special) {
