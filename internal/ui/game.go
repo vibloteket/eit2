@@ -366,11 +366,11 @@ func menuButtons(gameOver bool) (restart, back imageRect) {
 
 func touchButtons() []button {
 	return []button{
-		{Rect: imageRect{X: 45, Y: 420, W: 145, H: 120}, Label: "LEFT", Do: actionLeft},
-		{Rect: imageRect{X: 205, Y: 420, W: 145, H: 120}, Label: "RIGHT", Do: actionRight},
+		{Rect: imageRect{X: 15, Y: 420, W: 175, H: 120}, Label: "LEFT", Do: actionLeft},
+		{Rect: imageRect{X: 210, Y: 420, W: 175, H: 120}, Label: "RIGHT", Do: actionRight},
 		{Rect: imageRect{X: 125, Y: 570, W: 145, H: 120}, Label: "DOWN", Do: actionDown},
-		{Rect: imageRect{X: 930, Y: 420, W: 145, H: 120}, Label: "CCW", Do: actionCCW},
-		{Rect: imageRect{X: 1090, Y: 420, W: 145, H: 120}, Label: "CW", Do: actionCW},
+		{Rect: imageRect{X: 895, Y: 420, W: 175, H: 120}, Label: "CCW", Do: actionCCW},
+		{Rect: imageRect{X: 1090, Y: 420, W: 175, H: 120}, Label: "CW", Do: actionCW},
 		{Rect: imageRect{X: 970, Y: 570, W: 150, H: 120}, Label: "DROP", Do: actionDrop},
 		{Rect: imageRect{X: 1135, Y: 570, W: 100, H: 120}, Label: "ANTI", Do: actionAnti},
 	}
