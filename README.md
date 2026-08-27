@@ -37,7 +37,9 @@ This initial technical spike proves the project structure and its first targets:
   keep explicit reproducible seeds;
 - specials skip their spawn cycle on an empty board and otherwise remain for
   18 seconds plus one second per ten settled blocks, capped at 30 seconds;
-- four-second activation messages identify the special, sender and target.
+- four-second activation messages identify the special, sender and target;
+- an opt-in Debug mode pauses play and can trigger any of all 22 specials using
+  normal player and target routing.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.
@@ -80,8 +82,13 @@ keyboard player. Browsers only expose connected gamepads after the user has
 interacted with them.
 
 The first player can play with arrow keys or A/D, Q/W, S and Space. On touch
-screens, use the six controls along the bottom for left, right, down, both
-rotation directions and hard drop.
+screens, use the controls around the board for left, right, down, both rotation
+directions, hard drop and Antidote.
+
+For development testing, enable **Debug mode** in the lobby. During a match,
+open **Debug**, choose a source player and tap a special. Direct/self effects
+apply to that player while offensive effects follow that player's current
+target. The panel pauses simulation while open.
 
 ## Build outputs
 

@@ -272,6 +272,19 @@ func TestSoloSpecialFeedbackSaysSelf(t *testing.T) {
 	}
 }
 
+func TestDebugCollectUsesNormalRouting(t *testing.T) {
+	m := New(2)
+	if !m.DebugCollect(0, game.SpecialBlind) {
+		t.Fatal("debug collect failed")
+	}
+	if !m.Players[1].Blind || m.Players[0].Blind {
+		t.Fatal("debug special did not follow target routing")
+	}
+	if m.DebugCollect(-1, game.SpecialBlind) || m.DebugCollect(2, game.SpecialBlind) || m.DebugCollect(0, game.SpecialNone) {
+		t.Fatal("debug collect accepted invalid input")
+	}
+}
+
 func TestLastAlivePlayerWins(t *testing.T) {
 	m := New(3)
 	m.Players[0].GameOver = true

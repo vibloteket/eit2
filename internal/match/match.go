@@ -92,6 +92,17 @@ func playerNumber(index int) string {
 	return string(rune('1' + index))
 }
 
+// DebugCollect activates a special for a source player and immediately routes
+// any target effect through normal match rules.
+func (m *Match) DebugCollect(player int, special core.Special) bool {
+	if player < 0 || player >= len(m.Players) || special == core.SpecialNone {
+		return false
+	}
+	m.Players[player].CollectSpecial(special)
+	m.routeSpecials()
+	return true
+}
+
 func (m *Match) CycleTarget(player int) int {
 	if player < 0 || player >= len(m.Players) || m.Players[player].GameOver {
 		return -1

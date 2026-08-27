@@ -537,6 +537,14 @@ func (g *Game) ShowEvent(message string) {
 	g.EventTicks = 4 * 60
 }
 
+// CollectSpecial activates a special as if its marked row had just been
+// cleared. It is exported for deterministic scenarios and Debug mode.
+func (g *Game) CollectSpecial(special Special) {
+	if special != SpecialNone {
+		g.activateSpecial(special)
+	}
+}
+
 func (g *Game) activateSpecial(special Special) {
 	if special == SpecialAntidote {
 		g.ShowEvent("COLLECTED: " + special.Name())

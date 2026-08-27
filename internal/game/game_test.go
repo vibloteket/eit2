@@ -650,6 +650,16 @@ func TestSpecialNamesAreHumanReadable(t *testing.T) {
 	if SpecialAntidote.Name() != "Antidote" || SpecialFaster.Name() != "Rabbit / Faster" || SpecialColor.Name() != "Blackout" {
 		t.Fatal("special display names are incomplete")
 	}
+	if len(AllSpecials) != 22 {
+		t.Fatalf("debug special list has %d entries, want 22", len(AllSpecials))
+	}
+	seen := make(map[Special]bool)
+	for _, special := range AllSpecials {
+		if special == SpecialNone || seen[special] || special.Name() == "Unknown" {
+			t.Fatalf("invalid debug special entry: %v", special)
+		}
+		seen[special] = true
+	}
 }
 
 func TestEventExpiresAfterFourSeconds(t *testing.T) {
