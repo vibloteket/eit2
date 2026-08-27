@@ -284,9 +284,27 @@ func TestQuestionRemovesHalfOfPlacedBlocks(t *testing.T) {
 	}
 }
 
-func TestStairBuildsDiagonalPattern(t *testing.T) {
+func advanceAllPatternRows(g *Game) {
+	for g.PendingPatternRows() > 0 {
+		for range 3 {
+			g.advancePattern()
+		}
+	}
+}
+
+func TestStairBuildsFromBottomUp(t *testing.T) {
 	g := New(23)
 	g.ApplySpecial(SpecialStair)
+	if g.PendingPatternRows() != 10 {
+		t.Fatalf("queued stair rows = %d", g.PendingPatternRows())
+	}
+	for range 3 {
+		g.advancePattern()
+	}
+	if g.Board[21][0] == 0 || g.Board[20][1] != 0 {
+		t.Fatal("stair did not start at bottom")
+	}
+	advanceAllPatternRows(g)
 	for x := 0; x <= 9; x++ {
 		y := 21 - x
 		if g.Board[y][x] == 0 {
@@ -295,9 +313,16 @@ func TestStairBuildsDiagonalPattern(t *testing.T) {
 	}
 }
 
-func TestFillAddsTenRowsWithOneHoleEach(t *testing.T) {
+func TestFillAddsTenRowsBottomUpWithOneHoleEach(t *testing.T) {
 	g := New(24)
 	g.ApplySpecial(SpecialFill)
+	for range 3 {
+		g.advancePattern()
+	}
+	if g.PendingPatternRows() != 9 {
+		t.Fatalf("pending rows after first fill row = %d", g.PendingPatternRows())
+	}
+	advanceAllPatternRows(g)
 	for y := 12; y <= 21; y++ {
 		occupied := 0
 		for _, value := range g.Board[y] {
@@ -311,12 +336,24 @@ func TestFillAddsTenRowsWithOneHoleEach(t *testing.T) {
 	}
 }
 
-func TestFillCanEliminatePlayerOnCollision(t *testing.T) {
+func TestFillDoesNotOverwriteActivePiece(t *testing.T) {
 	g := New(25)
-	g.Active = Piece{Kind: 1, X: 3, Y: 12}
+	g.Active = Piece{Kind: 1, X: 3, Y: 20}
+	active := g.Cells(g.Active)
 	g.ApplySpecial(SpecialFill)
-	if !g.GameOver {
-		t.Fatal("fill collision should eliminate player")
+	for range 3 {
+		g.advancePattern()
+	}
+	if g.GameOver {
+		t.Fatal("fill overlap should not immediately eliminate player")
+	}
+	for _, point := range active {
+		if point.Y == 21 && g.Board[point.Y][point.X] != 0 {
+			t.Fatalf("fill overwrote active piece at %+v", point)
+		}
+	}
+	if !g.grounded() {
+		t.Fatal("new fill row should act as ground for active piece")
 	}
 }
 

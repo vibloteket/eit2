@@ -36,7 +36,9 @@ collector's board, Blind hides the selected target's Next preview, Inverse
 reverses the target's horizontal movement and rotation, Rabbit/Faster speeds up
 the target, Turtle/Slower slows the collector, Bridge adds two disruption rows,
 Question removes half of the target's placed blocks, Stair builds a diagonal,
-and Fill packs the target's lower ten rows. One Antidote clears all active
+and Fill packs the target's lower ten rows. Stair and Fill animate from the
+bottom upward; they never overwrite the active piece, which instead settles on
+the newly created structure using normal lock delay. One Antidote clears all active
 effects, including helpful Slower stacks, making its
 use a tactical trade-off. Solo mode targets Self for special effects so every
 special can be tested, while ordinary four-line garbage attacks remain disabled

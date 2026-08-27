@@ -28,6 +28,16 @@ const (
 	SpecialFill     // Fills the selected target's lower ten rows with one hole each.
 )
 
+type patternCell struct {
+	X        int
+	Occupied bool
+}
+
+type patternRow struct {
+	Y     int
+	Cells []patternCell
+}
+
 type Piece struct {
 	Kind     int
 	Rotation int
@@ -77,6 +87,8 @@ type Game struct {
 	fallTick       int
 	lockTick       int
 	specialTick    int
+	patternTick    int
+	patternRows    []patternRow
 }
 
 func New(seed uint64) *Game {
@@ -196,6 +208,7 @@ func (g *Game) Tick() {
 	if g.GameOver {
 		return
 	}
+	g.advancePattern()
 	if g.grounded() {
 		g.lockTick++
 		if g.lockTick >= LockDelayTicks {
@@ -424,46 +437,73 @@ func (g *Game) ApplySpecial(special Special) {
 	}
 }
 
-func (g *Game) setPatternCell(x, y int, occupied bool) {
-	if !occupied {
-		g.Board[y][x] = 0
-		g.Specials[y][x] = SpecialNone
-		return
-	}
-	g.Board[y][x] = 1 + g.random.IntN(len(shapes))
-	g.Specials[y][x] = SpecialNone
+func (g *Game) queuePattern(rows []patternRow) {
+	g.patternRows = append(g.patternRows, rows...)
+	g.patternTick = 0
 }
 
 func (g *Game) addStair() {
-	// Ported from the original pattern: one diagonal block per row, with the
-	// neighbouring cells explicitly cleared so the staircase stays readable.
-	g.setPatternCell(0, 21, true)
-	g.setPatternCell(1, 21, false)
-	for x := 1; x <= 8; x++ {
-		y := 21 - x
-		g.setPatternCell(x-1, y, false)
-		g.setPatternCell(x, y, true)
-		g.setPatternCell(x+1, y, false)
+	rows := make([]patternRow, 0, 10)
+	for x := 0; x < BoardWidth; x++ {
+		y := BoardHeight - 1 - x
+		cells := []patternCell{{X: x, Occupied: true}}
+		if x > 0 {
+			cells = append(cells, patternCell{X: x - 1})
+		}
+		if x < BoardWidth-1 {
+			cells = append(cells, patternCell{X: x + 1})
+		}
+		rows = append(rows, patternRow{Y: y, Cells: cells})
 	}
-	g.setPatternCell(8, 12, false)
-	g.setPatternCell(9, 12, true)
-	g.checkActiveCollision()
+	g.queuePattern(rows)
 }
 
 func (g *Game) addFill() {
-	for y := 21; y >= 12; y-- {
+	rows := make([]patternRow, 0, 10)
+	for y := BoardHeight - 1; y >= BoardHeight-10; y-- {
 		hole := g.random.IntN(BoardWidth)
+		cells := make([]patternCell, 0, BoardWidth)
 		for x := 0; x < BoardWidth; x++ {
-			g.setPatternCell(x, y, x != hole)
+			cells = append(cells, patternCell{X: x, Occupied: x != hole})
 		}
+		rows = append(rows, patternRow{Y: y, Cells: cells})
 	}
-	g.checkActiveCollision()
+	g.queuePattern(rows)
 }
 
-func (g *Game) checkActiveCollision() {
-	if !g.valid(g.Active) {
-		g.GameOver = true
+func (g *Game) advancePattern() {
+	if len(g.patternRows) == 0 {
+		return
 	}
+	g.patternTick++
+	if g.patternTick < 3 { // roughly one row per 50 ms at 60 Hz
+		return
+	}
+	g.patternTick = 0
+	row := g.patternRows[0]
+	g.patternRows = g.patternRows[1:]
+	active := make(map[Point]bool, 4)
+	for _, point := range g.Cells(g.Active) {
+		active[point] = true
+	}
+	for _, cell := range row.Cells {
+		point := Point{X: cell.X, Y: row.Y}
+		if active[point] {
+			// Do not overwrite the falling piece. New surrounding blocks become
+			// normal ground, so the piece settles through the usual lock delay.
+			continue
+		}
+		g.Specials[row.Y][cell.X] = SpecialNone
+		if cell.Occupied {
+			g.Board[row.Y][cell.X] = 1 + g.random.IntN(len(shapes))
+		} else {
+			g.Board[row.Y][cell.X] = 0
+		}
+	}
+}
+
+func (g *Game) PendingPatternRows() int {
+	return len(g.patternRows)
 }
 
 func (g *Game) removeRandomHalf() {
