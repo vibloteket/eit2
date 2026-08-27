@@ -45,6 +45,28 @@ func (l *Lobby) Join(device Device) (int, bool) {
 	return len(l.Slots) - 1, true
 }
 
+func (l *Lobby) PlayerForDevice(device Device) int {
+	for i, slot := range l.Slots {
+		if slot.Device.Key() == device.Key() {
+			return i
+		}
+	}
+	return -1
+}
+
+func (l *Lobby) ReplaceDevice(player int, device Device) bool {
+	if player < 0 || player >= len(l.Slots) {
+		return false
+	}
+	existing := l.PlayerForDevice(device)
+	if existing >= 0 && existing != player {
+		return false
+	}
+	l.Slots[player].Device = device
+	l.Slots[player].Ready = true
+	return true
+}
+
 func (l *Lobby) Leave(device Device) bool {
 	for i, slot := range l.Slots {
 		if slot.Device.Key() == device.Key() {

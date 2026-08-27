@@ -41,6 +41,18 @@ func TestCanStartWithOnePlayer(t *testing.T) {
 	}
 }
 
+func TestReplaceDisconnectedPlayerDevice(t *testing.T) {
+	var l Lobby
+	l.Join(pad(1))
+	l.Join(pad(2))
+	if !l.ReplaceDevice(0, pad(9)) || l.Slots[0].Device.ID != 9 {
+		t.Fatalf("replacement failed: %+v", l.Slots)
+	}
+	if l.ReplaceDevice(0, pad(2)) {
+		t.Fatal("same device was assigned to two players")
+	}
+}
+
 func TestLeaveRemovesAssignedDevice(t *testing.T) {
 	var l Lobby
 	l.Join(pad(1))

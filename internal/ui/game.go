@@ -71,21 +71,22 @@ func (r imageRect) contains(x, y int) bool {
 }
 
 type Game struct {
-	Lobby        lobby.Lobby
-	gamepadIDs   []ebiten.GamepadID
-	touchIDs     []ebiten.TouchID
-	pressedIDs   []ebiten.TouchID
-	heldActions  map[action]int
-	padHeld      map[int]map[action]int
-	fontSource   *text.GoTextFaceSource
-	view         view
-	players      []*core.Game
-	match        *matchcore.Match
-	paused       bool
-	debugEnabled bool
-	debugOpen    bool
-	debugPlayer  int
-	touchDevice  lobby.Device
+	Lobby              lobby.Lobby
+	gamepadIDs         []ebiten.GamepadID
+	touchIDs           []ebiten.TouchID
+	pressedIDs         []ebiten.TouchID
+	heldActions        map[action]int
+	padHeld            map[int]map[action]int
+	fontSource         *text.GoTextFaceSource
+	view               view
+	players            []*core.Game
+	match              *matchcore.Match
+	paused             bool
+	debugEnabled       bool
+	debugOpen          bool
+	debugPlayer        int
+	disconnectedPlayer int
+	touchDevice        lobby.Device
 }
 
 func NewGame() *Game {
@@ -94,10 +95,11 @@ func NewGame() *Game {
 		panic(fmt.Sprintf("load embedded font: %v", err))
 	}
 	return &Game{
-		fontSource:  fontSource,
-		heldActions: make(map[action]int),
-		padHeld:     make(map[int]map[action]int),
-		touchDevice: lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
+		fontSource:         fontSource,
+		heldActions:        make(map[action]int),
+		padHeld:            make(map[int]map[action]int),
+		disconnectedPlayer: -1,
+		touchDevice:        lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
 }
 
@@ -116,6 +118,10 @@ func (g *Game) updateLobby() {
 	for _, id := range g.gamepadIDs {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
 			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)})
+		}
+		if g.Lobby.CanStart() && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
+			g.start()
+			return
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeySpace) {
@@ -153,6 +159,7 @@ func (g *Game) start() {
 	g.paused = false
 	g.debugOpen = false
 	g.debugPlayer = 0
+	g.disconnectedPlayer = -1
 	clear(g.heldActions)
 	clear(g.padHeld)
 	g.view = viewPlay
@@ -170,6 +177,7 @@ func (g *Game) backToLobby() {
 
 func (g *Game) updatePlay() {
 	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
+	g.updateControllerConnections()
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.backToLobby()
 		return
@@ -203,6 +211,9 @@ func (g *Game) updatePlay() {
 		if g.handlePlayMenuPointer(x, y, soloGameOver || matchOver) {
 			return
 		}
+	}
+	if g.disconnectedPlayer >= 0 {
+		return
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		g.paused = !g.paused
@@ -272,6 +283,31 @@ func (g *Game) updatePlay() {
 	g.match.Tick()
 }
 
+func (g *Game) updateControllerConnections() {
+	connected := make(map[int]bool)
+	for _, id := range ebiten.AppendGamepadIDs(g.gamepadIDs[:0]) {
+		connected[int(id)] = true
+		if g.disconnectedPlayer >= 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
+			device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
+			if g.Lobby.ReplaceDevice(g.disconnectedPlayer, device) {
+				g.disconnectedPlayer = -1
+			}
+		}
+	}
+	if g.disconnectedPlayer >= 0 {
+		return
+	}
+	for player, slot := range g.Lobby.Slots {
+		if slot.Device.Kind == lobby.DeviceGamepad && !connected[slot.Device.ID] {
+			g.disconnectedPlayer = player
+			g.paused = true
+			clear(g.heldActions)
+			clear(g.padHeld)
+			return
+		}
+	}
+}
+
 func (g *Game) playerForDevice(kind lobby.DeviceKind) *core.Game {
 	for i, slot := range g.Lobby.Slots {
 		if slot.Device.Kind == kind && i < len(g.players) {
@@ -327,6 +363,11 @@ func (g *Game) updateGamepads() {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopLeft) {
 			g.players[playerIndex].UseAntidote()
 		}
+		if g.disconnectedPlayer < 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
+			g.paused = !g.paused
+			clear(g.heldActions)
+			clear(g.padHeld)
+		}
 	}
 }
 
@@ -353,6 +394,9 @@ func (g *Game) handleDebugPointer(x, y int) {
 }
 
 func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
+	if g.disconnectedPlayer >= 0 {
+		return true
+	}
 	if g.paused || gameOver {
 		if g.paused && resumeButton().contains(x, y) {
 			g.paused = false
@@ -738,17 +782,27 @@ func (g *Game) drawDebugPanel(screen *ebiten.Image) {
 func (g *Game) drawMatchOverlay(screen *ebiten.Image) {
 	gameOver := len(g.players) == 1 && g.players[0].GameOver
 	matchOver := g.match != nil && g.match.Over
-	if !g.paused && !gameOver && !matchOver {
+	if !g.paused && !gameOver && !matchOver && g.disconnectedPlayer < 0 {
 		return
 	}
 	ebitenutil.DrawRect(screen, 385, 235, 510, 230, color.RGBA{R: 8, G: 12, B: 20, A: 238})
 	title := "PAUSED"
-	if gameOver {
+	if g.disconnectedPlayer >= 0 {
+		title = fmt.Sprintf("PLAYER %d CONTROLLER DISCONNECTED", g.disconnectedPlayer+1)
+	} else if gameOver {
 		title = "GAME OVER"
 	} else if matchOver && g.match.Winner >= 0 {
 		title = fmt.Sprintf("PLAYER %d WINS", g.match.Winner+1)
 	}
-	drawCenteredText(screen, title, g.face(48), logicalWidth/2, 260, white)
+	fontSize := 48.0
+	if g.disconnectedPlayer >= 0 {
+		fontSize = 25
+	}
+	drawCenteredText(screen, title, g.face(fontSize), logicalWidth/2, 260, white)
+	if g.disconnectedPlayer >= 0 {
+		drawCenteredText(screen, "Connect a controller and press A", g.face(20), logicalWidth/2, 320, muted)
+		return
+	}
 	restart, back := menuButtons(gameOver || matchOver)
 	if g.paused {
 		resume := resumeButton()

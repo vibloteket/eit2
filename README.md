@@ -26,6 +26,8 @@ This initial technical spike proves the project structure and its first targets:
 - deterministic tests for assigning up to four input devices;
 - a 16:9 lobby showing four player slots and allowing solo play;
 - keyboard, standard gamepad and touch join input;
+- gamepad Start launches/pauses play, and disconnects pause the match until a
+  controller presses A to reclaim the affected player slot;
 - a first playable solo falling-block core with movement, rotation, gravity,
   soft/hard drop, a short lock delay, line clearing and scoring;
 - multi-touch controls with hold/repeat and visual pressed feedback;
