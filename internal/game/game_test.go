@@ -543,6 +543,41 @@ func TestTransAndSZAreClearedByAntidote(t *testing.T) {
 	}
 }
 
+func TestCastleClearsBoardAndBuildsBottomUp(t *testing.T) {
+	g := New(39)
+	g.Board[5][0] = 4
+	g.Specials[5][0] = SpecialAntidote
+	g.ApplySpecial(SpecialCastle)
+	if g.Board[5][0] != 0 || g.Specials[5][0] != SpecialNone {
+		t.Fatal("castle did not clear old structure")
+	}
+	if g.PendingPatternRows() != 11 {
+		t.Fatalf("castle rows = %d, want 11", g.PendingPatternRows())
+	}
+	for range 3 {
+		g.advancePattern()
+	}
+	for x := 2; x <= 7; x++ {
+		if g.Board[21][x] == 0 {
+			t.Fatalf("castle bottom missing x=%d", x)
+		}
+	}
+	advanceAllPatternRows(g)
+	if g.Board[11][1] == 0 || g.Board[11][2] == 0 || g.Board[11][4] == 0 || g.Board[11][7] == 0 || g.Board[11][8] == 0 {
+		t.Fatal("castle battlements missing")
+	}
+}
+
+func TestBlackoutAndIceAreClearedByAntidote(t *testing.T) {
+	g := New(40)
+	g.ApplySpecial(SpecialColor)
+	g.ApplySpecial(SpecialTrans)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.Blackout || g.Trans {
+		t.Fatalf("blackout=%v trans=%v", g.Blackout, g.Trans)
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

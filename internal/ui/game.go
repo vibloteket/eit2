@@ -468,7 +468,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	for y, row := range game.Board {
 		for x, value := range row {
 			if value != 0 {
-				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
+				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini, game.Trans, game.Blackout)
 				drawSpecial(screen, boardX+x*cell, boardY+y*cell, cell, game.Specials[y][x], g.face(float64(cell-5)))
 			}
 		}
@@ -544,7 +544,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		for y, row := range game.Board {
 			for bx, value := range row {
 				if value != 0 {
-					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
+					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini, game.Trans, game.Blackout)
 					drawSpecial(screen, boardX+bx*cell, boardY+y*cell, cell, game.Specials[y][bx], g.face(float64(cell-4)))
 				}
 			}
@@ -689,6 +689,9 @@ func effectLabel(game *core.Game) string {
 	if game.Trans {
 		appendEffect("Ice")
 	}
+	if game.Blackout {
+		appendEffect("Blackout")
+	}
 	if label == "" {
 		return "None"
 	}
@@ -734,13 +737,17 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "SZ"
 	case core.SpecialTrans:
 		label = "IC"
+	case core.SpecialCastle:
+		label = "CA"
+	case core.SpecialColor:
+		label = "BO"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
 	}
 }
 
-func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, translucent bool) {
+func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, translucent, blackout bool) {
 	if mini {
 		miniSize := max(4, size*2/5)
 		x += (size - miniSize) / 2
@@ -748,6 +755,9 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, transluc
 		size = miniSize
 	}
 	colour := pieceColors[value]
+	if blackout {
+		colour = color.RGBA{R: 16, G: 20, B: 29, A: 255}
+	}
 	if translucent {
 		colour.A = 72
 	}
@@ -755,7 +765,7 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, transluc
 }
 
 func drawCell(screen *ebiten.Image, x, y, size, value int) {
-	drawSettledCell(screen, x, y, size, value, false, false)
+	drawSettledCell(screen, x, y, size, value, false, false, false)
 }
 
 func (g *Game) Layout(_, _ int) (int, int) {

@@ -211,6 +211,20 @@ func TestSZAndTransRouteToTarget(t *testing.T) {
 	}
 }
 
+func TestCastleAndBlackoutRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[1].Board[5][0] = 1
+	m.Players[0].QueueSpecial(game.SpecialCastle)
+	m.Players[0].QueueSpecial(game.SpecialColor)
+	m.routeSpecials()
+	if m.Players[1].PendingPatternRows() != 11 || !m.Players[1].Blackout {
+		t.Fatal("selected target did not receive Castle and Blackout")
+	}
+	if m.Players[1].Board[5][0] != 0 {
+		t.Fatal("castle did not clear selected target")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

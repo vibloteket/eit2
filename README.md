@@ -44,8 +44,9 @@ Fill packs the target's lower ten rows, Flip vertically reverses the target's
 settled structure, Switch exchanges settled structures, Packet sends one row
 per line cleared for 20 seconds, Ring builds a hollow ring, Mini shrinks settled
 blocks visually, Blink flashes the active piece, SZ restricts upcoming pieces
-to S/Z, and Trans/Ice makes settled blocks translucent. Pattern attacks animate
-from the bottom upward; they never overwrite the active piece, which instead settles on
+to S/Z, Trans/Ice makes settled blocks translucent, Castle replaces the board
+with the original castle silhouette, and Color/Blackout darkens settled blocks.
+Pattern attacks animate from the bottom upward; they never overwrite the active piece, which instead settles on
 the newly created structure using normal lock delay. One Antidote clears all active
 effects, including helpful Slower stacks, making its
 use a tactical trade-off. Solo mode targets Self for special effects so every

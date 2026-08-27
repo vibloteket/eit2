@@ -34,6 +34,8 @@ const (
 	SpecialBlink    // Makes the selected target's active piece blink.
 	SpecialSZ       // Restricts the selected target's future pieces to S and Z.
 	SpecialTrans    // Renders the selected target's settled blocks translucent.
+	SpecialCastle   // Replaces the selected target's board with a castle.
+	SpecialColor    // Blackout: renders the selected target's settled blocks dark.
 )
 
 type patternCell struct {
@@ -95,6 +97,7 @@ type Game struct {
 	BlinkVisible         bool
 	SZ                   bool
 	Trans                bool
+	Blackout             bool
 	blinkTick            int
 	pendingSpecial       []Special
 	pendingGarbage       int
@@ -401,7 +404,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(18) {
+	switch g.random.IntN(20) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -436,6 +439,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialSZ
 	case 17:
 		special = SpecialTrans
+	case 18:
+		special = SpecialCastle
+	case 19:
+		special = SpecialColor
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 	seconds := 18 + len(occupied)/10
@@ -463,7 +470,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing, SpecialMini, SpecialBlink, SpecialSZ, SpecialTrans:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing, SpecialMini, SpecialBlink, SpecialSZ, SpecialTrans, SpecialCastle, SpecialColor:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -518,6 +525,10 @@ func (g *Game) ApplySpecial(special Special) {
 		}
 	case SpecialTrans:
 		g.Trans = true
+	case SpecialCastle:
+		g.addCastle()
+	case SpecialColor:
+		g.Blackout = true
 	}
 }
 
@@ -587,6 +598,40 @@ func (g *Game) addFill() {
 		}
 		rows = append(rows, patternRow{Y: y, Cells: cells})
 	}
+	g.queuePattern(rows)
+}
+
+func (g *Game) addCastle() {
+	// Castle first clears the settled structure, then rebuilds the original
+	// eleven-row grey castle silhouette from bottom to top.
+	g.Board = [BoardHeight][BoardWidth]int{}
+	g.Specials = [BoardHeight][BoardWidth]Special{}
+	occupiedByY := map[int][]int{
+		21: {2, 3, 4, 5, 6, 7},
+		20: {2, 3, 4, 6, 7},
+		19: {2, 3, 4, 6, 7},
+		18: {2, 4, 5, 6, 7},
+		17: {2, 4, 5, 6, 7},
+		16: {2, 3, 4, 5, 7},
+		15: {2, 3, 4, 5, 7},
+		14: {2, 3, 5, 6, 7},
+		13: {1, 2, 3, 4, 5, 6, 7, 8},
+		12: {1, 2, 3, 4, 5, 6, 7, 8},
+		11: {1, 2, 4, 5, 7, 8},
+	}
+	rows := make([]patternRow, 0, len(occupiedByY))
+	for y := 21; y >= 11; y-- {
+		occupied := make(map[int]bool)
+		for _, x := range occupiedByY[y] {
+			occupied[x] = true
+		}
+		cells := make([]patternCell, 0, BoardWidth)
+		for x := 0; x < BoardWidth; x++ {
+			cells = append(cells, patternCell{X: x, Occupied: occupied[x]})
+		}
+		rows = append(rows, patternRow{Y: y, Cells: cells})
+	}
+	g.patternRows = nil
 	g.queuePattern(rows)
 }
 
@@ -674,7 +719,7 @@ func (g *Game) removeRandomHalf() {
 }
 
 func (g *Game) HasActiveEffect() bool {
-	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0 || g.Mini || g.Blink || g.SZ || g.Trans
+	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0 || g.Mini || g.Blink || g.SZ || g.Trans || g.Blackout
 }
 
 func (g *Game) UseAntidote() bool {
@@ -693,6 +738,7 @@ func (g *Game) UseAntidote() bool {
 	g.blinkTick = 0
 	g.SZ = false
 	g.Trans = false
+	g.Blackout = false
 	return true
 }
 
