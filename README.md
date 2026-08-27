@@ -29,10 +29,11 @@ matching the original game's basic multiplayer attack. The first two special
 blocks are implemented: Antidote is stored when collected, Clear empties the
 collector's board, Blind hides the selected target's Next preview, Inverse
 reverses the target's horizontal movement and rotation, Rabbit/Faster speeds up
-the target, and Turtle/Slower slows the collector. One Antidote clears all
-active effects, including helpful Slower stacks, making its use a tactical
-trade-off. Android is deliberately deferred; native Linux and web are the
-active targets.
+the target, Turtle/Slower slows the collector, Bridge adds two disruption rows
+to the target, and Question removes half of the target's placed blocks. One
+Antidote clears all active effects, including helpful Slower stacks, making its
+use a tactical trade-off. Android is deliberately deferred; native Linux and
+web are the active targets.
 
 ## Develop
 

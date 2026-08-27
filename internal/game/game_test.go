@@ -243,6 +243,47 @@ func TestAntidoteIsNotSpentWithoutEffect(t *testing.T) {
 	}
 }
 
+func TestBridgeAddsTwoRows(t *testing.T) {
+	g := New(21)
+	g.ApplySpecial(SpecialBridge)
+	occupied := 0
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 2*(BoardWidth-1) {
+		t.Fatalf("bridge occupied cells = %d", occupied)
+	}
+}
+
+func TestQuestionRemovesHalfOfPlacedBlocks(t *testing.T) {
+	g := New(22)
+	for y := BoardHeight - 2; y < BoardHeight; y++ {
+		for x := 0; x < BoardWidth; x++ {
+			g.Board[y][x] = 1
+		}
+	}
+	g.SpawnSpecial(SpecialAntidote, Point{X: 0, Y: BoardHeight - 1})
+	g.ApplySpecial(SpecialQuestion)
+	occupied := 0
+	for _, row := range g.Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 10 {
+		t.Fatalf("question left %d blocks, want 10", occupied)
+	}
+	if g.Specials[BoardHeight-1][0] != SpecialNone && g.Board[BoardHeight-1][0] == 0 {
+		t.Fatal("question left an orphaned special")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

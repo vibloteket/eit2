@@ -74,6 +74,41 @@ func TestSpecialRoutesToSelectedTarget(t *testing.T) {
 	}
 }
 
+func TestBridgeAndQuestionRouteToTarget(t *testing.T) {
+	m := New(2)
+	for y := game.BoardHeight - 2; y < game.BoardHeight; y++ {
+		for x := 0; x < game.BoardWidth; x++ {
+			m.Players[1].Board[y][x] = 1
+		}
+	}
+	m.Players[0].QueueSpecial(game.SpecialQuestion)
+	m.routeSpecials()
+	occupied := 0
+	for _, row := range m.Players[1].Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 10 {
+		t.Fatalf("question left %d blocks on target", occupied)
+	}
+	m.Players[0].QueueSpecial(game.SpecialBridge)
+	m.routeSpecials()
+	occupied = 0
+	for _, row := range m.Players[1].Board {
+		for _, value := range row {
+			if value != 0 {
+				occupied++
+			}
+		}
+	}
+	if occupied != 28 {
+		t.Fatalf("bridge left %d blocks on target, want 28", occupied)
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

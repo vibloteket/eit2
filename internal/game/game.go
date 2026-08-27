@@ -20,8 +20,10 @@ const (
 	SpecialClear
 	SpecialBlind
 	SpecialInverse
-	SpecialFaster // Rabbit: speeds up the selected target.
-	SpecialSlower // Turtle: slows down the collector.
+	SpecialFaster   // Rabbit: speeds up the selected target.
+	SpecialSlower   // Turtle: slows down the collector.
+	SpecialBridge   // Adds two disruptive rows to the selected target.
+	SpecialQuestion // Removes half of the selected target's placed blocks.
 )
 
 type Piece struct {
@@ -344,7 +346,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(6) {
+	switch g.random.IntN(8) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -355,6 +357,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialFaster
 	case 5:
 		special = SpecialSlower
+	case 6:
+		special = SpecialBridge
+	case 7:
+		special = SpecialQuestion
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -372,7 +378,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -401,6 +407,29 @@ func (g *Game) ApplySpecial(special Special) {
 		g.Inverse = true
 	case SpecialFaster:
 		g.FasterStacks++
+	case SpecialBridge:
+		g.AddGarbage(2)
+	case SpecialQuestion:
+		g.removeRandomHalf()
+	}
+}
+
+func (g *Game) removeRandomHalf() {
+	occupied := make([]Point, 0)
+	for y, row := range g.Board {
+		for x, value := range row {
+			if value != 0 {
+				occupied = append(occupied, Point{X: x, Y: y})
+			}
+		}
+	}
+	remove := len(occupied) / 2
+	g.random.Shuffle(len(occupied), func(i, j int) {
+		occupied[i], occupied[j] = occupied[j], occupied[i]
+	})
+	for _, point := range occupied[:remove] {
+		g.Board[point.Y][point.X] = 0
+		g.Specials[point.Y][point.X] = SpecialNone
 	}
 }
 

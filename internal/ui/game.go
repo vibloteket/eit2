@@ -686,6 +686,10 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "F"
 	case core.SpecialSlower:
 		label = "S"
+	case core.SpecialBridge:
+		label = "+2"
+	case core.SpecialQuestion:
+		label = "?"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
