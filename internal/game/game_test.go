@@ -209,6 +209,18 @@ func TestSpecialExpiresAtItsSpawnLifetime(t *testing.T) {
 	}
 }
 
+func TestAntidoteFeedbackDistinguishesCollectAndUse(t *testing.T) {
+	g := New(44)
+	g.activateSpecial(SpecialAntidote)
+	if g.LastEvent != "COLLECTED: Antidote" || g.Antidotes != 1 {
+		t.Fatalf("collect event=%q antidotes=%d", g.LastEvent, g.Antidotes)
+	}
+	g.ApplySpecial(SpecialBlind)
+	if !g.UseAntidote() || g.LastEvent != "USED: Antidote" {
+		t.Fatalf("use event=%q", g.LastEvent)
+	}
+}
+
 func TestAntidoteSpecialActivatesWhenItsRowClears(t *testing.T) {
 	g := New(10)
 	for x := 0; x < BoardWidth; x++ {

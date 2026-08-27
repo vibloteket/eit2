@@ -538,7 +538,11 @@ func (g *Game) ShowEvent(message string) {
 }
 
 func (g *Game) activateSpecial(special Special) {
-	g.ShowEvent("ACTIVATED: " + special.Name())
+	if special == SpecialAntidote {
+		g.ShowEvent("COLLECTED: " + special.Name())
+	} else {
+		g.ShowEvent("ACTIVATED: " + special.Name())
+	}
 	switch special {
 	case SpecialAntidote:
 		if g.Antidotes < 4 {
@@ -876,6 +880,7 @@ func (g *Game) UseAntidote() bool {
 	g.RumbleRounds = 0
 	g.rumbleTick = 0
 	g.rumblePoints = nil
+	g.ShowEvent("USED: Antidote")
 	return true
 }
 
