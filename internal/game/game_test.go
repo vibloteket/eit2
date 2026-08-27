@@ -578,6 +578,48 @@ func TestBlackoutAndIceAreClearedByAntidote(t *testing.T) {
 	}
 }
 
+func TestRumbleMovesBlocksWithoutChangingCount(t *testing.T) {
+	g := New(41)
+	for x := 2; x < 8; x++ {
+		g.Board[18][x] = 1
+	}
+	before := g.Board
+	g.ApplySpecial(SpecialRumble)
+	if g.RumbleRounds != 5 {
+		t.Fatalf("rumble rounds = %d", g.RumbleRounds)
+	}
+	for range 15 {
+		g.advanceRumble()
+	}
+	occupied := 0
+	changed := false
+	for y, row := range g.Board {
+		for x, value := range row {
+			if value != 0 {
+				occupied++
+			}
+			if value != before[y][x] {
+				changed = true
+			}
+		}
+	}
+	if occupied != 6 || !changed || g.RumbleRounds != 0 {
+		t.Fatalf("occupied=%d changed=%v rounds=%d", occupied, changed, g.RumbleRounds)
+	}
+}
+
+func TestBackgroundChangesAndAntidoteResetsIt(t *testing.T) {
+	g := New(42)
+	g.ApplySpecial(SpecialBackground)
+	if g.BackgroundVariant < 1 || g.BackgroundVariant > 6 {
+		t.Fatalf("background variant = %d", g.BackgroundVariant)
+	}
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.BackgroundVariant != 0 {
+		t.Fatal("antidote did not reset background")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

@@ -20,22 +20,24 @@ const (
 	SpecialClear
 	SpecialBlind
 	SpecialInverse
-	SpecialFaster   // Rabbit: speeds up the selected target.
-	SpecialSlower   // Turtle: slows down the collector.
-	SpecialBridge   // Adds two disruptive rows to the selected target.
-	SpecialQuestion // Removes half of the selected target's placed blocks.
-	SpecialStair    // Builds a diagonal staircase on the selected target.
-	SpecialFill     // Fills the selected target's lower ten rows with one hole each.
-	SpecialFlip     // Vertically flips the selected target's placed structure.
-	SpecialSwitch   // Swaps placed structures with the selected target.
-	SpecialPacket   // Sends one garbage row per cleared row for 20 seconds.
-	SpecialRing     // Builds a hollow ring on the selected target.
-	SpecialMini     // Renders the selected target's settled blocks smaller.
-	SpecialBlink    // Makes the selected target's active piece blink.
-	SpecialSZ       // Restricts the selected target's future pieces to S and Z.
-	SpecialTrans    // Renders the selected target's settled blocks translucent.
-	SpecialCastle   // Replaces the selected target's board with a castle.
-	SpecialColor    // Blackout: renders the selected target's settled blocks dark.
+	SpecialFaster     // Rabbit: speeds up the selected target.
+	SpecialSlower     // Turtle: slows down the collector.
+	SpecialBridge     // Adds two disruptive rows to the selected target.
+	SpecialQuestion   // Removes half of the selected target's placed blocks.
+	SpecialStair      // Builds a diagonal staircase on the selected target.
+	SpecialFill       // Fills the selected target's lower ten rows with one hole each.
+	SpecialFlip       // Vertically flips the selected target's placed structure.
+	SpecialSwitch     // Swaps placed structures with the selected target.
+	SpecialPacket     // Sends one garbage row per cleared row for 20 seconds.
+	SpecialRing       // Builds a hollow ring on the selected target.
+	SpecialMini       // Renders the selected target's settled blocks smaller.
+	SpecialBlink      // Makes the selected target's active piece blink.
+	SpecialSZ         // Restricts the selected target's future pieces to S and Z.
+	SpecialTrans      // Renders the selected target's settled blocks translucent.
+	SpecialCastle     // Replaces the selected target's board with a castle.
+	SpecialColor      // Blackout: renders the selected target's settled blocks dark.
+	SpecialRumble     // Shakes a selection of the target's settled blocks.
+	SpecialBackground // Changes the selected target's playfield background.
 )
 
 type patternCell struct {
@@ -98,6 +100,10 @@ type Game struct {
 	SZ                   bool
 	Trans                bool
 	Blackout             bool
+	BackgroundVariant    int
+	RumbleRounds         int
+	rumbleTick           int
+	rumblePoints         []Point
 	blinkTick            int
 	pendingSpecial       []Special
 	pendingGarbage       int
@@ -235,6 +241,7 @@ func (g *Game) Tick() {
 		return
 	}
 	g.advancePattern()
+	g.advanceRumble()
 	if g.PacketTicks > 0 {
 		g.PacketTicks--
 	}
@@ -404,7 +411,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(20) {
+	switch g.random.IntN(22) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -443,6 +450,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialCastle
 	case 19:
 		special = SpecialColor
+	case 20:
+		special = SpecialRumble
+	case 21:
+		special = SpecialBackground
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 	seconds := 18 + len(occupied)/10
@@ -470,7 +481,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing, SpecialMini, SpecialBlink, SpecialSZ, SpecialTrans, SpecialCastle, SpecialColor:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch, SpecialRing, SpecialMini, SpecialBlink, SpecialSZ, SpecialTrans, SpecialCastle, SpecialColor, SpecialRumble, SpecialBackground:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -529,6 +540,10 @@ func (g *Game) ApplySpecial(special Special) {
 		g.addCastle()
 	case SpecialColor:
 		g.Blackout = true
+	case SpecialRumble:
+		g.startRumble()
+	case SpecialBackground:
+		g.BackgroundVariant = 1 + g.random.IntN(6)
 	}
 }
 
@@ -699,6 +714,54 @@ func (g *Game) PendingPatternRows() int {
 	return len(g.patternRows)
 }
 
+func (g *Game) startRumble() {
+	occupied := make([]Point, 0)
+	for y, row := range g.Board {
+		for x, value := range row {
+			if value != 0 {
+				occupied = append(occupied, Point{X: x, Y: y})
+			}
+		}
+	}
+	g.random.Shuffle(len(occupied), func(i, j int) {
+		occupied[i], occupied[j] = occupied[j], occupied[i]
+	})
+	if len(occupied) > 6 {
+		occupied = occupied[:6]
+	}
+	g.rumblePoints = occupied
+	g.RumbleRounds = 5
+	g.rumbleTick = 0
+}
+
+func (g *Game) advanceRumble() {
+	if g.RumbleRounds == 0 || len(g.rumblePoints) == 0 {
+		return
+	}
+	g.rumbleTick++
+	if g.rumbleTick < 3 {
+		return
+	}
+	g.rumbleTick = 0
+	for i, point := range g.rumblePoints {
+		if g.Board[point.Y][point.X] == 0 {
+			continue
+		}
+		dx := g.random.IntN(3) - 1
+		dy := -g.random.IntN(2)
+		destination := Point{X: point.X + dx, Y: point.Y + dy}
+		if destination.X < 0 || destination.X >= BoardWidth || destination.Y < 1 || destination.Y >= BoardHeight || g.Board[destination.Y][destination.X] != 0 {
+			continue
+		}
+		g.Board[destination.Y][destination.X] = g.Board[point.Y][point.X]
+		g.Specials[destination.Y][destination.X] = g.Specials[point.Y][point.X]
+		g.Board[point.Y][point.X] = 0
+		g.Specials[point.Y][point.X] = SpecialNone
+		g.rumblePoints[i] = destination
+	}
+	g.RumbleRounds--
+}
+
 func (g *Game) removeRandomHalf() {
 	occupied := make([]Point, 0)
 	for y, row := range g.Board {
@@ -719,7 +782,7 @@ func (g *Game) removeRandomHalf() {
 }
 
 func (g *Game) HasActiveEffect() bool {
-	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0 || g.Mini || g.Blink || g.SZ || g.Trans || g.Blackout
+	return g.Blind || g.Inverse || g.FasterStacks > 0 || g.SlowerBonus > 0 || g.PacketTicks > 0 || g.Mini || g.Blink || g.SZ || g.Trans || g.Blackout || g.RumbleRounds > 0 || g.BackgroundVariant > 0
 }
 
 func (g *Game) UseAntidote() bool {
@@ -739,6 +802,10 @@ func (g *Game) UseAntidote() bool {
 	g.SZ = false
 	g.Trans = false
 	g.Blackout = false
+	g.BackgroundVariant = 0
+	g.RumbleRounds = 0
+	g.rumbleTick = 0
+	g.rumblePoints = nil
 	return true
 }
 

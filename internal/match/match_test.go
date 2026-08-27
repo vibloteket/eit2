@@ -225,6 +225,20 @@ func TestCastleAndBlackoutRouteToTarget(t *testing.T) {
 	}
 }
 
+func TestRumbleAndBackgroundRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[1].Board[18][4] = 1
+	m.Players[0].QueueSpecial(game.SpecialRumble)
+	m.Players[0].QueueSpecial(game.SpecialBackground)
+	m.routeSpecials()
+	if m.Players[1].RumbleRounds != 5 || m.Players[1].BackgroundVariant == 0 {
+		t.Fatal("selected target did not receive Rumble and Background")
+	}
+	if m.Players[0].RumbleRounds != 0 || m.Players[0].BackgroundVariant != 0 {
+		t.Fatal("attacker received its own Rumble or Background")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

@@ -464,7 +464,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
 	boardX, boardY := (logicalWidth-boardW)/2, 40
 	ebitenutil.DrawRect(screen, float64(boardX-5), float64(boardY-5), float64(boardW+10), float64(boardH+10), muted)
-	ebitenutil.DrawRect(screen, float64(boardX), float64(boardY), float64(boardW), float64(boardH), panel)
+	drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 	for y, row := range game.Board {
 		for x, value := range row {
 			if value != 0 {
@@ -525,6 +525,22 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	g.drawMatchOverlay(screen)
 }
 
+func drawBoardBackground(screen *ebiten.Image, x, y, width, height, variant int) {
+	variants := [...]color.RGBA{
+		panel,
+		{R: 35, G: 50, B: 72, A: 255},
+		{R: 56, G: 38, B: 66, A: 255},
+		{R: 29, G: 63, B: 54, A: 255},
+		{R: 71, G: 48, B: 32, A: 255},
+		{R: 45, G: 44, B: 76, A: 255},
+		{R: 69, G: 35, B: 48, A: 255},
+	}
+	if variant < 0 || variant >= len(variants) {
+		variant = 0
+	}
+	ebitenutil.DrawRect(screen, float64(x), float64(y), float64(width), float64(height), variants[variant])
+}
+
 func (g *Game) drawCouch(screen *ebiten.Image) {
 	count := len(g.players)
 	const gap = 12
@@ -540,7 +556,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(22), float64(x+8), 20, white)
 		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(16), float64(x+48), 25, muted)
 		ebitenutil.DrawRect(screen, float64(boardX-3), float64(boardY-3), float64(boardW+6), float64(boardH+6), muted)
-		ebitenutil.DrawRect(screen, float64(boardX), float64(boardY), float64(boardW), float64(boardH), panel)
+		drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 		for y, row := range game.Board {
 			for bx, value := range row {
 				if value != 0 {
@@ -692,6 +708,12 @@ func effectLabel(game *core.Game) string {
 	if game.Blackout {
 		appendEffect("Blackout")
 	}
+	if game.RumbleRounds > 0 {
+		appendEffect("Rumble")
+	}
+	if game.BackgroundVariant > 0 {
+		appendEffect("Background")
+	}
 	if label == "" {
 		return "None"
 	}
@@ -741,6 +763,10 @@ func drawSpecial(screen *ebiten.Image, x, y, size int, special core.Special, fac
 		label = "CA"
 	case core.SpecialColor:
 		label = "BO"
+	case core.SpecialRumble:
+		label = "RU"
+	case core.SpecialBackground:
+		label = "BG"
 	}
 	if label != "" {
 		drawCenteredText(screen, label, face, float64(x+size/2), float64(y+1), background)
