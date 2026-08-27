@@ -620,6 +620,27 @@ func TestBackgroundChangesAndAntidoteResetsIt(t *testing.T) {
 	}
 }
 
+func TestSpecialNamesAreHumanReadable(t *testing.T) {
+	if SpecialAntidote.Name() != "Antidote" || SpecialFaster.Name() != "Rabbit / Faster" || SpecialColor.Name() != "Blackout" {
+		t.Fatal("special display names are incomplete")
+	}
+}
+
+func TestEventExpiresAfterFourSeconds(t *testing.T) {
+	g := New(43)
+	g.ShowEvent("test")
+	for range 4*60 - 1 {
+		g.Tick()
+	}
+	if g.LastEvent == "" {
+		t.Fatal("event expired too early")
+	}
+	g.Tick()
+	if g.LastEvent != "" || g.EventTicks != 0 {
+		t.Fatal("event did not expire")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {

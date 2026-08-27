@@ -71,11 +71,25 @@ func (m *Match) routeSpecials() {
 			}
 			if special == core.SpecialSwitch {
 				player.SwapBoard(m.Players[target])
+				player.ShowEvent("SWITCHED WITH P" + playerNumber(target))
+				if target != attacker {
+					m.Players[target].ShowEvent("SWITCHED BY P" + playerNumber(attacker))
+				}
 				continue
 			}
 			m.Players[target].ApplySpecial(special)
+			if target == attacker {
+				player.ShowEvent("SELF: " + special.Name())
+			} else {
+				player.ShowEvent("SENT " + special.Name() + " TO P" + playerNumber(target))
+				m.Players[target].ShowEvent("P" + playerNumber(attacker) + ": " + special.Name())
+			}
 		}
 	}
+}
+
+func playerNumber(index int) string {
+	return string(rune('1' + index))
 }
 
 func (m *Match) CycleTarget(player int) int {

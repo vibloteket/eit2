@@ -14,6 +14,57 @@ type Point struct{ X, Y int }
 
 type Special int
 
+func (s Special) Name() string {
+	switch s {
+	case SpecialAntidote:
+		return "Antidote"
+	case SpecialClear:
+		return "Clear"
+	case SpecialBlind:
+		return "Blind"
+	case SpecialInverse:
+		return "Inverse"
+	case SpecialFaster:
+		return "Rabbit / Faster"
+	case SpecialSlower:
+		return "Turtle / Slower"
+	case SpecialBridge:
+		return "Bridge"
+	case SpecialQuestion:
+		return "Question"
+	case SpecialStair:
+		return "Stair"
+	case SpecialFill:
+		return "Fill"
+	case SpecialFlip:
+		return "Flip"
+	case SpecialSwitch:
+		return "Switch"
+	case SpecialPacket:
+		return "Packet"
+	case SpecialRing:
+		return "Ring"
+	case SpecialMini:
+		return "Mini"
+	case SpecialBlink:
+		return "Blink"
+	case SpecialSZ:
+		return "SZ"
+	case SpecialTrans:
+		return "Ice"
+	case SpecialCastle:
+		return "Castle"
+	case SpecialColor:
+		return "Blackout"
+	case SpecialRumble:
+		return "Rumble"
+	case SpecialBackground:
+		return "Background"
+	default:
+		return "Unknown"
+	}
+}
+
 const (
 	SpecialNone Special = iota
 	SpecialAntidote
@@ -114,6 +165,8 @@ type Game struct {
 	specialLifetimeTicks int
 	patternTick          int
 	patternRows          []patternRow
+	LastEvent            string
+	EventTicks           int
 }
 
 func New(seed uint64) *Game {
@@ -239,6 +292,12 @@ func (g *Game) HardDrop() {
 func (g *Game) Tick() {
 	if g.GameOver {
 		return
+	}
+	if g.EventTicks > 0 {
+		g.EventTicks--
+		if g.EventTicks == 0 {
+			g.LastEvent = ""
+		}
 	}
 	g.advancePattern()
 	g.advanceRumble()
@@ -472,7 +531,13 @@ func (g *Game) SpecialLifetimeTicks() int {
 	return g.specialLifetimeTicks
 }
 
+func (g *Game) ShowEvent(message string) {
+	g.LastEvent = message
+	g.EventTicks = 4 * 60
+}
+
 func (g *Game) activateSpecial(special Special) {
+	g.ShowEvent("ACTIVATED: " + special.Name())
 	switch special {
 	case SpecialAntidote:
 		if g.Antidotes < 4 {

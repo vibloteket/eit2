@@ -251,6 +251,27 @@ func TestFasterRoutesToTarget(t *testing.T) {
 	}
 }
 
+func TestSpecialFeedbackNamesSenderAndTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialBlind)
+	m.routeSpecials()
+	if m.Players[0].LastEvent != "SENT Blind TO P2" {
+		t.Fatalf("sender event = %q", m.Players[0].LastEvent)
+	}
+	if m.Players[1].LastEvent != "P1: Blind" {
+		t.Fatalf("target event = %q", m.Players[1].LastEvent)
+	}
+}
+
+func TestSoloSpecialFeedbackSaysSelf(t *testing.T) {
+	m := New(1)
+	m.Players[0].QueueSpecial(game.SpecialInverse)
+	m.routeSpecials()
+	if m.Players[0].LastEvent != "SELF: Inverse" {
+		t.Fatalf("solo event = %q", m.Players[0].LastEvent)
+	}
+}
+
 func TestLastAlivePlayerWins(t *testing.T) {
 	m := New(3)
 	m.Players[0].GameOver = true

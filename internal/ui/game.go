@@ -511,6 +511,10 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), 4, accent)
 	drawCenteredText(screen, "PAUSE", g.face(20), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
 
+	if game.LastEvent != "" {
+		drawCenteredText(screen, game.LastEvent, g.face(22), logicalWidth/2, 645, accent)
+	}
+
 	for _, control := range touchButtons() {
 		r := control.Rect
 		fill := panel
@@ -595,6 +599,10 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 			stored = fmt.Sprintf("A × %d", game.Antidotes)
 		}
 		drawText(screen, stored, g.face(17), float64(hudX), 323, white)
+		if game.LastEvent != "" {
+			event := fitText(game.LastEvent, g.face(13), float64(areaWidth-16))
+			drawCenteredText(screen, event, g.face(13), float64(x+areaWidth/2), 675, accent)
+		}
 		if game.GameOver {
 			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
 		}
