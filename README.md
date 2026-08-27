@@ -5,6 +5,13 @@ players. It is a clean successor to the original
 [`vibloteket/eit`](https://github.com/vibloteket/eit), built in Go with
 [Ebitengine](https://ebitengine.org/).
 
+## License
+
+Eit 2 is free software licensed under
+[`AGPL-3.0-or-later`](LICENSE). Network users of modified hosted versions must
+be offered the corresponding source code. See [`NOTICE.md`](NOTICE.md) for
+origin and third-party notices and [`ASSETS.md`](ASSETS.md) for asset licensing.
+
 The current published version is stored in `VERSION` and shown in the lobby.
 Every public deployment must increment it so testers can identify the exact
 build. The web loader also appends the version to the Wasm URL to avoid stale
@@ -93,5 +100,5 @@ loader to run directly from `file://`.
 - `cmd/eit2`: native and WebAssembly entry point
 - `web`: browser loader
 
-Future gameplay rules will live in an engine-independent `internal/game`
-package so they can be tested without opening a window.
+Gameplay rules live in the engine-independent `internal/game` package so they
+can be tested without opening a window.
