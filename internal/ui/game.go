@@ -15,6 +15,7 @@ import (
 	core "github.com/vibloteket/eit2/internal/game"
 	"github.com/vibloteket/eit2/internal/lobby"
 	matchcore "github.com/vibloteket/eit2/internal/match"
+	"github.com/vibloteket/eit2/internal/version"
 )
 
 const (
@@ -418,6 +419,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) drawLobby(screen *ebiten.Image) {
 	screen.Fill(background)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
+	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
 	drawText(screen, "Tap anywhere or press A to join", g.face(27), 42, 92, white)
 	const gap, margin = 20, 40
 	width := (logicalWidth - margin*2 - gap*3) / lobby.MaxPlayers

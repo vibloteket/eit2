@@ -31,3 +31,4 @@
 - Keep touch as a lightweight input adapter for browser-based mobile testing.
 - Do not add Android build complexity until Linux and web targets are stable.
 - Do not copy legacy assets without checking their licensing status.
+- Increment the root `VERSION` file for every public deployment; the lobby and Wasm cache key use it.

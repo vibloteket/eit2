@@ -5,6 +5,11 @@ players. It is a clean successor to the original
 [`vibloteket/eit`](https://github.com/vibloteket/eit), built in Go with
 [Ebitengine](https://ebitengine.org/).
 
+The current published version is stored in `VERSION` and shown in the lobby.
+Every public deployment must increment it so testers can identify the exact
+build. The web loader also appends the version to the Wasm URL to avoid stale
+browser caches.
+
 ## Current milestone
 
 This initial technical spike proves the project structure and its first targets:

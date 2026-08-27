@@ -29,7 +29,10 @@
     <script src="wasm_exec.js"></script>
     <script>
       const go = new Go();
-      WebAssembly.instantiateStreaming(fetch("eit2.wasm"), go.importObject)
+      WebAssembly.instantiateStreaming(
+        fetch("eit2.wasm?v=__VERSION__"),
+        go.importObject,
+      )
         .then((result) => go.run(result.instance))
         .catch((error) => {
           document.body.textContent = `Could not start Eit 2: ${error}`;
