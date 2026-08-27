@@ -26,6 +26,8 @@ const (
 	SpecialQuestion // Removes half of the selected target's placed blocks.
 	SpecialStair    // Builds a diagonal staircase on the selected target.
 	SpecialFill     // Fills the selected target's lower ten rows with one hole each.
+	SpecialFlip     // Vertically flips the selected target's placed structure.
+	SpecialSwitch   // Swaps placed structures with the selected target.
 )
 
 type patternCell struct {
@@ -361,7 +363,7 @@ func (g *Game) spawnSpecial() {
 		return
 	}
 	special := SpecialAntidote
-	switch g.random.IntN(10) {
+	switch g.random.IntN(12) {
 	case 1:
 		special = SpecialClear
 	case 2:
@@ -380,6 +382,10 @@ func (g *Game) spawnSpecial() {
 		special = SpecialStair
 	case 9:
 		special = SpecialFill
+	case 10:
+		special = SpecialFlip
+	case 11:
+		special = SpecialSwitch
 	}
 	g.SpawnSpecial(special, occupied[g.random.IntN(len(occupied))])
 }
@@ -397,7 +403,7 @@ func (g *Game) activateSpecial(special Special) {
 	case SpecialClear:
 		g.Board = [BoardHeight][BoardWidth]int{}
 		g.Specials = [BoardHeight][BoardWidth]Special{}
-	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill:
+	case SpecialBlind, SpecialInverse, SpecialFaster, SpecialBridge, SpecialQuestion, SpecialStair, SpecialFill, SpecialFlip, SpecialSwitch:
 		g.pendingSpecial = append(g.pendingSpecial, special)
 	case SpecialSlower:
 		// Original Eit's Turtle is a small permanent slowdown for the collector.
@@ -434,7 +440,44 @@ func (g *Game) ApplySpecial(special Special) {
 		g.addStair()
 	case SpecialFill:
 		g.addFill()
+	case SpecialFlip:
+		g.FlipBoard()
 	}
+}
+
+// FlipBoard reverses the occupied vertical extent of the settled structure,
+// matching the original game's Flip behavior. The active piece is not moved.
+func (g *Game) FlipBoard() {
+	top := BoardHeight
+	for y, row := range g.Board {
+		for _, value := range row {
+			if value != 0 {
+				top = y
+				break
+			}
+		}
+		if top != BoardHeight {
+			break
+		}
+	}
+	if top == BoardHeight {
+		return
+	}
+	for upper, lower := top, BoardHeight-1; upper < lower; upper, lower = upper+1, lower-1 {
+		g.Board[upper], g.Board[lower] = g.Board[lower], g.Board[upper]
+		g.Specials[upper], g.Specials[lower] = g.Specials[lower], g.Specials[upper]
+	}
+}
+
+// SwapBoard exchanges settled blocks and their attached special markers. Match
+// state, active pieces, score, effects, next pieces and queued patterns stay
+// with their original players.
+func (g *Game) SwapBoard(other *Game) {
+	if other == nil || other == g {
+		return
+	}
+	g.Board, other.Board = other.Board, g.Board
+	g.Specials, other.Specials = other.Specials, g.Specials
 }
 
 func (g *Game) queuePattern(rows []patternRow) {

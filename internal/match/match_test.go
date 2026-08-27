@@ -147,6 +147,35 @@ func TestStairAndFillRouteToTarget(t *testing.T) {
 	}
 }
 
+func TestFlipAndSwitchRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[1].Board[18][2] = 3
+	m.Players[0].QueueSpecial(game.SpecialFlip)
+	m.routeSpecials()
+	if m.Players[1].Board[21][2] != 3 {
+		t.Fatal("selected target board was not flipped")
+	}
+
+	m = New(2)
+	m.Players[0].Board[21][0] = 1
+	m.Players[1].Board[20][9] = 2
+	m.Players[0].QueueSpecial(game.SpecialSwitch)
+	m.routeSpecials()
+	if m.Players[0].Board[20][9] != 2 || m.Players[1].Board[21][0] != 1 {
+		t.Fatal("attacker and selected target did not swap boards")
+	}
+}
+
+func TestSoloSwitchIsNoOp(t *testing.T) {
+	m := New(1)
+	m.Players[0].Board[21][0] = 1
+	m.Players[0].QueueSpecial(game.SpecialSwitch)
+	m.routeSpecials()
+	if m.Players[0].Board[21][0] != 1 {
+		t.Fatal("solo switch changed its own board")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

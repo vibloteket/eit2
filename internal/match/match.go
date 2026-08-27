@@ -66,9 +66,14 @@ func (m *Match) routeSpecials() {
 			if len(m.Players) == 1 {
 				target = attacker
 			}
-			if target >= 0 && target < len(m.Players) && !m.Players[target].GameOver {
-				m.Players[target].ApplySpecial(special)
+			if target < 0 || target >= len(m.Players) || m.Players[target].GameOver {
+				continue
 			}
+			if special == core.SpecialSwitch {
+				player.SwapBoard(m.Players[target])
+				continue
+			}
+			m.Players[target].ApplySpecial(special)
 		}
 	}
 }

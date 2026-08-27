@@ -357,6 +357,45 @@ func TestFillDoesNotOverwriteActivePiece(t *testing.T) {
 	}
 }
 
+func TestFlipReversesOccupiedVerticalExtentAndSpecials(t *testing.T) {
+	g := New(26)
+	g.Board[18][1] = 1
+	g.Board[21][7] = 2
+	g.Specials[18][1] = SpecialAntidote
+	g.FlipBoard()
+	if g.Board[21][1] != 1 || g.Board[18][7] != 2 {
+		t.Fatalf("flip positions incorrect: top=%d bottom=%d", g.Board[18][7], g.Board[21][1])
+	}
+	if g.Specials[21][1] != SpecialAntidote {
+		t.Fatal("special marker did not flip with settled block")
+	}
+}
+
+func TestFlipOfEmptyBoardIsNoOp(t *testing.T) {
+	g := New(27)
+	active := g.Active
+	g.FlipBoard()
+	if g.Active != active {
+		t.Fatal("flip moved active piece")
+	}
+}
+
+func TestSwapExchangesOnlySettledBoards(t *testing.T) {
+	a, b := New(28), New(29)
+	a.Board[21][0] = 1
+	a.Specials[21][0] = SpecialClear
+	b.Board[20][9] = 2
+	aActive, bActive := a.Active, b.Active
+	aNext, bNext := a.NextKind, b.NextKind
+	a.SwapBoard(b)
+	if a.Board[20][9] != 2 || b.Board[21][0] != 1 || b.Specials[21][0] != SpecialClear {
+		t.Fatal("settled boards were not swapped")
+	}
+	if a.Active != aActive || b.Active != bActive || a.NextKind != aNext || b.NextKind != bNext {
+		t.Fatal("swap changed active or next pieces")
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {
