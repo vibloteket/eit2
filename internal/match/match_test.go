@@ -198,6 +198,19 @@ func TestMiniAndBlinkRouteToTarget(t *testing.T) {
 	}
 }
 
+func TestSZAndTransRouteToTarget(t *testing.T) {
+	m := New(2)
+	m.Players[0].QueueSpecial(game.SpecialSZ)
+	m.Players[0].QueueSpecial(game.SpecialTrans)
+	m.routeSpecials()
+	if !m.Players[1].SZ || !m.Players[1].Trans {
+		t.Fatal("selected target did not receive SZ and Trans")
+	}
+	if m.Players[0].SZ || m.Players[0].Trans {
+		t.Fatal("attacker received its own SZ or Trans")
+	}
+}
+
 func TestFasterRoutesToTarget(t *testing.T) {
 	m := New(2)
 	m.Players[0].QueueSpecial(game.SpecialFaster)

@@ -518,6 +518,31 @@ func TestMiniAndBlinkAreClearedByAntidote(t *testing.T) {
 	}
 }
 
+func TestSZRestrictsFuturePiecesToSAndZ(t *testing.T) {
+	g := New(37)
+	g.ApplySpecial(SpecialSZ)
+	for range 30 {
+		if g.NextKind != 5 && g.NextKind != 6 {
+			t.Fatalf("SZ generated kind %d", g.NextKind)
+		}
+		g.Board = [BoardHeight][BoardWidth]int{}
+		g.HardDrop()
+		if g.Active.Kind != 5 && g.Active.Kind != 6 {
+			t.Fatalf("SZ spawned kind %d", g.Active.Kind)
+		}
+	}
+}
+
+func TestTransAndSZAreClearedByAntidote(t *testing.T) {
+	g := New(38)
+	g.ApplySpecial(SpecialSZ)
+	g.ApplySpecial(SpecialTrans)
+	g.Antidotes = 1
+	if !g.UseAntidote() || g.SZ || g.Trans {
+		t.Fatalf("sz=%v trans=%v", g.SZ, g.Trans)
+	}
+}
+
 func TestClearSpecialEmptiesBoard(t *testing.T) {
 	g := New(11)
 	for x := 0; x < BoardWidth; x++ {
