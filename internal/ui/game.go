@@ -71,22 +71,23 @@ func (r imageRect) contains(x, y int) bool {
 }
 
 type Game struct {
-	Lobby              lobby.Lobby
-	gamepadIDs         []ebiten.GamepadID
-	touchIDs           []ebiten.TouchID
-	pressedIDs         []ebiten.TouchID
-	heldActions        map[action]int
-	padHeld            map[int]map[action]int
-	fontSource         *text.GoTextFaceSource
-	view               view
-	players            []*core.Game
-	match              *matchcore.Match
-	paused             bool
-	debugEnabled       bool
-	debugOpen          bool
-	debugPlayer        int
-	disconnectedPlayer int
-	touchDevice        lobby.Device
+	Lobby               lobby.Lobby
+	gamepadIDs          []ebiten.GamepadID
+	touchIDs            []ebiten.TouchID
+	pressedIDs          []ebiten.TouchID
+	heldActions         map[action]int
+	padHeld             map[int]map[action]int
+	fontSource          *text.GoTextFaceSource
+	view                view
+	players             []*core.Game
+	match               *matchcore.Match
+	paused              bool
+	debugEnabled        bool
+	debugOpen           bool
+	debugPlayer         int
+	controllerDebugOpen bool
+	disconnectedPlayer  int
+	touchDevice         lobby.Device
 }
 
 func NewGame() *Game {
@@ -138,7 +139,11 @@ func (g *Game) updateLobby() error {
 	}
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if debugLobbyButton().contains(x, y) {
+		if controllerDebugButton().contains(x, y) {
+			g.controllerDebugOpen = !g.controllerDebugOpen
+		} else if g.controllerDebugOpen {
+			g.controllerDebugOpen = false
+		} else if debugLobbyButton().contains(x, y) {
 			g.debugEnabled = !g.debugEnabled
 		} else if g.Lobby.CanStart() && startButton().contains(x, y) {
 			g.start()
@@ -148,7 +153,11 @@ func (g *Game) updateLobby() error {
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if debugLobbyButton().contains(x, y) {
+		if controllerDebugButton().contains(x, y) {
+			g.controllerDebugOpen = !g.controllerDebugOpen
+		} else if g.controllerDebugOpen {
+			g.controllerDebugOpen = false
+		} else if debugLobbyButton().contains(x, y) {
 			g.debugEnabled = !g.debugEnabled
 		} else if g.Lobby.CanStart() && startButton().contains(x, y) {
 			g.start()
@@ -452,11 +461,12 @@ func apply(game *core.Game, action action) {
 	}
 }
 
-func startButton() imageRect      { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
-func debugLobbyButton() imageRect { return imageRect{X: 1010, Y: 590, W: 220, H: 70} }
-func debugPlayButton() imageRect  { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
-func pauseButton() imageRect      { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
-func resumeButton() imageRect     { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
+func startButton() imageRect           { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
+func debugLobbyButton() imageRect      { return imageRect{X: 1010, Y: 590, W: 220, H: 70} }
+func controllerDebugButton() imageRect { return imageRect{X: 50, Y: 590, W: 250, H: 70} }
+func debugPlayButton() imageRect       { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
+func pauseButton() imageRect           { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func resumeButton() imageRect          { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
 
 func debugCloseButton() imageRect { return imageRect{X: 1035, Y: 110, W: 150, H: 60} }
 func debugPrevPlayer() imageRect  { return imageRect{X: 150, Y: 110, W: 90, H: 60} }
@@ -563,6 +573,9 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 			drawCenteredText(screen, "TO JOIN", g.face(30), centerX, 312, white)
 		}
 	}
+	controllers := controllerDebugButton()
+	ebitenutil.DrawRect(screen, float64(controllers.X), float64(controllers.Y), float64(controllers.W), float64(controllers.H), panel)
+	drawCenteredText(screen, "CONTROLLER DEBUG", g.face(17), float64(controllers.X+controllers.W/2), float64(controllers.Y+20), white)
 	debug := debugLobbyButton()
 	debugFill := panel
 	debugLabel := "DEBUG MODE: OFF"
@@ -578,6 +591,85 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 		drawCenteredText(screen, "START", g.face(36), float64(r.X+r.W/2), float64(r.Y+20), background)
 	} else {
 		drawCenteredText(screen, "1–4 players", g.face(25), logicalWidth/2, 625, muted)
+	}
+	g.drawControllerDebug(screen)
+}
+
+func standardButtonName(button ebiten.StandardGamepadButton) string {
+	names := map[ebiten.StandardGamepadButton]string{
+		ebiten.StandardGamepadButtonRightBottom:   "A",
+		ebiten.StandardGamepadButtonRightRight:    "B",
+		ebiten.StandardGamepadButtonRightLeft:     "X",
+		ebiten.StandardGamepadButtonRightTop:      "Y",
+		ebiten.StandardGamepadButtonFrontTopLeft:  "LB",
+		ebiten.StandardGamepadButtonFrontTopRight: "RB",
+		ebiten.StandardGamepadButtonCenterLeft:    "BACK",
+		ebiten.StandardGamepadButtonCenterRight:   "START",
+		ebiten.StandardGamepadButtonLeftTop:       "UP",
+		ebiten.StandardGamepadButtonLeftBottom:    "DOWN",
+		ebiten.StandardGamepadButtonLeftLeft:      "LEFT",
+		ebiten.StandardGamepadButtonLeftRight:     "RIGHT",
+	}
+	return names[button]
+}
+
+func pressedStandardButtons(id ebiten.GamepadID) string {
+	pressed := ""
+	for button := ebiten.StandardGamepadButton(0); button <= ebiten.StandardGamepadButtonMax; button++ {
+		if !ebiten.IsStandardGamepadButtonPressed(id, button) {
+			continue
+		}
+		name := standardButtonName(button)
+		if name == "" {
+			name = fmt.Sprintf("B%d", button)
+		}
+		if pressed != "" {
+			pressed += " "
+		}
+		pressed += name
+	}
+	if pressed == "" {
+		return "—"
+	}
+	return pressed
+}
+
+func (g *Game) drawControllerDebug(screen *ebiten.Image) {
+	if !g.controllerDebugOpen {
+		return
+	}
+	ebitenutil.DrawRect(screen, 55, 65, 1170, 570, color.RGBA{R: 8, G: 12, B: 20, A: 250})
+	ebitenutil.DrawRect(screen, 55, 65, 1170, 5, accent)
+	drawText(screen, "CONTROLLER DEBUG", g.face(32), 90, 92, accent)
+	drawText(screen, "Tap anywhere to close · press buttons to see live state", g.face(17), 90, 137, muted)
+	ids := ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
+	if len(ids) == 0 {
+		drawCenteredText(screen, "No gamepads detected", g.face(28), logicalWidth/2, 310, white)
+		return
+	}
+	for index, id := range ids {
+		y := 185 + index*100
+		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id)}
+		player := g.Lobby.PlayerForDevice(device)
+		assignment := "not joined"
+		if player >= 0 {
+			assignment = fmt.Sprintf("PLAYER %d", player+1)
+		}
+		mapping := "raw mapping"
+		if ebiten.IsStandardGamepadLayoutAvailable(id) {
+			mapping = "standard mapping"
+		}
+		name := ebiten.GamepadName(id)
+		if name == "" {
+			name = "Unnamed controller"
+		}
+		drawText(screen, fmt.Sprintf("ID %d · %s", id, name), g.face(20), 90, float64(y), white)
+		drawText(screen, assignment+" · "+mapping+fmt.Sprintf(" · axes %d", ebiten.GamepadAxisCount(id)), g.face(16), 90, float64(y+31), muted)
+		drawText(screen, "Pressed: "+pressedStandardButtons(id), g.face(17), 90, float64(y+58), accent)
+		sdlID := ebiten.GamepadSDLID(id)
+		if sdlID != "" {
+			drawText(screen, "SDL: "+sdlID, g.face(13), 650, float64(y+31), muted)
+		}
 	}
 }
 

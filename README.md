@@ -87,7 +87,11 @@ The first player can play with arrow keys or A/D, Q/W, S and Space. On touch
 screens, use the controls around the board for left, right, down, both rotation
 directions, hard drop and Antidote.
 
-For development testing, enable **Debug mode** in the lobby. During a match,
+The lobby's **Controller debug** panel shows connected controller names/IDs,
+player assignment, standard mapping availability, axis count, SDL GUID where
+available and live pressed buttons.
+
+For gameplay testing, enable **Debug mode** in the lobby. During a match,
 open **Debug**, choose a source player and tap a special. Direct/self effects
 apply to that player while offensive effects follow that player's current
 target. The panel pauses simulation while open.
