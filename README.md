@@ -41,7 +41,9 @@ This initial technical spike proves the project structure and its first targets:
   18 seconds plus one second per ten settled blocks, capped at 30 seconds;
 - four-second activation messages identify the special, sender and target;
 - an opt-in Debug mode pauses play and can trigger any of all 22 specials using
-  normal player and target routing.
+  normal player and target routing;
+- short project-owned WAV effects for lock, line clears, special pickup,
+  incoming attacks and game over, with mute and Debug-mode sound tests.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.

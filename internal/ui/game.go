@@ -17,6 +17,7 @@ import (
 	core "github.com/vibloteket/eit2/internal/game"
 	"github.com/vibloteket/eit2/internal/lobby"
 	matchcore "github.com/vibloteket/eit2/internal/match"
+	"github.com/vibloteket/eit2/internal/sound"
 	"github.com/vibloteket/eit2/internal/version"
 )
 
@@ -87,6 +88,8 @@ type Game struct {
 	debugPlayer         int
 	controllerDebugOpen bool
 	disconnectedPlayer  int
+	sound               *sound.Manager
+	soundError          error
 	touchDevice         lobby.Device
 }
 
@@ -95,8 +98,11 @@ func NewGame() *Game {
 	if err != nil {
 		panic(fmt.Sprintf("load embedded font: %v", err))
 	}
+	soundManager, soundErr := sound.New()
 	return &Game{
 		fontSource:         fontSource,
+		sound:              soundManager,
+		soundError:         soundErr,
 		heldActions:        make(map[action]int),
 		padHeld:            make(map[int]map[action]int),
 		disconnectedPlayer: -1,
@@ -108,6 +114,7 @@ func (g *Game) Update() error {
 	g.pressedIDs = inpututil.AppendJustPressedTouchIDs(g.pressedIDs[:0])
 	if g.view == viewPlay {
 		g.updatePlay()
+		g.playAudioEvents()
 		return nil
 	}
 	return g.updateLobby()
@@ -139,7 +146,9 @@ func (g *Game) updateLobby() error {
 	}
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if controllerDebugButton().contains(x, y) {
+		if muteButton().contains(x, y) && g.sound != nil {
+			g.sound.ToggleMute()
+		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
 			g.controllerDebugOpen = false
@@ -153,7 +162,9 @@ func (g *Game) updateLobby() error {
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if controllerDebugButton().contains(x, y) {
+		if muteButton().contains(x, y) && g.sound != nil {
+			g.sound.ToggleMute()
+		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
 			g.controllerDebugOpen = false
@@ -323,6 +334,24 @@ func (g *Game) updateControllerConnections() {
 	}
 }
 
+func (g *Game) playAudioEvents() {
+	if g.sound == nil {
+		return
+	}
+	mapping := map[core.AudioEvent]sound.Effect{
+		core.AudioLock: sound.Lock, core.AudioLine: sound.Line,
+		core.AudioFourLine: sound.FourLine, core.AudioPickup: sound.Pickup,
+		core.AudioAttack: sound.Attack, core.AudioGameOver: sound.GameOver,
+	}
+	for _, player := range g.players {
+		for _, event := range player.ConsumeAudioEvents() {
+			if effect, ok := mapping[event]; ok {
+				g.sound.Play(effect)
+			}
+		}
+	}
+}
+
 func (g *Game) playerForDevice(kind lobby.DeviceKind) *core.Game {
 	for i, slot := range g.Lobby.Slots {
 		if slot.Device.Kind == kind && i < len(g.players) {
@@ -406,6 +435,12 @@ func (g *Game) handleDebugPointer(x, y int) {
 			return
 		}
 	}
+	for _, item := range debugSoundButtons() {
+		if item.Rect.contains(x, y) && g.sound != nil {
+			g.sound.Play(item.Effect)
+			return
+		}
+	}
 }
 
 func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
@@ -464,6 +499,7 @@ func apply(game *core.Game, action action) {
 func startButton() imageRect           { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
 func debugLobbyButton() imageRect      { return imageRect{X: 1010, Y: 590, W: 220, H: 70} }
 func controllerDebugButton() imageRect { return imageRect{X: 50, Y: 590, W: 250, H: 70} }
+func muteButton() imageRect            { return imageRect{X: 320, Y: 590, W: 145, H: 70} }
 func debugPlayButton() imageRect       { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
 func pauseButton() imageRect           { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
 func resumeButton() imageRect          { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
@@ -471,6 +507,25 @@ func resumeButton() imageRect          { return imageRect{X: 375, Y: 340, W: 160
 func debugCloseButton() imageRect { return imageRect{X: 1035, Y: 110, W: 150, H: 60} }
 func debugPrevPlayer() imageRect  { return imageRect{X: 150, Y: 110, W: 90, H: 60} }
 func debugNextPlayer() imageRect  { return imageRect{X: 390, Y: 110, W: 90, H: 60} }
+
+func debugSoundButtons() []struct {
+	Rect   imageRect
+	Label  string
+	Effect sound.Effect
+} {
+	return []struct {
+		Rect   imageRect
+		Label  string
+		Effect sound.Effect
+	}{
+		{imageRect{105, 590, 160, 48}, "Lock", sound.Lock},
+		{imageRect{275, 590, 160, 48}, "Line", sound.Line},
+		{imageRect{445, 590, 160, 48}, "Four-line", sound.FourLine},
+		{imageRect{615, 590, 160, 48}, "Pickup", sound.Pickup},
+		{imageRect{785, 590, 160, 48}, "Attack", sound.Attack},
+		{imageRect{955, 590, 160, 48}, "Game over", sound.GameOver},
+	}
+}
 
 func debugSpecialButtons() []struct {
 	Rect    imageRect
@@ -480,13 +535,13 @@ func debugSpecialButtons() []struct {
 		Rect    imageRect
 		Special core.Special
 	}, 0, len(core.AllSpecials))
-	const columns, width, height, gapX, gapY = 4, 255, 62, 18, 14
+	const columns, width, height, gapX, gapY = 4, 255, 52, 18, 8
 	for i, special := range core.AllSpecials {
 		row, column := i/columns, i%columns
 		buttons = append(buttons, struct {
 			Rect    imageRect
 			Special core.Special
-		}{Rect: imageRect{X: 105 + column*(width+gapX), Y: 205 + row*(height+gapY), W: width, H: height}, Special: special})
+		}{Rect: imageRect{X: 105 + column*(width+gapX), Y: 190 + row*(height+gapY), W: width, H: height}, Special: special})
 	}
 	return buttons
 }
@@ -576,6 +631,15 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	controllers := controllerDebugButton()
 	ebitenutil.DrawRect(screen, float64(controllers.X), float64(controllers.Y), float64(controllers.W), float64(controllers.H), panel)
 	drawCenteredText(screen, "CONTROLLER DEBUG", g.face(17), float64(controllers.X+controllers.W/2), float64(controllers.Y+20), white)
+	mute := muteButton()
+	ebitenutil.DrawRect(screen, float64(mute.X), float64(mute.Y), float64(mute.W), float64(mute.H), panel)
+	muteLabel := "SOUND ON"
+	if g.sound == nil || g.sound.Muted() {
+		muteLabel = "MUTED"
+	} else if !g.sound.Ready() {
+		muteLabel = "AUDIO WAIT"
+	}
+	drawCenteredText(screen, muteLabel, g.face(16), float64(mute.X+mute.W/2), float64(mute.Y+20), white)
 	debug := debugLobbyButton()
 	debugFill := panel
 	debugLabel := "DEBUG MODE: OFF"
@@ -874,7 +938,19 @@ func (g *Game) drawDebugPanel(screen *ebiten.Image) {
 		ebitenutil.DrawRect(screen, float64(item.Rect.X), float64(item.Rect.Y), float64(item.Rect.W), 3, muted)
 		drawCenteredText(screen, item.Special.Name(), g.face(16), float64(item.Rect.X+item.Rect.W/2), float64(item.Rect.Y+17), white)
 	}
-	drawCenteredText(screen, "Selecting a special uses normal target routing", g.face(17), logicalWidth/2, 625, muted)
+	for _, item := range debugSoundButtons() {
+		ebitenutil.DrawRect(screen, float64(item.Rect.X), float64(item.Rect.Y), float64(item.Rect.W), float64(item.Rect.H), panel)
+		drawCenteredText(screen, item.Label, g.face(15), float64(item.Rect.X+item.Rect.W/2), float64(item.Rect.Y+13), white)
+	}
+	audioState := "Audio ready"
+	if g.soundError != nil {
+		audioState = "Audio error"
+	} else if g.sound == nil || g.sound.Muted() {
+		audioState = "Muted"
+	} else if !g.sound.Ready() {
+		audioState = "Audio waiting for user interaction"
+	}
+	drawCenteredText(screen, audioState+" · sound test", g.face(15), logicalWidth/2, 565, muted)
 }
 
 func (g *Game) drawMatchOverlay(screen *ebiten.Image) {

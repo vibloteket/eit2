@@ -12,6 +12,17 @@ const (
 
 type Point struct{ X, Y int }
 
+type AudioEvent int
+
+const (
+	AudioLock AudioEvent = iota + 1
+	AudioLine
+	AudioFourLine
+	AudioPickup
+	AudioAttack
+	AudioGameOver
+)
+
 type Special int
 
 func (s Special) Name() string {
@@ -168,6 +179,7 @@ type Game struct {
 	patternRows          []patternRow
 	LastEvent            string
 	EventTicks           int
+	audioEvents          []AudioEvent
 }
 
 func New(seed uint64) *Game {
@@ -200,6 +212,13 @@ func (g *Game) valid(piece Piece) bool {
 	return true
 }
 
+func (g *Game) setGameOver() {
+	if !g.GameOver {
+		g.audioEvents = append(g.audioEvents, AudioGameOver)
+	}
+	g.GameOver = true
+}
+
 func (g *Game) Spawn() {
 	kind := g.NextKind
 	if kind < 0 || (g.SZ && kind != 5 && kind != 6) {
@@ -208,7 +227,7 @@ func (g *Game) Spawn() {
 	g.Active = Piece{Kind: kind, X: 3, Y: -1}
 	g.NextKind = g.randomPieceKind()
 	if !g.valid(g.Active) {
-		g.GameOver = true
+		g.setGameOver()
 	}
 }
 
@@ -377,7 +396,7 @@ func (g *Game) lock() {
 	g.fallTick = 0
 	for _, cell := range g.Cells(g.Active) {
 		if cell.Y < 0 {
-			g.GameOver = true
+			g.setGameOver()
 			return
 		}
 		g.Board[cell.Y][cell.X] = g.Active.Kind + 1
@@ -387,6 +406,13 @@ func (g *Game) lock() {
 	g.Lines += cleared
 	scores := [...]int{0, 40, 100, 300, 1200}
 	g.Score += scores[cleared] * (level + 1)
+	if cleared == 0 {
+		g.audioEvents = append(g.audioEvents, AudioLock)
+	} else if cleared == 4 {
+		g.audioEvents = append(g.audioEvents, AudioFourLine)
+	} else {
+		g.audioEvents = append(g.audioEvents, AudioLine)
+	}
 	if g.PacketTicks > 0 {
 		g.pendingGarbage += cleared
 	}
@@ -401,6 +427,12 @@ func (g *Game) lock() {
 
 // QueueAttack adds outgoing garbage rows. Besides four-line clears, later
 // special-block effects can use the same match-facing mechanism.
+func (g *Game) ConsumeAudioEvents() []AudioEvent {
+	result := append([]AudioEvent(nil), g.audioEvents...)
+	g.audioEvents = g.audioEvents[:0]
+	return result
+}
+
 func (g *Game) QueueAttack(rows int) {
 	if rows > 0 {
 		g.pendingGarbage += rows
@@ -419,6 +451,9 @@ func (g *Game) ConsumeGarbage() int {
 // the original game's disruptive top-of-stack attack rather than pushing the
 // entire board upward from the bottom.
 func (g *Game) AddGarbage(rows int) {
+	if rows > 0 {
+		g.audioEvents = append(g.audioEvents, AudioAttack)
+	}
 	for range rows {
 		row := BoardHeight - 1
 		for y := 0; y < BoardHeight; y++ {
@@ -435,7 +470,7 @@ func (g *Game) AddGarbage(rows int) {
 			}
 		}
 		if row < 0 {
-			g.GameOver = true
+			g.setGameOver()
 			return
 		}
 		hole := g.random.IntN(BoardWidth)
@@ -446,7 +481,7 @@ func (g *Game) AddGarbage(rows int) {
 		}
 		for _, cell := range g.Cells(g.Active) {
 			if cell.Y == row && g.Board[cell.Y][cell.X] != 0 {
-				g.GameOver = true
+				g.setGameOver()
 				return
 			}
 		}
@@ -550,6 +585,7 @@ func (g *Game) CollectSpecial(special Special) {
 }
 
 func (g *Game) activateSpecial(special Special) {
+	g.audioEvents = append(g.audioEvents, AudioPickup)
 	if special == SpecialAntidote {
 		g.ShowEvent("COLLECTED: " + special.Name())
 	} else {
@@ -587,6 +623,9 @@ func (g *Game) ConsumeSpecials() []Special {
 }
 
 func (g *Game) ApplySpecial(special Special) {
+	if special != SpecialBridge {
+		g.audioEvents = append(g.audioEvents, AudioAttack)
+	}
 	switch special {
 	case SpecialBlind:
 		g.Blind = true

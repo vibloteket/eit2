@@ -13,6 +13,19 @@ func TestPieceCannotMoveThroughWall(t *testing.T) {
 	}
 }
 
+func TestHardDropEmitsLockAudio(t *testing.T) {
+	g := New(45)
+	g.ConsumeAudioEvents()
+	g.HardDrop()
+	events := g.ConsumeAudioEvents()
+	if len(events) != 1 || events[0] != AudioLock {
+		t.Fatalf("audio events = %v, want Lock", events)
+	}
+	if len(g.ConsumeAudioEvents()) != 0 {
+		t.Fatal("audio events were not consumed")
+	}
+}
+
 func TestHardDropLocksPieceAndSpawnsNext(t *testing.T) {
 	g := New(1)
 	first := g.Active
@@ -105,6 +118,22 @@ func TestGravitySpeedsUpWithLevel(t *testing.T) {
 	g.Lines = 5
 	if g.GravityTicks() >= initial {
 		t.Fatalf("level 1 gravity = %d, initial = %d", g.GravityTicks(), initial)
+	}
+}
+
+func TestFourLineClearUsesCelebrationInsteadOfLockSound(t *testing.T) {
+	g := New(46)
+	for y := BoardHeight - 4; y < BoardHeight; y++ {
+		for x := 1; x < BoardWidth; x++ {
+			g.Board[y][x] = 1
+		}
+	}
+	g.Active = Piece{Kind: 0, Rotation: 1, X: -2, Y: BoardHeight - 4}
+	g.ConsumeAudioEvents()
+	g.lock()
+	events := g.ConsumeAudioEvents()
+	if len(events) != 1 || events[0] != AudioFourLine {
+		t.Fatalf("audio events = %v, want FourLine", events)
 	}
 }
 
