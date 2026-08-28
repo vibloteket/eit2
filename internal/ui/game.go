@@ -109,11 +109,10 @@ func (g *Game) Update() error {
 		g.updatePlay()
 		return nil
 	}
-	g.updateLobby()
-	return nil
+	return g.updateLobby()
 }
 
-func (g *Game) updateLobby() {
+func (g *Game) updateLobby() error {
 	g.gamepadIDs = ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
 	for _, id := range g.gamepadIDs {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
@@ -121,8 +120,14 @@ func (g *Game) updateLobby() {
 		}
 		if g.Lobby.CanStart() && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
 			g.start()
-			return
+			return nil
 		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterLeft) {
+			return ebiten.Termination
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		return ebiten.Termination
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		if g.Lobby.CanStart() {
@@ -151,6 +156,7 @@ func (g *Game) updateLobby() {
 			g.Lobby.Join(g.touchDevice)
 		}
 	}
+	return nil
 }
 
 func (g *Game) start() {

@@ -1,4 +1,4 @@
-.PHONY: install run test lint build build-web check clean
+.PHONY: install run test lint build build-web package verify-packages check clean
 
 install:
 	go mod download
@@ -26,6 +26,12 @@ build-web:
 	sed 's/__VERSION__/$(VERSION)/g' web/index.html > dist/web/index.html
 	cp web/favicon.svg web/favicon-32.png dist/web/
 	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" dist/web/wasm_exec.js
+
+package:
+	./scripts/package.sh
+
+verify-packages: package
+	./scripts/verify-packages.sh
 
 check: lint test build build-web
 

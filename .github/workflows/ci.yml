@@ -29,15 +29,16 @@ jobs:
       - name: Verify
         run: make check
 
-      - name: Record artifact sizes
-        run: |
-          du -h dist/native/eit2 dist/web/eit2.wasm
-          sha256sum dist/native/eit2 dist/web/eit2.wasm > dist/SHA256SUMS
+      - name: Package Linux, Windows and web builds
+        run: make verify-packages
 
-      - name: Upload native and web builds
+      - name: Record artifact sizes
+        run: du -h dist/packages/*
+
+      - name: Upload versioned packages
         uses: actions/upload-artifact@v4
         with:
-          name: eit2-${{ github.sha }}
-          path: dist/
+          name: eit2-packages-${{ github.sha }}
+          path: dist/packages/
           if-no-files-found: error
           retention-days: 30

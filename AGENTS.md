@@ -15,6 +15,7 @@
 - Test: `make test`
 - Lint: `make lint`
 - Build native and web: `make build build-web`
+- Build and verify release archives: `make verify-packages`
 - Full verification: `make check`
 
 ## Key paths
@@ -22,6 +23,7 @@
 - Input assignment: `internal/lobby/`
 - Ebitengine adapter/UI: `internal/ui/`
 - Browser loader: `web/`
+- Packaging: `packaging/`, `scripts/package.sh`, `scripts/verify-packages.sh`
 - Generated artifacts: `dist/`
 
 ## Notes for future agents

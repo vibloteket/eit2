@@ -95,12 +95,15 @@ target. The panel pauses simulation while open.
 ## Build outputs
 
 ```sh
-make build       # dist/native/eit2
-make build-web   # dist/web/
+make build             # dist/native/eit2
+make build-web         # dist/web/
+make verify-packages   # build and verify Linux, Windows and web archives
 ```
 
-Serve the web directory over HTTP; browsers do not normally allow the Wasm
-loader to run directly from `file://`.
+Versioned archives and `SHA256SUMS` are written under `dist/packages/`. Desktop
+builds support `--fullscreen`, `--windowed` and `--version`. Serve the web
+directory over HTTP; browsers do not normally allow the Wasm loader to run
+directly from `file://`.
 
 ## Architecture
 
