@@ -24,13 +24,13 @@ jobs:
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev xvfb
 
       - name: Verify
         run: make check
 
       - name: Package Linux, Windows and web builds
-        run: make verify-packages
+        run: xvfb-run -a make verify-packages
 
       - name: Record artifact sizes
         run: du -h dist/packages/*
