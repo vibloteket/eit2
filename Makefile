@@ -1,4 +1,4 @@
-.PHONY: install run test lint build build-web package verify-packages check clean
+.PHONY: install run test lint build build-web package package-linux package-web verify-packages verify-linux verify-web check clean
 
 install:
 	go mod download
@@ -30,8 +30,20 @@ build-web:
 package:
 	./scripts/package.sh
 
+package-linux:
+	./scripts/package-platform.sh linux
+
+package-web:
+	./scripts/package-platform.sh web
+
 verify-packages: package
 	./scripts/verify-packages.sh
+
+verify-linux: package-linux
+	./scripts/verify-platform-package.sh linux
+
+verify-web: package-web
+	./scripts/verify-platform-package.sh web
 
 check: lint test build build-web
 

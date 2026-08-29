@@ -10,35 +10,97 @@ permissions:
   contents: read
 
 jobs:
-  test-and-build:
+  verify:
+    name: Verify source
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+      - name: Verify
+        run: make check
 
+  package-linux:
+    name: Package Linux x86_64
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev xvfb
-
-      - name: Verify
-        run: make check
-
-      - name: Package Linux, Windows and web builds
-        run: xvfb-run -a make verify-packages
-
-      - name: Record artifact sizes
-        run: du -h dist/packages/*
-
-      - name: Upload versioned packages
-        uses: actions/upload-artifact@v7
+      - name: Build and verify Linux package
+        run: |
+          ./scripts/package-platform.sh linux
+          xvfb-run -a ./scripts/verify-platform-package.sh linux
+      - uses: actions/upload-artifact@v7
         with:
-          name: eit2-packages-${{ github.sha }}
-          path: dist/packages/
+          name: eit2-linux-x86_64
+          path: |
+            dist/packages/eit2-linux-x86_64-*.tar.gz
+            dist/packages/eit2-linux-x86_64-*.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  package-windows:
+    name: Package Windows x86_64
+    needs: verify
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build Windows package
+        shell: pwsh
+        run: ./scripts/package-windows.ps1
+      - name: Verify Windows package
+        shell: pwsh
+        run: ./scripts/verify-windows-package.ps1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: eit2-windows-x86_64
+          path: |
+            dist/packages/eit2-windows-x86_64-*.zip
+            dist/packages/eit2-windows-x86_64-*.zip.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  package-web:
+    name: Package WebAssembly
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build and verify web package
+        run: |
+          ./scripts/package-platform.sh web
+          ./scripts/verify-platform-package.sh web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: eit2-web
+          path: |
+            dist/packages/eit2-web-*.zip
+            dist/packages/eit2-web-*.zip.sha256
           if-no-files-found: error
           retention-days: 30

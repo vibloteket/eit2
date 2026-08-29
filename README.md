@@ -112,8 +112,10 @@ make build-web         # dist/web/
 make verify-packages   # build and verify Linux, Windows and web archives
 ```
 
-Versioned archives and `SHA256SUMS` are written under `dist/packages/`. Desktop
-builds support `--fullscreen`, `--windowed` and `--version`. Serve the web
+Versioned archives and checksums are written under `dist/packages/`. CI uploads
+separate `eit2-linux-x86_64`, `eit2-windows-x86_64` and `eit2-web` artifacts so
+testers only download the target they need. Desktop builds support
+`--fullscreen`, `--windowed` and `--version`. Serve the web
 directory over HTTP; browsers do not normally allow the Wasm loader to run
 directly from `file://`.
 
