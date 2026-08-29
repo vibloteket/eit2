@@ -20,6 +20,21 @@ func TestEmbeddedEffectsDecode(t *testing.T) {
 	}
 }
 
+func TestMusicLoopDecodes(t *testing.T) {
+	data, err := files.ReadFile("audio/music-loop.wav")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pcm, err := decodeWAV(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	seconds := len(pcm) / (sampleRate * 4)
+	if seconds < 3 || seconds > 5 {
+		t.Fatalf("music loop duration = %d seconds", seconds)
+	}
+}
+
 func TestEffectSetIsComplete(t *testing.T) {
 	for _, effect := range []Effect{Lock, Line, FourLine, Pickup, Attack, GameOver} {
 		if filenames[effect] == "" {

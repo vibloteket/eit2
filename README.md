@@ -43,7 +43,8 @@ This initial technical spike proves the project structure and its first targets:
 - an opt-in Debug mode pauses play and can trigger any of all 22 specials using
   normal player and target routing;
 - short project-owned WAV effects for lock, line clears, special pickup,
-  incoming attacks and game over, with mute and Debug-mode sound tests.
+  incoming attacks and game over, plus a quiet looping prototype melody, with
+  separate Mute/Music controls and Debug-mode sound status/tests.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.

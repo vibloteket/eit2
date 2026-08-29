@@ -26,6 +26,8 @@ var effects = map[string][]tone{
 	"game-over.wav": {{0, .14, 330, .25, "triangle"}, {.12, .15, 247, .27, "triangle"}, {.25, .25, 165, .29, "triangle"}},
 }
 
+var musicPattern = []float64{261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23, 246.94, 293.66, 392.00, 293.66, 220.00, 277.18, 329.63, 277.18}
+
 func main() {
 	output := "internal/sound/audio"
 	if len(os.Args) == 2 {
@@ -39,6 +41,22 @@ func main() {
 			panic(err)
 		}
 	}
+	if err := writeWAV(filepath.Join(output, "music-loop.wav"), renderMusic()); err != nil {
+		panic(err)
+	}
+}
+
+func renderMusic() []int16 {
+	const step = .25
+	notes := make([]tone, 0, len(musicPattern)*2)
+	for i, frequency := range musicPattern {
+		start := float64(i) * step
+		notes = append(notes, tone{start, step * .86, frequency, .12, "triangle"})
+		if i%4 == 0 {
+			notes = append(notes, tone{start, step * 3.7, frequency / 2, .055, "sine"})
+		}
+	}
+	return render(notes)
 }
 
 func render(notes []tone) []int16 {

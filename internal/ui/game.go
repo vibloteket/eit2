@@ -112,6 +112,9 @@ func NewGame() *Game {
 
 func (g *Game) Update() error {
 	g.pressedIDs = inpututil.AppendJustPressedTouchIDs(g.pressedIDs[:0])
+	if g.sound != nil {
+		g.sound.Update()
+	}
 	if g.view == viewPlay {
 		g.updatePlay()
 		g.playAudioEvents()
@@ -148,6 +151,8 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.TouchPosition(id)
 		if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
+		} else if musicButton().contains(x, y) && g.sound != nil {
+			g.sound.ToggleMusic()
 		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
@@ -164,6 +169,8 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.CursorPosition()
 		if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
+		} else if musicButton().contains(x, y) && g.sound != nil {
+			g.sound.ToggleMusic()
 		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
@@ -500,6 +507,7 @@ func startButton() imageRect           { return imageRect{X: 490, Y: 590, W: 300
 func debugLobbyButton() imageRect      { return imageRect{X: 1010, Y: 590, W: 220, H: 70} }
 func controllerDebugButton() imageRect { return imageRect{X: 50, Y: 590, W: 250, H: 70} }
 func muteButton() imageRect            { return imageRect{X: 320, Y: 590, W: 145, H: 70} }
+func musicButton() imageRect           { return imageRect{X: 805, Y: 590, W: 185, H: 70} }
 func debugPlayButton() imageRect       { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
 func pauseButton() imageRect           { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
 func resumeButton() imageRect          { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
@@ -640,6 +648,13 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 		muteLabel = "AUDIO WAIT"
 	}
 	drawCenteredText(screen, muteLabel, g.face(16), float64(mute.X+mute.W/2), float64(mute.Y+20), white)
+	music := musicButton()
+	ebitenutil.DrawRect(screen, float64(music.X), float64(music.Y), float64(music.W), float64(music.H), panel)
+	musicLabel := "MUSIC ON"
+	if g.sound == nil || !g.sound.MusicEnabled() {
+		musicLabel = "MUSIC OFF"
+	}
+	drawCenteredText(screen, musicLabel, g.face(16), float64(music.X+music.W/2), float64(music.Y+20), white)
 	debug := debugLobbyButton()
 	debugFill := panel
 	debugLabel := "DEBUG MODE: OFF"
@@ -950,7 +965,13 @@ func (g *Game) drawDebugPanel(screen *ebiten.Image) {
 	} else if !g.sound.Ready() {
 		audioState = "Audio waiting for user interaction"
 	}
-	drawCenteredText(screen, audioState+" · sound test", g.face(15), logicalWidth/2, 565, muted)
+	musicState := "music stopped"
+	if g.sound != nil && g.sound.MusicPlaying() {
+		musicState = "music playing"
+	} else if g.sound != nil && !g.sound.MusicEnabled() {
+		musicState = "music disabled"
+	}
+	drawCenteredText(screen, audioState+" · "+musicState+" · sound test", g.face(15), logicalWidth/2, 565, muted)
 }
 
 func (g *Game) drawMatchOverlay(screen *ebiten.Image) {
