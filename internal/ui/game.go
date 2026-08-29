@@ -629,6 +629,11 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 		clear(g.heldActions)
 		return true
 	}
+	if len(g.players) == 1 && touchMenuButton().contains(x, y) {
+		g.paused = true
+		clear(g.heldActions)
+		return true
+	}
 	return false
 }
 
@@ -665,7 +670,8 @@ func lobbyMenuButtons() []imageRect {
 	}
 	return buttons
 }
-func debugPlayButton() imageRect { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func debugPlayButton() imageRect { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
+func touchMenuButton() imageRect { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
 func resumeButton() imageRect    { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
 
 func debugCloseButton() imageRect { return imageRect{X: 1035, Y: 110, W: 150, H: 60} }
@@ -827,13 +833,12 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	drawCenteredText(screen, debugLabel, g.face(17), float64(debug.X+debug.W/2), float64(debug.Y+20), white)
 	r := startButton()
 	startFill, startText := accent, background
-	startLabel := "START"
 	if !g.Lobby.CanStart() {
 		startFill, startText = panel, muted
-		startLabel = "START · JOIN WITH 1 / 2 / 3 OR GAMEPAD A"
+		drawCenteredText(screen, "JOIN WITH TOUCH, 1 / 2 / 3 OR GAMEPAD A", g.face(16), logicalWidth/2, float64(r.Y-27), muted)
 	}
 	ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), startFill)
-	drawCenteredText(screen, startLabel, g.face(20), float64(r.X+r.W/2), float64(r.Y+27), startText)
+	drawCenteredText(screen, "START", g.face(26), float64(r.X+r.W/2), float64(r.Y+17), startText)
 	buttons := lobbyMenuButtons()
 	if g.lobbyFocus >= 0 && g.lobbyFocus < len(buttons) {
 		r := buttons[g.lobbyFocus]
@@ -983,6 +988,10 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	effects := effectLabel(game)
 	drawText(screen, effects, g.face(22), 1020, 307, white)
 
+	menu := touchMenuButton()
+	ebitenutil.DrawRect(screen, float64(menu.X), float64(menu.Y), float64(menu.W), float64(menu.H), panel)
+	ebitenutil.DrawRect(screen, float64(menu.X), float64(menu.Y), float64(menu.W), 4, accent)
+	drawCenteredText(screen, "MENU", g.face(20), float64(menu.X+menu.W/2), float64(menu.Y+18), white)
 	if g.debugEnabled {
 		debug := debugPlayButton()
 		ebitenutil.DrawRect(screen, float64(debug.X), float64(debug.Y), float64(debug.W), float64(debug.H), panel)
