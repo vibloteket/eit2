@@ -82,13 +82,16 @@ make run
 ```
 
 In the lobby, press the standard south/A button on a gamepad to join. On a
-phone, tap once to join and then tap **Start**. Enter/Space joins or starts a
-keyboard player. Browsers only expose connected gamepads after the user has
-interacted with them.
+phone, tap once to join and then tap **Start**. Keyboard layouts 1, 2 and 3 join
+with the corresponding number key; Enter only starts an already populated
+lobby. Mouse clicks operate visible UI buttons and never create a touch player.
+Browsers only expose connected gamepads after user interaction.
 
-The first player can play with arrow keys or A/D, Q/W, S and Space. On touch
-screens, use the controls around the board for left, right, down, both rotation
-directions, hard drop and Antidote.
+Keyboard 1 uses A/D, S, Q/W, left Shift, E and Tab. Keyboard 2 uses arrows,
+comma/period, right Shift, slash and Enter. Emergency Keyboard 3 uses J/L, K,
+U/I, Space, O and P; three-player keyboard use depends on the hardware's key
+rollover. Touch screens use controls around the board for movement, rotation,
+hard drop and Antidote.
 
 The lobby's **Controller debug** panel shows connected controller names/IDs,
 player assignment, standard mapping availability, axis count, SDL GUID where

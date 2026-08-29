@@ -65,6 +65,20 @@ type button struct {
 	Do    action
 }
 
+type keyboardLayout struct {
+	ID                        int
+	Name                      string
+	Left, Right, Down         ebiten.Key
+	RotateCCW, RotateCW, Drop ebiten.Key
+	Antidote, Target          ebiten.Key
+}
+
+var keyboardLayouts = []keyboardLayout{
+	{controls.KeyboardLayouts[0].ID, controls.KeyboardLayouts[0].Name, ebiten.KeyA, ebiten.KeyD, ebiten.KeyS, ebiten.KeyQ, ebiten.KeyW, ebiten.KeyShiftLeft, ebiten.KeyE, ebiten.KeyTab},
+	{controls.KeyboardLayouts[1].ID, controls.KeyboardLayouts[1].Name, ebiten.KeyArrowLeft, ebiten.KeyArrowRight, ebiten.KeyArrowDown, ebiten.KeyComma, ebiten.KeyPeriod, ebiten.KeyShiftRight, ebiten.KeySlash, ebiten.KeyEnter},
+	{controls.KeyboardLayouts[2].ID, controls.KeyboardLayouts[2].Name, ebiten.KeyJ, ebiten.KeyL, ebiten.KeyK, ebiten.KeyU, ebiten.KeyI, ebiten.KeySpace, ebiten.KeyO, ebiten.KeyP},
+}
+
 type imageRect struct{ X, Y, W, H int }
 
 func (r imageRect) contains(x, y int) bool {
@@ -140,12 +154,15 @@ func (g *Game) updateLobby() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		return ebiten.Termination
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		if g.Lobby.CanStart() {
-			g.start()
-		} else {
-			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceKeyboard, Name: "Keyboard"})
+	joinKeys := []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3}
+	for index, key := range joinKeys {
+		if inpututil.IsKeyJustPressed(key) {
+			layout := keyboardLayouts[index]
+			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name})
 		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) && g.Lobby.CanStart() {
+		g.start()
 	}
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
@@ -179,8 +196,6 @@ func (g *Game) updateLobby() error {
 			g.debugEnabled = !g.debugEnabled
 		} else if g.Lobby.CanStart() && startButton().contains(x, y) {
 			g.start()
-		} else {
-			g.Lobby.Join(g.touchDevice)
 		}
 	}
 	return nil
@@ -255,31 +270,7 @@ func (g *Game) updatePlay() {
 	if g.paused || soloGameOver || matchOver {
 		return
 	}
-	if keyboardPlayer := g.playerForDevice(lobby.DeviceKeyboard); keyboardPlayer != nil {
-		if inpututil.IsKeyJustPressed(ebiten.KeyLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			keyboardPlayer.MoveInput(-1)
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-			keyboardPlayer.MoveInput(1)
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
-			if ebiten.Tick()%2 == 0 {
-				keyboardPlayer.StepDown()
-			}
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-			keyboardPlayer.RotateInput(-1)
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) {
-			keyboardPlayer.RotateInput(1)
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			keyboardPlayer.HardDrop()
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
-			keyboardPlayer.UseAntidote()
-		}
-	}
+	g.updateKeyboards()
 	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
 	if touchPlayer == nil {
 		touchPlayer = player
@@ -355,6 +346,49 @@ func (g *Game) playAudioEvents() {
 			if effect, ok := mapping[event]; ok {
 				g.sound.Play(effect)
 			}
+		}
+	}
+}
+
+func (g *Game) updateKeyboards() {
+	for playerIndex, slot := range g.Lobby.Slots {
+		if slot.Device.Kind != lobby.DeviceKeyboard || playerIndex >= len(g.players) {
+			continue
+		}
+		var layout *keyboardLayout
+		for i := range keyboardLayouts {
+			if keyboardLayouts[i].ID == slot.Device.ID {
+				layout = &keyboardLayouts[i]
+				break
+			}
+		}
+		if layout == nil {
+			continue
+		}
+		player := g.players[playerIndex]
+		if inpututil.IsKeyJustPressed(layout.Left) {
+			player.MoveInput(-1)
+		}
+		if inpututil.IsKeyJustPressed(layout.Right) {
+			player.MoveInput(1)
+		}
+		if ebiten.IsKeyPressed(layout.Down) && ebiten.Tick()%2 == 0 {
+			player.StepDown()
+		}
+		if inpututil.IsKeyJustPressed(layout.RotateCCW) {
+			player.RotateInput(-1)
+		}
+		if inpututil.IsKeyJustPressed(layout.RotateCW) {
+			player.RotateInput(1)
+		}
+		if inpututil.IsKeyJustPressed(layout.Drop) {
+			player.HardDrop()
+		}
+		if inpututil.IsKeyJustPressed(layout.Antidote) {
+			player.UseAntidote()
+		}
+		if inpututil.IsKeyJustPressed(layout.Target) {
+			g.match.CycleTarget(playerIndex)
 		}
 	}
 }
@@ -617,7 +651,7 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	screen.Fill(background)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
 	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
-	drawText(screen, "Tap anywhere or press A to join", g.face(27), 42, 92, white)
+	drawText(screen, "Touch / gamepad A / keys 1, 2, 3 to join · Enter starts", g.face(24), 42, 92, white)
 	const gap, margin = 20, 40
 	width := (logicalWidth - margin*2 - gap*3) / lobby.MaxPlayers
 	for i := 0; i < lobby.MaxPlayers; i++ {
