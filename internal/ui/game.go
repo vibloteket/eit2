@@ -943,7 +943,8 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	for y, row := range game.Board {
 		for x, value := range row {
 			if value != 0 {
-				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
+				hasSpecial := game.Specials[y][x] != core.SpecialNone
+				drawSettledCell(screen, boardX+x*cell, boardY+y*cell, cell, value, game.Mini && !hasSpecial, game.Trans)
 				drawSpecial(screen, boardX+x*cell, boardY+y*cell, cell, game.Specials[y][x], g.face(float64(cell-5)))
 			}
 		}
@@ -1048,7 +1049,8 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		for y, row := range game.Board {
 			for bx, value := range row {
 				if value != 0 {
-					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini, game.Trans)
+					hasSpecial := game.Specials[y][bx] != core.SpecialNone
+					drawSettledCell(screen, boardX+bx*cell, boardY+y*cell, cell, value, game.Mini && !hasSpecial, game.Trans)
 					drawSpecial(screen, boardX+bx*cell, boardY+y*cell, cell, game.Specials[y][bx], g.face(float64(cell-4)))
 				}
 			}
