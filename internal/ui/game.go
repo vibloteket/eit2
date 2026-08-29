@@ -102,6 +102,7 @@ type Game struct {
 	debugPlayer         int
 	controllerDebugOpen bool
 	disconnectedPlayer  int
+	lobbyFocus          int
 	sound               *sound.Manager
 	soundError          error
 	touchDevice         lobby.Device
@@ -139,15 +140,41 @@ func (g *Game) Update() error {
 
 func (g *Game) updateLobby() error {
 	g.gamepadIDs = ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
+	menu := controls.MenuState{Focus: g.lobbyFocus, Count: len(lobbyMenuButtons())}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		menu.Move(-1)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		menu.Move(1)
+	}
+	activate := inpututil.IsKeyJustPressed(ebiten.KeyEnter)
 	for _, id := range g.gamepadIDs {
+		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
+		joined := g.Lobby.PlayerForDevice(device) >= 0
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) || inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftTop) {
+			menu.Move(-1)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftRight) || inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftBottom) {
+			menu.Move(1)
+		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
-			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)})
+			if joined {
+				activate = true
+			} else {
+				g.Lobby.Join(device)
+			}
 		}
 		if g.Lobby.CanStart() && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
 			g.start()
 			return nil
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterLeft) {
+			return ebiten.Termination
+		}
+	}
+	g.lobbyFocus = menu.Focus
+	if activate {
+		if terminate := g.activateLobbyMenu(g.lobbyFocus); terminate {
 			return ebiten.Termination
 		}
 	}
@@ -161,12 +188,13 @@ func (g *Game) updateLobby() error {
 			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name})
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) && g.Lobby.CanStart() {
-		g.start()
-	}
 	for _, id := range g.pressedIDs {
 		x, y := ebiten.TouchPosition(id)
-		if muteButton().contains(x, y) && g.sound != nil {
+		if keyboardJoinButton().contains(x, y) {
+			g.joinNextKeyboard()
+		} else if exitButton().contains(x, y) {
+			return ebiten.Termination
+		} else if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
 		} else if musicButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMusic()
@@ -184,7 +212,11 @@ func (g *Game) updateLobby() error {
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if muteButton().contains(x, y) && g.sound != nil {
+		if keyboardJoinButton().contains(x, y) {
+			g.joinNextKeyboard()
+		} else if exitButton().contains(x, y) {
+			return ebiten.Termination
+		} else if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
 		} else if musicButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMusic()
@@ -199,6 +231,42 @@ func (g *Game) updateLobby() error {
 		}
 	}
 	return nil
+}
+
+func (g *Game) joinNextKeyboard() {
+	for _, layout := range keyboardLayouts {
+		device := lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name}
+		if g.Lobby.PlayerForDevice(device) < 0 {
+			g.Lobby.Join(device)
+			return
+		}
+	}
+}
+
+func (g *Game) activateLobbyMenu(index int) bool {
+	switch index {
+	case 0:
+		if g.Lobby.CanStart() {
+			g.start()
+		}
+	case 1:
+		g.joinNextKeyboard()
+	case 2:
+		if g.sound != nil {
+			g.sound.ToggleMute()
+		}
+	case 3:
+		if g.sound != nil {
+			g.sound.ToggleMusic()
+		}
+	case 4:
+		g.controllerDebugOpen = !g.controllerDebugOpen
+	case 5:
+		g.debugEnabled = !g.debugEnabled
+	case 6:
+		return true
+	}
+	return false
 }
 
 func (g *Game) start() {
@@ -538,13 +606,19 @@ func apply(game *core.Game, action action) {
 }
 
 func startButton() imageRect           { return imageRect{X: 490, Y: 590, W: 300, H: 85} }
+func keyboardJoinButton() imageRect    { return imageRect{X: 490, Y: 495, W: 300, H: 70} }
 func debugLobbyButton() imageRect      { return imageRect{X: 1010, Y: 590, W: 220, H: 70} }
 func controllerDebugButton() imageRect { return imageRect{X: 50, Y: 590, W: 250, H: 70} }
 func muteButton() imageRect            { return imageRect{X: 320, Y: 590, W: 145, H: 70} }
 func musicButton() imageRect           { return imageRect{X: 805, Y: 590, W: 185, H: 70} }
-func debugPlayButton() imageRect       { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
-func pauseButton() imageRect           { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
-func resumeButton() imageRect          { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
+func exitButton() imageRect            { return imageRect{X: 1090, Y: 500, W: 140, H: 60} }
+
+func lobbyMenuButtons() []imageRect {
+	return []imageRect{startButton(), keyboardJoinButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton(), exitButton()}
+}
+func debugPlayButton() imageRect { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
+func pauseButton() imageRect     { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func resumeButton() imageRect    { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
 
 func debugCloseButton() imageRect { return imageRect{X: 1035, Y: 110, W: 150, H: 60} }
 func debugPrevPlayer() imageRect  { return imageRect{X: 150, Y: 110, W: 90, H: 60} }
@@ -670,6 +744,12 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 			drawCenteredText(screen, "TO JOIN", g.face(30), centerX, 312, white)
 		}
 	}
+	keyboard := keyboardJoinButton()
+	ebitenutil.DrawRect(screen, float64(keyboard.X), float64(keyboard.Y), float64(keyboard.W), float64(keyboard.H), panel)
+	drawCenteredText(screen, "JOIN NEXT KEYBOARD", g.face(17), float64(keyboard.X+keyboard.W/2), float64(keyboard.Y+20), white)
+	exit := exitButton()
+	ebitenutil.DrawRect(screen, float64(exit.X), float64(exit.Y), float64(exit.W), float64(exit.H), panel)
+	drawCenteredText(screen, "EXIT", g.face(17), float64(exit.X+exit.W/2), float64(exit.Y+16), white)
 	controllers := controllerDebugButton()
 	ebitenutil.DrawRect(screen, float64(controllers.X), float64(controllers.Y), float64(controllers.W), float64(controllers.H), panel)
 	drawCenteredText(screen, "CONTROLLER DEBUG", g.face(17), float64(controllers.X+controllers.W/2), float64(controllers.Y+20), white)
@@ -703,7 +783,15 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 		ebitenutil.DrawRect(screen, float64(r.X), float64(r.Y), float64(r.W), float64(r.H), accent)
 		drawCenteredText(screen, "START", g.face(36), float64(r.X+r.W/2), float64(r.Y+20), background)
 	} else {
-		drawCenteredText(screen, "1–4 players", g.face(25), logicalWidth/2, 625, muted)
+		drawCenteredText(screen, "JOIN A PLAYER FIRST", g.face(19), logicalWidth/2, 625, muted)
+	}
+	buttons := lobbyMenuButtons()
+	if g.lobbyFocus >= 0 && g.lobbyFocus < len(buttons) {
+		r := buttons[g.lobbyFocus]
+		ebitenutil.DrawRect(screen, float64(r.X-4), float64(r.Y-4), float64(r.W+8), 4, white)
+		ebitenutil.DrawRect(screen, float64(r.X-4), float64(r.Y+r.H), float64(r.W+8), 4, white)
+		ebitenutil.DrawRect(screen, float64(r.X-4), float64(r.Y-4), 4, float64(r.H+8), white)
+		ebitenutil.DrawRect(screen, float64(r.X+r.W), float64(r.Y-4), 4, float64(r.H+8), white)
 	}
 	g.drawControllerDebug(screen)
 }

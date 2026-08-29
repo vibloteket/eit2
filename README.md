@@ -81,10 +81,12 @@ make check
 make run
 ```
 
-In the lobby, press the standard south/A button on a gamepad to join. On a
-phone, tap once to join and then tap **Start**. Keyboard layouts 1, 2 and 3 join
-with the corresponding number key; Enter only starts an already populated
-lobby. Mouse clicks operate visible UI buttons and never create a touch player.
+The lobby is fully keyboard/gamepad navigable: arrows or D-pad move visible
+focus, Enter or a joined gamepad's A activates, and Escape or Back exits. An
+unjoined gamepad's A joins it. On a phone, tap once to join and then tap
+**Start**. Keyboard layouts 1, 2 and 3 join with the corresponding number key,
+or use **Join next keyboard**; Enter only activates the focused menu action.
+Mouse clicks operate visible UI buttons and never create a touch player.
 Browsers only expose connected gamepads after user interaction.
 
 Keyboard 1 uses A/D, S, Q/W, left Shift, E and Tab. Keyboard 2 uses arrows,
