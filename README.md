@@ -81,16 +81,19 @@ make check
 make run
 ```
 
-The lobby is fully keyboard/gamepad navigable: arrows or D-pad move visible
-focus, Enter or a joined gamepad's A activates, and Escape or Back exits. An
+The lobby is fully keyboard/gamepad navigable: arrows or D-pad move focus
+according to the visual two-row layout, Enter or a joined gamepad's A activates,
+and Escape or Back exits native builds (web only leaves fullscreen). An
 unjoined gamepad's A joins it. On a phone, tap once to join and then tap
 **Start**. Keyboard layouts 1, 2 and 3 join with the corresponding number key,
 or use **Join next keyboard**; Enter only activates the focused menu action.
 Mouse clicks operate visible UI buttons and never create a touch player.
 Browsers only expose connected gamepads after user interaction.
 
-Keyboard 1 uses A/D, S, Q/W, left Shift, E and Tab. Keyboard 2 uses arrows,
-comma/period, right Shift, slash and Enter. Emergency Keyboard 3 uses J/L, K,
+Keyboard 1 uses A/D, S, Q/W, left Shift, E and Tab. When it is the only
+keyboard player, arrows/comma/period/right Shift/slash also work as aliases.
+Keyboard 2 uses arrows, comma for counter-clockwise rotation, up or period for
+clockwise rotation, right Shift, slash and Enter. Emergency Keyboard 3 uses J/L, K,
 U/I, Space, O and P; three-player keyboard use depends on the hardware's key
 rollover. Touch screens use controls around the board for movement, rotation,
 hard drop and Antidote.

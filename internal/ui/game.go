@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image/color"
+	"runtime"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -66,17 +67,20 @@ type button struct {
 }
 
 type keyboardLayout struct {
-	ID                        int
-	Name                      string
-	Left, Right, Down         ebiten.Key
-	RotateCCW, RotateCW, Drop ebiten.Key
-	Antidote, Target          ebiten.Key
+	ID                  int
+	Name                string
+	Left, Right, Down   ebiten.Key
+	RotateCCW, RotateCW ebiten.Key
+	RotateCWAlt, Drop   ebiten.Key
+	Antidote, Target    ebiten.Key
 }
 
+const noKey ebiten.Key = -1
+
 var keyboardLayouts = []keyboardLayout{
-	{controls.KeyboardLayouts[0].ID, controls.KeyboardLayouts[0].Name, ebiten.KeyA, ebiten.KeyD, ebiten.KeyS, ebiten.KeyQ, ebiten.KeyW, ebiten.KeyShiftLeft, ebiten.KeyE, ebiten.KeyTab},
-	{controls.KeyboardLayouts[1].ID, controls.KeyboardLayouts[1].Name, ebiten.KeyArrowLeft, ebiten.KeyArrowRight, ebiten.KeyArrowDown, ebiten.KeyComma, ebiten.KeyPeriod, ebiten.KeyShiftRight, ebiten.KeySlash, ebiten.KeyEnter},
-	{controls.KeyboardLayouts[2].ID, controls.KeyboardLayouts[2].Name, ebiten.KeyJ, ebiten.KeyL, ebiten.KeyK, ebiten.KeyU, ebiten.KeyI, ebiten.KeySpace, ebiten.KeyO, ebiten.KeyP},
+	{controls.KeyboardLayouts[0].ID, controls.KeyboardLayouts[0].Name, ebiten.KeyA, ebiten.KeyD, ebiten.KeyS, ebiten.KeyQ, ebiten.KeyW, noKey, ebiten.KeyShiftLeft, ebiten.KeyE, ebiten.KeyTab},
+	{controls.KeyboardLayouts[1].ID, controls.KeyboardLayouts[1].Name, ebiten.KeyArrowLeft, ebiten.KeyArrowRight, ebiten.KeyArrowDown, ebiten.KeyComma, ebiten.KeyArrowUp, ebiten.KeyPeriod, ebiten.KeyShiftRight, ebiten.KeySlash, ebiten.KeyEnter},
+	{controls.KeyboardLayouts[2].ID, controls.KeyboardLayouts[2].Name, ebiten.KeyJ, ebiten.KeyL, ebiten.KeyK, ebiten.KeyU, ebiten.KeyI, noKey, ebiten.KeySpace, ebiten.KeyO, ebiten.KeyP},
 }
 
 type imageRect struct{ X, Y, W, H int }
@@ -138,24 +142,46 @@ func (g *Game) Update() error {
 	return g.updateLobby()
 }
 
+func isWeb() bool { return runtime.GOOS == "js" }
+
+func leaveWebFullscreen() {
+	if isWeb() && ebiten.IsFullscreen() {
+		ebiten.SetFullscreen(false)
+	}
+}
+
 func (g *Game) updateLobby() error {
 	g.gamepadIDs = ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
-	menu := controls.MenuState{Focus: g.lobbyFocus, Count: len(lobbyMenuButtons())}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		menu.Move(-1)
+	navigate := func(direction controls.MenuDirection) {
+		g.lobbyFocus = controls.NavigateLobby(g.lobbyFocus, direction, !isWeb())
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		menu.Move(1)
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
+		navigate(controls.MenuLeft)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
+		navigate(controls.MenuRight)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		navigate(controls.MenuUp)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		navigate(controls.MenuDown)
 	}
 	activate := inpututil.IsKeyJustPressed(ebiten.KeyEnter)
 	for _, id := range g.gamepadIDs {
 		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
 		joined := g.Lobby.PlayerForDevice(device) >= 0
-		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) || inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftTop) {
-			menu.Move(-1)
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) {
+			navigate(controls.MenuLeft)
 		}
-		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftRight) || inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftBottom) {
-			menu.Move(1)
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftRight) {
+			navigate(controls.MenuRight)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftTop) {
+			navigate(controls.MenuUp)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftBottom) {
+			navigate(controls.MenuDown)
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
 			if joined {
@@ -169,17 +195,24 @@ func (g *Game) updateLobby() error {
 			return nil
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterLeft) {
-			return ebiten.Termination
+			if isWeb() {
+				leaveWebFullscreen()
+			} else {
+				return ebiten.Termination
+			}
 		}
 	}
-	g.lobbyFocus = menu.Focus
 	if activate {
-		if terminate := g.activateLobbyMenu(g.lobbyFocus); terminate {
+		if g.activateLobbyMenu(g.lobbyFocus) {
 			return ebiten.Termination
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		return ebiten.Termination
+		if isWeb() {
+			leaveWebFullscreen()
+		} else {
+			return ebiten.Termination
+		}
 	}
 	joinKeys := []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3}
 	for index, key := range joinKeys {
@@ -192,7 +225,7 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.TouchPosition(id)
 		if keyboardJoinButton().contains(x, y) {
 			g.joinNextKeyboard()
-		} else if exitButton().contains(x, y) {
+		} else if !isWeb() && exitButton().contains(x, y) {
 			return ebiten.Termination
 		} else if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
@@ -214,7 +247,7 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.CursorPosition()
 		if keyboardJoinButton().contains(x, y) {
 			g.joinNextKeyboard()
-		} else if exitButton().contains(x, y) {
+		} else if !isWeb() && exitButton().contains(x, y) {
 			return ebiten.Termination
 		} else if muteButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMute()
@@ -264,7 +297,7 @@ func (g *Game) activateLobbyMenu(index int) bool {
 	case 5:
 		g.debugEnabled = !g.debugEnabled
 	case 6:
-		return true
+		return !isWeb()
 	}
 	return false
 }
@@ -339,6 +372,7 @@ func (g *Game) updatePlay() {
 		return
 	}
 	g.updateKeyboards()
+	g.updateSoloKeyboardAliases()
 	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
 	if touchPlayer == nil {
 		touchPlayer = player
@@ -418,6 +452,37 @@ func (g *Game) playAudioEvents() {
 	}
 }
 
+func (g *Game) updateSoloKeyboardAliases() {
+	if len(g.players) != 1 || len(g.Lobby.Slots) != 1 || g.Lobby.Slots[0].Device.Kind != lobby.DeviceKeyboard || g.Lobby.Slots[0].Device.ID != 1 {
+		return
+	}
+	player := g.players[0]
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
+		player.MoveInput(-1)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
+		player.MoveInput(1)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && ebiten.Tick()%2 == 0 {
+		player.StepDown()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyComma) {
+		player.RotateInput(-1)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyPeriod) {
+		player.RotateInput(1)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyShiftRight) {
+		player.HardDrop()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeySlash) {
+		player.UseAntidote()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		g.match.CycleTarget(0)
+	}
+}
+
 func (g *Game) updateKeyboards() {
 	for playerIndex, slot := range g.Lobby.Slots {
 		if slot.Device.Kind != lobby.DeviceKeyboard || playerIndex >= len(g.players) {
@@ -446,7 +511,7 @@ func (g *Game) updateKeyboards() {
 		if inpututil.IsKeyJustPressed(layout.RotateCCW) {
 			player.RotateInput(-1)
 		}
-		if inpututil.IsKeyJustPressed(layout.RotateCW) {
+		if inpututil.IsKeyJustPressed(layout.RotateCW) || (layout.RotateCWAlt != noKey && inpututil.IsKeyJustPressed(layout.RotateCWAlt)) {
 			player.RotateInput(1)
 		}
 		if inpututil.IsKeyJustPressed(layout.Drop) {
@@ -578,7 +643,11 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 		clear(g.heldActions)
 		return true
 	}
-	if pauseButton().contains(x, y) {
+	pause := pauseButton()
+	if len(g.players) > 1 {
+		pause = couchPauseButton()
+	}
+	if pause.contains(x, y) {
 		g.paused = true
 		clear(g.heldActions)
 		return true
@@ -614,11 +683,16 @@ func musicButton() imageRect           { return imageRect{X: 805, Y: 590, W: 185
 func exitButton() imageRect            { return imageRect{X: 1090, Y: 500, W: 140, H: 60} }
 
 func lobbyMenuButtons() []imageRect {
-	return []imageRect{startButton(), keyboardJoinButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton(), exitButton()}
+	buttons := []imageRect{startButton(), keyboardJoinButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton()}
+	if !isWeb() {
+		buttons = append(buttons, exitButton())
+	}
+	return buttons
 }
-func debugPlayButton() imageRect { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
-func pauseButton() imageRect     { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
-func resumeButton() imageRect    { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
+func debugPlayButton() imageRect  { return imageRect{X: 45, Y: 280, W: 160, H: 62} }
+func pauseButton() imageRect      { return imageRect{X: 45, Y: 205, W: 160, H: 62} }
+func couchPauseButton() imageRect { return imageRect{X: 560, Y: 8, W: 160, H: 52} }
+func resumeButton() imageRect     { return imageRect{X: 375, Y: 340, W: 160, H: 72} }
 
 func debugCloseButton() imageRect { return imageRect{X: 1035, Y: 110, W: 150, H: 60} }
 func debugPrevPlayer() imageRect  { return imageRect{X: 150, Y: 110, W: 90, H: 60} }
@@ -747,9 +821,11 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	keyboard := keyboardJoinButton()
 	ebitenutil.DrawRect(screen, float64(keyboard.X), float64(keyboard.Y), float64(keyboard.W), float64(keyboard.H), panel)
 	drawCenteredText(screen, "JOIN NEXT KEYBOARD", g.face(17), float64(keyboard.X+keyboard.W/2), float64(keyboard.Y+20), white)
-	exit := exitButton()
-	ebitenutil.DrawRect(screen, float64(exit.X), float64(exit.Y), float64(exit.W), float64(exit.H), panel)
-	drawCenteredText(screen, "EXIT", g.face(17), float64(exit.X+exit.W/2), float64(exit.Y+16), white)
+	if !isWeb() {
+		exit := exitButton()
+		ebitenutil.DrawRect(screen, float64(exit.X), float64(exit.Y), float64(exit.W), float64(exit.H), panel)
+		drawCenteredText(screen, "EXIT", g.face(17), float64(exit.X+exit.W/2), float64(exit.Y+16), white)
+	}
 	controllers := controllerDebugButton()
 	ebitenutil.DrawRect(screen, float64(controllers.X), float64(controllers.Y), float64(controllers.W), float64(controllers.H), panel)
 	drawCenteredText(screen, "CONTROLLER DEBUG", g.face(17), float64(controllers.X+controllers.W/2), float64(controllers.Y+20), white)
@@ -1047,9 +1123,10 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 			}
 		}
 	}
-	pause := pauseButton()
+	pause := couchPauseButton()
 	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), float64(pause.H), panel)
-	drawCenteredText(screen, "PAUSE", g.face(18), float64(pause.X+pause.W/2), float64(pause.Y+18), white)
+	ebitenutil.DrawRect(screen, float64(pause.X), float64(pause.Y), float64(pause.W), 3, accent)
+	drawCenteredText(screen, "PAUSE", g.face(17), float64(pause.X+pause.W/2), float64(pause.Y+14), white)
 }
 
 func (g *Game) drawDebugPanel(screen *ebiten.Image) {
