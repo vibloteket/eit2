@@ -11,6 +11,7 @@ $directory = Join-Path $stage $folderName
 $archive = Join-Path $packages "$folderName.zip"
 
 Remove-Item $packages, $stage -Recurse -Force -ErrorAction SilentlyContinue
+New-Item $packages -ItemType Directory -Force | Out-Null
 New-Item $directory -ItemType Directory -Force | Out-Null
 
 $env:GOOS = 'windows'
