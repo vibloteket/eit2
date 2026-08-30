@@ -33,6 +33,7 @@ var (
 	accent      = color.RGBA{R: 76, G: 230, B: 166, A: 255}
 	white       = color.RGBA{R: 235, G: 241, B: 247, A: 255}
 	muted       = color.RGBA{R: 148, G: 163, B: 184, A: 255}
+	iceBlock    = color.RGBA{R: 205, G: 231, B: 238, A: 238}
 	pieceColors = [...]color.RGBA{
 		{}, {R: 97, G: 218, B: 251, A: 255}, {R: 255, G: 209, B: 102, A: 255},
 		{R: 139, G: 124, B: 246, A: 255}, {R: 255, G: 159, B: 67, A: 255},
@@ -1523,18 +1524,21 @@ func drawBlackout(screen *ebiten.Image, game *core.Game, boardX, boardY, boardW,
 	screen.DrawImage(mask, op)
 }
 
-func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, translucent bool) {
+func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, iced bool) {
 	if mini {
 		miniSize := max(4, size*2/5)
 		x += (size - miniSize) / 2
 		y += (size - miniSize) / 2
 		size = miniSize
 	}
-	colour := pieceColors[value]
-	if translucent {
-		colour.A = 72
+	if iced {
+		// Ice removes the piece colours and nearly merges adjacent settled
+		// cells. The active piece and special labels are drawn separately and
+		// remain readable.
+		ebitenutil.DrawRect(screen, float64(x), float64(y), float64(size), float64(size), iceBlock)
+		return
 	}
-	ebitenutil.DrawRect(screen, float64(x+1), float64(y+1), float64(size-2), float64(size-2), colour)
+	ebitenutil.DrawRect(screen, float64(x+1), float64(y+1), float64(size-2), float64(size-2), pieceColors[value])
 }
 
 func drawCell(screen *ebiten.Image, x, y, size, value int) {
