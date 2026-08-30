@@ -81,11 +81,12 @@ make check
 make run
 ```
 
-The lobby is fully keyboard/gamepad navigable: arrows or D-pad move focus
+The lobby is fully keyboard/gamepad navigable: arrows, D-pad or left analog
+stick move focus
 according to the visual two-row layout, Enter or a joined gamepad's A activates,
 and Escape or Back exits native builds (web only leaves fullscreen). Start is
 always visible but disabled until a player joins. An
-unjoined gamepad's A joins it. On a phone, tap once to join and then tap
+unjoined gamepad's A joins it; a joined gamepad's B leaves its lobby slot. On a phone, tap once to join and then tap
 **Start**. Keyboard layouts 1, 2 and 3 join with the corresponding number key,
 or use **Join next keyboard**; Enter only activates the focused menu action.
 Mouse clicks operate visible UI buttons and never create a touch player.
@@ -99,8 +100,10 @@ clockwise rotation, right Shift, slash and Enter. Emergency Keyboard 3 uses J/L,
 U/I, Space, O and P; three-player keyboard use depends on the hardware's key
 rollover. Touch screens use controls around the board for movement, rotation,
 hard drop and Antidote. During play, P or Escape opens/closes the pause menu;
-Lobby is then chosen explicitly from that menu. No Pause button overlays the
-playfields.
+Lobby is then chosen explicitly from that menu. The pause/game-over/winner
+menus are gamepad-focusable; A selects and B resumes/backtracks. No Pause button
+overlays the playfields. Debug mode supports D-pad selection (LB/RB changes
+source player), and Controller Debug closes with B.
 
 The lobby's **Controller debug** panel shows connected controller names/IDs,
 player assignment, standard mapping availability, axis count, SDL GUID where

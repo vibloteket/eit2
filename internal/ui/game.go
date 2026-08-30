@@ -107,6 +107,10 @@ type Game struct {
 	controllerDebugOpen bool
 	disconnectedPlayer  int
 	lobbyFocus          int
+	overlayFocus        int
+	debugFocus          int
+	stickX              map[int]int
+	stickY              map[int]int
 	sound               *sound.Manager
 	soundError          error
 	touchDevice         lobby.Device
@@ -124,6 +128,8 @@ func NewGame() *Game {
 		soundError:         soundErr,
 		heldActions:        make(map[action]int),
 		padHeld:            make(map[int]map[action]int),
+		stickX:             make(map[int]int),
+		stickY:             make(map[int]int),
 		disconnectedPlayer: -1,
 		touchDevice:        lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
@@ -169,8 +175,30 @@ func (g *Game) updateLobby() error {
 	}
 	activate := inpututil.IsKeyJustPressed(ebiten.KeyEnter)
 	for _, id := range g.gamepadIDs {
+		if g.controllerDebugOpen && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
+			g.controllerDebugOpen = false
+			continue
+		}
 		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
-		joined := g.Lobby.PlayerForDevice(device) >= 0
+		joinedPlayer := g.Lobby.PlayerForDevice(device)
+		joined := joinedPlayer >= 0
+		xDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal), g.stickX[int(id)])
+		yDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickVertical), g.stickY[int(id)])
+		if xDirection != g.stickX[int(id)] && xDirection != 0 {
+			if xDirection < 0 {
+				navigate(controls.MenuLeft)
+			} else {
+				navigate(controls.MenuRight)
+			}
+		}
+		if yDirection != g.stickY[int(id)] && yDirection != 0 {
+			if yDirection < 0 {
+				navigate(controls.MenuUp)
+			} else {
+				navigate(controls.MenuDown)
+			}
+		}
+		g.stickX[int(id)], g.stickY[int(id)] = xDirection, yDirection
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) {
 			navigate(controls.MenuLeft)
 		}
@@ -190,6 +218,12 @@ func (g *Game) updateLobby() error {
 				g.Lobby.Join(device)
 			}
 		}
+		if joined && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
+			g.Lobby.Leave(device)
+			if g.lobbyFocus == 0 && !g.Lobby.CanStart() {
+				g.lobbyFocus = 1
+			}
+		}
 		if g.Lobby.CanStart() && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
 			g.start()
 			return nil
@@ -206,6 +240,9 @@ func (g *Game) updateLobby() error {
 		if g.activateLobbyMenu(g.lobbyFocus) {
 			return ebiten.Termination
 		}
+	}
+	if g.Lobby.CanStart() && g.lobbyFocus == 1 {
+		g.lobbyFocus = 0
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		if isWeb() {
@@ -313,6 +350,7 @@ func (g *Game) updatePlay() {
 	g.updateControllerConnections()
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.paused = !g.paused
+		g.overlayFocus = 0
 		clear(g.heldActions)
 		clear(g.padHeld)
 		return
@@ -322,6 +360,7 @@ func (g *Game) updatePlay() {
 	}
 	player := g.players[0]
 	if g.debugOpen {
+		g.updateDebugGamepads()
 		for _, id := range g.pressedIDs {
 			x, y := ebiten.TouchPosition(id)
 			g.handleDebugPointer(x, y)
@@ -350,8 +389,12 @@ func (g *Game) updatePlay() {
 	if g.disconnectedPlayer >= 0 {
 		return
 	}
+	if g.paused || soloGameOver || matchOver {
+		g.updateOverlayGamepads(soloGameOver || matchOver)
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		g.paused = !g.paused
+		g.overlayFocus = 0
 		clear(g.heldActions)
 	}
 	if g.paused || soloGameOver || matchOver {
@@ -527,10 +570,21 @@ func (g *Game) updateGamepads() {
 			continue
 		}
 		id := ebiten.GamepadID(slot.Device.ID)
+		if g.disconnectedPlayer < 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
+			g.paused = !g.paused
+			g.overlayFocus = 0
+			clear(g.heldActions)
+			clear(g.padHeld)
+		}
+		if g.paused || (g.match != nil && g.match.Over) {
+			continue
+		}
+		xAxis := ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal)
+		yAxis := ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickVertical)
 		active := map[action]bool{
-			actionLeft:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftLeft),
-			actionRight: ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftRight),
-			actionDown:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftBottom),
+			actionLeft:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftLeft) || xAxis < -0.55,
+			actionRight: ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftRight) || xAxis > 0.55,
+			actionDown:  ebiten.IsStandardGamepadButtonPressed(id, ebiten.StandardGamepadButtonLeftBottom) || yAxis > 0.55,
 		}
 		held := g.padHeld[playerIndex]
 		if held == nil {
@@ -567,10 +621,99 @@ func (g *Game) updateGamepads() {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopLeft) {
 			g.players[playerIndex].UseAntidote()
 		}
-		if g.disconnectedPlayer < 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
-			g.paused = !g.paused
-			clear(g.heldActions)
-			clear(g.padHeld)
+	}
+}
+
+func (g *Game) updateDebugGamepads() {
+	buttons := debugSpecialButtons()
+	for _, id := range ebiten.AppendGamepadIDs(g.gamepadIDs[:0]) {
+		xDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal), g.stickX[int(id)])
+		yDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickVertical), g.stickY[int(id)])
+		if xDirection != g.stickX[int(id)] && xDirection != 0 {
+			if xDirection < 0 {
+				g.debugFocus = max(0, g.debugFocus-1)
+			} else {
+				g.debugFocus = min(len(buttons)-1, g.debugFocus+1)
+			}
+		}
+		if yDirection != g.stickY[int(id)] && yDirection != 0 {
+			if yDirection < 0 {
+				g.debugFocus = max(0, g.debugFocus-4)
+			} else {
+				g.debugFocus = min(len(buttons)-1, g.debugFocus+4)
+			}
+		}
+		g.stickX[int(id)], g.stickY[int(id)] = xDirection, yDirection
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
+			g.debugOpen = false
+			return
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopLeft) && g.debugPlayer > 0 {
+			g.debugPlayer--
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonFrontTopRight) && g.debugPlayer+1 < len(g.players) {
+			g.debugPlayer++
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) {
+			g.debugFocus = max(0, g.debugFocus-1)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftRight) {
+			g.debugFocus = min(len(buttons)-1, g.debugFocus+1)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftTop) {
+			g.debugFocus = max(0, g.debugFocus-4)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftBottom) {
+			g.debugFocus = min(len(buttons)-1, g.debugFocus+4)
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) && len(buttons) > 0 {
+			g.match.DebugCollect(g.debugPlayer, buttons[g.debugFocus].Special)
+			g.debugOpen = false
+			return
+		}
+	}
+}
+
+func (g *Game) updateOverlayGamepads(gameOver bool) {
+	buttonCount := 3
+	if gameOver {
+		buttonCount = 2
+	}
+	for _, id := range ebiten.AppendGamepadIDs(g.gamepadIDs[:0]) {
+		xDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal), g.stickX[int(id)])
+		if xDirection != g.stickX[int(id)] && xDirection != 0 {
+			g.overlayFocus = (g.overlayFocus + xDirection + buttonCount) % buttonCount
+		}
+		g.stickX[int(id)] = xDirection
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftLeft) {
+			g.overlayFocus = (g.overlayFocus - 1 + buttonCount) % buttonCount
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonLeftRight) {
+			g.overlayFocus = (g.overlayFocus + 1) % buttonCount
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
+			if g.paused {
+				g.paused = false
+			} else {
+				g.backToLobby()
+			}
+			return
+		}
+		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
+			if !gameOver && g.overlayFocus == 0 {
+				g.paused = false
+				return
+			}
+			adjusted := g.overlayFocus
+			if !gameOver {
+				adjusted--
+			}
+			if adjusted == 0 {
+				g.restart()
+			} else {
+				g.backToLobby()
+			}
+			return
 		}
 	}
 }
@@ -626,11 +769,13 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 	}
 	if g.debugEnabled && debugPlayButton().contains(x, y) {
 		g.debugOpen = true
+		g.debugFocus = 0
 		clear(g.heldActions)
 		return true
 	}
 	if len(g.players) == 1 && touchMenuButton().contains(x, y) {
 		g.paused = true
+		g.overlayFocus = 0
 		clear(g.heldActions)
 		return true
 	}
@@ -896,7 +1041,7 @@ func (g *Game) drawControllerDebug(screen *ebiten.Image) {
 	ebitenutil.DrawRect(screen, 55, 65, 1170, 570, color.RGBA{R: 8, G: 12, B: 20, A: 250})
 	ebitenutil.DrawRect(screen, 55, 65, 1170, 5, accent)
 	drawText(screen, "CONTROLLER DEBUG", g.face(32), 90, 92, accent)
-	drawText(screen, "Tap anywhere to close · press buttons to see live state", g.face(17), 90, 137, muted)
+	drawText(screen, "Tap anywhere or press B to close · press buttons to see live state", g.face(17), 90, 137, muted)
 	ids := ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
 	if len(ids) == 0 {
 		drawCenteredText(screen, "No gamepads detected", g.face(28), logicalWidth/2, 310, white)
@@ -1130,9 +1275,13 @@ func (g *Game) drawDebugPanel(screen *ebiten.Image) {
 	ebitenutil.DrawRect(screen, float64(close.X), float64(close.Y), float64(close.W), float64(close.H), panel)
 	drawCenteredText(screen, "CLOSE", g.face(18), float64(close.X+close.W/2), float64(close.Y+16), white)
 
-	for _, item := range debugSpecialButtons() {
+	for index, item := range debugSpecialButtons() {
 		ebitenutil.DrawRect(screen, float64(item.Rect.X), float64(item.Rect.Y), float64(item.Rect.W), float64(item.Rect.H), panel)
-		ebitenutil.DrawRect(screen, float64(item.Rect.X), float64(item.Rect.Y), float64(item.Rect.W), 3, muted)
+		border := muted
+		if index == g.debugFocus {
+			border = accent
+		}
+		ebitenutil.DrawRect(screen, float64(item.Rect.X), float64(item.Rect.Y), float64(item.Rect.W), 3, border)
 		drawCenteredText(screen, item.Special.Name(), g.face(16), float64(item.Rect.X+item.Rect.W/2), float64(item.Rect.Y+17), white)
 	}
 	for _, item := range debugSoundButtons() {
@@ -1183,11 +1332,26 @@ func (g *Game) drawMatchOverlay(screen *ebiten.Image) {
 	restart, back := menuButtons(gameOver || matchOver)
 	if g.paused {
 		resume := resumeButton()
-		ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), accent)
-		drawCenteredText(screen, "RESUME", g.face(19), float64(resume.X+resume.W/2), float64(resume.Y+22), background)
+		fill, textColour := panel, white
+		if g.overlayFocus == 0 {
+			fill, textColour = accent, background
+		}
+		ebitenutil.DrawRect(screen, float64(resume.X), float64(resume.Y), float64(resume.W), float64(resume.H), fill)
+		drawCenteredText(screen, "RESUME", g.face(19), float64(resume.X+resume.W/2), float64(resume.Y+22), textColour)
 	}
-	ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), panel)
-	ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), panel)
+	restartFocus, backFocus := 0, 1
+	if g.paused {
+		restartFocus, backFocus = 1, 2
+	}
+	restartFill, backFill := panel, panel
+	if g.overlayFocus == restartFocus {
+		restartFill = accent
+	}
+	if g.overlayFocus == backFocus {
+		backFill = accent
+	}
+	ebitenutil.DrawRect(screen, float64(restart.X), float64(restart.Y), float64(restart.W), float64(restart.H), restartFill)
+	ebitenutil.DrawRect(screen, float64(back.X), float64(back.Y), float64(back.W), float64(back.H), backFill)
 	drawCenteredText(screen, "RESTART", g.face(19), float64(restart.X+restart.W/2), float64(restart.Y+22), white)
 	drawCenteredText(screen, "LOBBY", g.face(19), float64(back.X+back.W/2), float64(back.Y+22), white)
 }
