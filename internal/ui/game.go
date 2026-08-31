@@ -28,17 +28,21 @@ const (
 )
 
 var (
-	background  = color.RGBA{R: 8, G: 12, B: 20, A: 255}
-	panel       = color.RGBA{R: 18, G: 28, B: 42, A: 255}
-	accent      = color.RGBA{R: 76, G: 230, B: 166, A: 255}
-	white       = color.RGBA{R: 235, G: 241, B: 247, A: 255}
-	muted       = color.RGBA{R: 148, G: 163, B: 184, A: 255}
-	iceBlock    = color.RGBA{R: 205, G: 231, B: 238, A: 238}
+	// Doodle Party uses the warm paper, ink and painted-card palette from the
+	// chosen concept while keeping all gameplay geometry deterministic.
+	background  = color.RGBA{R: 242, G: 238, B: 226, A: 255}
+	panel       = color.RGBA{R: 182, G: 199, B: 191, A: 255}
+	accent      = color.RGBA{R: 171, G: 97, B: 75, A: 255}
+	white       = color.RGBA{R: 51, G: 62, B: 66, A: 255}
+	muted       = color.RGBA{R: 97, G: 131, B: 120, A: 255}
+	boardInk    = color.RGBA{R: 44, G: 82, B: 91, A: 255}
+	paperLight  = color.RGBA{R: 250, G: 247, B: 238, A: 255}
+	iceBlock    = color.RGBA{R: 214, G: 235, B: 232, A: 255}
 	pieceColors = [...]color.RGBA{
-		{}, {R: 97, G: 218, B: 251, A: 255}, {R: 255, G: 209, B: 102, A: 255},
-		{R: 139, G: 124, B: 246, A: 255}, {R: 255, G: 159, B: 67, A: 255},
-		{R: 71, G: 120, B: 245, A: 255}, {R: 76, G: 230, B: 166, A: 255},
-		{R: 255, G: 107, B: 107, A: 255}, {R: 142, G: 151, B: 164, A: 255},
+		{}, {R: 94, G: 162, B: 158, A: 255}, {R: 206, G: 155, B: 94, A: 255},
+		{R: 150, G: 109, B: 156, A: 255}, {R: 212, G: 171, B: 154, A: 255},
+		{R: 91, G: 126, B: 154, A: 255}, {R: 112, G: 157, B: 125, A: 255},
+		{R: 171, G: 97, B: 75, A: 255}, {R: 112, G: 111, B: 105, A: 255},
 	}
 )
 
@@ -923,6 +927,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) drawLobby(screen *ebiten.Image) {
 	screen.Fill(background)
+	drawPaperDoodles(screen)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
 	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
 	drawText(screen, "Touch / gamepad A / keys 1, 2, 3 to join · Enter starts", g.face(24), 42, 92, white)
@@ -994,6 +999,18 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 		ebitenutil.DrawRect(screen, float64(r.X+r.W), float64(r.Y-4), 4, float64(r.H+8), white)
 	}
 	g.drawControllerDebug(screen)
+}
+
+func drawPaperDoodles(screen *ebiten.Image) {
+	ink := color.RGBA{R: 97, G: 131, B: 120, A: 70}
+	for i := 0; i < 4; i++ {
+		x := float64(1040 + i*18)
+		ebitenutil.DrawLine(screen, x, 105, x+9, 119, ink)
+		ebitenutil.DrawLine(screen, x+9, 119, x-2, 133, ink)
+	}
+	ebitenutil.DrawCircle(screen, 1195, 118, 18, ink)
+	ebitenutil.DrawLine(screen, 1178, 118, 1212, 118, background)
+	ebitenutil.DrawLine(screen, 1195, 101, 1195, 135, background)
 }
 
 func standardButtonName(button ebiten.StandardGamepadButton) string {
@@ -1076,6 +1093,7 @@ func (g *Game) drawControllerDebug(screen *ebiten.Image) {
 
 func (g *Game) drawPlay(screen *ebiten.Image) {
 	screen.Fill(background)
+	drawPaperDoodles(screen)
 	if len(g.players) == 0 {
 		return
 	}
@@ -1089,7 +1107,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	const cell = 27
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
 	boardX, boardY := (logicalWidth-boardW)/2, 40
-	ebitenutil.DrawRect(screen, float64(boardX-5), float64(boardY-5), float64(boardW+10), float64(boardH+10), muted)
+	drawBoardFrame(screen, boardX, boardY, boardW, boardH, muted)
 	drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 	for y, row := range game.Board {
 		for x, value := range row {
@@ -1164,20 +1182,36 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	g.drawDebugPanel(screen)
 }
 
+func drawBoardFrame(screen *ebiten.Image, x, y, width, height int, border color.RGBA) {
+	// Two slightly offset strokes mimic an inked cardboard cut-out without
+	// allowing random wobble to make the board geometry unclear.
+	ebitenutil.DrawRect(screen, float64(x-7), float64(y-7), float64(width+14), float64(height+14), boardInk)
+	ebitenutil.DrawRect(screen, float64(x-4), float64(y-4), float64(width+8), float64(height+8), border)
+}
+
 func drawBoardBackground(screen *ebiten.Image, x, y, width, height, variant int) {
 	variants := [...]color.RGBA{
-		panel,
-		{R: 35, G: 50, B: 72, A: 255},
-		{R: 56, G: 38, B: 66, A: 255},
-		{R: 29, G: 63, B: 54, A: 255},
-		{R: 71, G: 48, B: 32, A: 255},
-		{R: 45, G: 44, B: 76, A: 255},
-		{R: 69, G: 35, B: 48, A: 255},
+		{R: 44, G: 82, B: 91, A: 255},
+		{R: 57, G: 88, B: 100, A: 255},
+		{R: 80, G: 72, B: 94, A: 255},
+		{R: 55, G: 94, B: 82, A: 255},
+		{R: 103, G: 78, B: 60, A: 255},
+		{R: 66, G: 70, B: 103, A: 255},
+		{R: 101, G: 66, B: 70, A: 255},
 	}
 	if variant < 0 || variant >= len(variants) {
 		variant = 0
 	}
 	ebitenutil.DrawRect(screen, float64(x), float64(y), float64(width), float64(height), variants[variant])
+	grid := color.RGBA{R: 242, G: 238, B: 226, A: 22}
+	for column := 1; column < core.BoardWidth; column++ {
+		gridX := x + column*width/core.BoardWidth
+		ebitenutil.DrawLine(screen, float64(gridX), float64(y), float64(gridX), float64(y+height), grid)
+	}
+	for row := 1; row < core.BoardHeight; row++ {
+		gridY := y + row*height/core.BoardHeight
+		ebitenutil.DrawLine(screen, float64(x), float64(gridY), float64(x+width), float64(gridY), grid)
+	}
 }
 
 func (g *Game) drawCouch(screen *ebiten.Image) {
@@ -1199,7 +1233,7 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		boardX, boardY := x+8, 72
 		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(22), float64(x+8), 20, white)
 		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(16), float64(x+48), 25, muted)
-		ebitenutil.DrawRect(screen, float64(boardX-3), float64(boardY-3), float64(boardW+6), float64(boardH+6), muted)
+		drawBoardFrame(screen, boardX, boardY, boardW, boardH, pieceColors[i%7+1])
 		drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 		for y, row := range game.Board {
 			for bx, value := range row {
@@ -1533,12 +1567,19 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, iced boo
 	}
 	if iced {
 		// Ice removes the piece colours and nearly merges adjacent settled
-		// cells. The active piece and special labels are drawn separately and
-		// remain readable.
+		// cells. The active piece and special labels remain readable.
 		ebitenutil.DrawRect(screen, float64(x), float64(y), float64(size), float64(size), iceBlock)
+		ebitenutil.DrawLine(screen, float64(x+3), float64(y+size-4), float64(x+size-4), float64(y+3), paperLight)
 		return
 	}
-	ebitenutil.DrawRect(screen, float64(x+1), float64(y+1), float64(size-2), float64(size-2), pieceColors[value])
+	// Dark underprint plus two imperfect inset layers gives each cell the
+	// tactile, hand-inked card look without introducing image assets.
+	ebitenutil.DrawRect(screen, float64(x+1), float64(y+2), float64(size-2), float64(size-2), boardInk)
+	ebitenutil.DrawRect(screen, float64(x+2), float64(y+1), float64(size-4), float64(size-4), pieceColors[value])
+	if size >= 12 {
+		highlight := color.RGBA{R: 250, G: 247, B: 238, A: 105}
+		ebitenutil.DrawLine(screen, float64(x+5), float64(y+5), float64(x+size-6), float64(y+4), highlight)
+	}
 }
 
 func drawCell(screen *ebiten.Image, x, y, size, value int) {
