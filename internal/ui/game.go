@@ -185,13 +185,24 @@ func (g *Game) updateLobby() error {
 	}
 	activate := inpututil.IsKeyJustPressed(ebiten.KeyEnter)
 	for _, id := range g.gamepadIDs {
+		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
+		joinedPlayer := g.Lobby.PlayerForDevice(device)
+		joined := joinedPlayer >= 0
+		if !joined {
+			// An unassigned controller cannot operate the lobby. Its first button
+			// press only joins it, preventing Start, Back or D-pad from triggering
+			// actions on behalf of players already in the lobby.
+			if anyStandardGamepadButtonJustPressed(id) {
+				if _, added := g.Lobby.Join(device); added {
+					g.lobbyFocus = 0
+				}
+			}
+			continue
+		}
 		if g.controllerDebugOpen && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			g.controllerDebugOpen = false
 			continue
 		}
-		device := lobby.Device{Kind: lobby.DeviceGamepad, ID: int(id), Name: ebiten.GamepadName(id)}
-		joinedPlayer := g.Lobby.PlayerForDevice(device)
-		joined := joinedPlayer >= 0
 		xDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal), g.stickX[int(id)])
 		yDirection := controls.AxisDirection(ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickVertical), g.stickY[int(id)])
 		if xDirection != g.stickX[int(id)] && xDirection != 0 {
@@ -222,11 +233,7 @@ func (g *Game) updateLobby() error {
 			navigate(controls.MenuDown)
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
-			if joined {
-				activate = true
-			} else if _, added := g.Lobby.Join(device); added {
-				g.lobbyFocus = 0
-			}
+			activate = true
 		}
 		if joined && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			g.Lobby.Leave(device)
@@ -984,7 +991,7 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	drawPaperDoodles(screen)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
 	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
-	drawText(screen, "Join/leave: keys 1, 2, 3 · Gamepad A joins, B leaves · Enter selects", g.face(22), 42, 92, white)
+	drawText(screen, "Join/leave: keys 1, 2, 3 · Any gamepad button joins, B leaves · Enter selects", g.face(21), 42, 92, white)
 	const gap, margin = 20, 40
 	width := (logicalWidth - margin*2 - gap*3) / lobby.MaxPlayers
 	for i := 0; i < lobby.MaxPlayers; i++ {
@@ -1065,6 +1072,15 @@ func drawPaperDoodles(screen *ebiten.Image) {
 	ebitenutil.DrawCircle(screen, 1195, 118, 18, ink)
 	ebitenutil.DrawLine(screen, 1178, 118, 1212, 118, background)
 	ebitenutil.DrawLine(screen, 1195, 101, 1195, 135, background)
+}
+
+func anyStandardGamepadButtonJustPressed(id ebiten.GamepadID) bool {
+	for button := ebiten.StandardGamepadButton(0); button <= ebiten.StandardGamepadButtonMax; button++ {
+		if inpututil.IsStandardGamepadButtonJustPressed(id, button) {
+			return true
+		}
+	}
+	return false
 }
 
 func standardButtonName(button ebiten.StandardGamepadButton) string {
