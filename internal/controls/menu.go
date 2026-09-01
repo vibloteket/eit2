@@ -9,29 +9,41 @@ const (
 	MenuDown
 )
 
-// NavigateLobby follows the visual layout. Indices: Start, Sound, Music,
-// Controller debug, Debug mode, and optional native Exit.
+// NavigateLobby follows the visible geometry. Indices: Start, Sound, Music,
+// Controller debug, Debug mode, and optional native Exit. The utility buttons
+// form one left-to-right row; Start sits above its centre.
 func NavigateLobby(focus int, direction MenuDirection, nativeExit bool) int {
-	left := map[int]int{0: 1, 1: 3, 2: 0, 3: 4, 4: 2, 5: 4}
-	right := map[int]int{0: 2, 1: 0, 2: 4, 3: 1, 4: 3, 5: 4}
-	up := map[int]int{0: 2, 1: 0, 2: 0, 3: 0, 4: 5, 5: 4}
-	down := map[int]int{0: 2, 1: 3, 2: 4, 3: 1, 4: 5, 5: 4}
-	if !nativeExit {
-		up[4], down[4] = 0, 2
+	row := []int{3, 1, 2, 4}
+	if nativeExit {
+		row = append(row, 5)
 	}
-	var next int
+	if focus == 0 {
+		switch direction {
+		case MenuLeft:
+			return 2
+		case MenuRight, MenuUp, MenuDown:
+			return 4
+		}
+	}
+	position := -1
+	for i, item := range row {
+		if item == focus {
+			position = i
+			break
+		}
+	}
+	if position < 0 {
+		return 0
+	}
 	switch direction {
 	case MenuLeft:
-		next = left[focus]
+		return row[(position-1+len(row))%len(row)]
 	case MenuRight:
-		next = right[focus]
+		return row[(position+1)%len(row)]
 	case MenuUp:
-		next = up[focus]
+		return 0
 	case MenuDown:
-		next = down[focus]
+		return focus
 	}
-	if !nativeExit && next == 5 {
-		return 4
-	}
-	return next
+	return focus
 }

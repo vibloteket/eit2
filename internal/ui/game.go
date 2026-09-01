@@ -119,6 +119,10 @@ type Game struct {
 	sound               *sound.Manager
 	soundError          error
 	touchDevice         lobby.Device
+	matchStarted        time.Time
+	pausedAt            time.Time
+	pausedDuration      time.Duration
+	round               int
 }
 
 func NewGame() *Game {
@@ -136,6 +140,7 @@ func NewGame() *Game {
 		stickX:             make(map[int]int),
 		stickY:             make(map[int]int),
 		disconnectedPlayer: -1,
+		lobbyFocus:         3,
 		touchDevice:        lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
 }
@@ -219,8 +224,8 @@ func (g *Game) updateLobby() error {
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
 			if joined {
 				activate = true
-			} else {
-				g.Lobby.Join(device)
+			} else if _, added := g.Lobby.Join(device); added {
+				g.lobbyFocus = 0
 			}
 		}
 		if joined && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
@@ -246,9 +251,6 @@ func (g *Game) updateLobby() error {
 			return ebiten.Termination
 		}
 	}
-	if g.Lobby.CanStart() && g.lobbyFocus == 1 {
-		g.lobbyFocus = 0
-	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		if isWeb() {
 			leaveWebFullscreen()
@@ -260,7 +262,15 @@ func (g *Game) updateLobby() error {
 	for index, key := range joinKeys {
 		if inpututil.IsKeyJustPressed(key) {
 			layout := keyboardLayouts[index]
-			g.Lobby.Join(lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name})
+			device := lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name}
+			if g.Lobby.PlayerForDevice(device) >= 0 {
+				g.Lobby.Leave(device)
+			} else if _, added := g.Lobby.Join(device); added {
+				g.lobbyFocus = 0
+			}
+			if !g.Lobby.CanStart() {
+				g.lobbyFocus = 1
+			}
 		}
 	}
 	for _, id := range g.pressedIDs {
@@ -329,12 +339,20 @@ func (g *Game) activateLobbyMenu(index int) bool {
 }
 
 func (g *Game) start() {
+	if g.view == viewPlay {
+		g.round++
+	} else {
+		g.round = 1
+	}
 	g.match = matchcore.NewSeeded(len(g.Lobby.Slots), uint64(time.Now().UnixNano()))
 	g.players = g.match.Players
 	g.paused = false
 	g.debugOpen = false
 	g.debugPlayer = 0
 	g.disconnectedPlayer = -1
+	g.matchStarted = time.Now()
+	g.pausedAt = time.Time{}
+	g.pausedDuration = 0
 	clear(g.heldActions)
 	clear(g.padHeld)
 	g.view = viewPlay
@@ -353,17 +371,22 @@ func (g *Game) backToLobby() {
 func (g *Game) updatePlay() {
 	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
 	g.updateControllerConnections()
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		g.paused = !g.paused
-		g.overlayFocus = 0
-		clear(g.heldActions)
-		clear(g.padHeld)
-		return
-	}
 	if len(g.players) == 0 {
 		return
 	}
 	player := g.players[0]
+	ending := (len(g.players) == 1 && player.GameOver) || (g.match != nil && g.match.Over)
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		if ending {
+			g.backToLobby()
+		} else {
+			g.setPaused(!g.paused)
+			g.overlayFocus = 0
+			clear(g.heldActions)
+			clear(g.padHeld)
+		}
+		return
+	}
 	if g.debugOpen {
 		g.updateDebugGamepads()
 		for _, id := range g.pressedIDs {
@@ -395,10 +418,12 @@ func (g *Game) updatePlay() {
 		return
 	}
 	if g.paused || soloGameOver || matchOver {
-		g.updateOverlayGamepads(soloGameOver || matchOver)
+		gameOver := soloGameOver || matchOver
+		g.updateOverlayKeyboard(gameOver)
+		g.updateOverlayGamepads(gameOver)
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
-		g.paused = !g.paused
+		g.setPaused(!g.paused)
 		g.overlayFocus = 0
 		clear(g.heldActions)
 	}
@@ -460,7 +485,7 @@ func (g *Game) updateControllerConnections() {
 	for player, slot := range g.Lobby.Slots {
 		if slot.Device.Kind == lobby.DeviceGamepad && !connected[slot.Device.ID] {
 			g.disconnectedPlayer = player
-			g.paused = true
+			g.setPaused(true)
 			clear(g.heldActions)
 			clear(g.padHeld)
 			return
@@ -576,7 +601,7 @@ func (g *Game) updateGamepads() {
 		}
 		id := ebiten.GamepadID(slot.Device.ID)
 		if g.disconnectedPlayer < 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
-			g.paused = !g.paused
+			g.setPaused(!g.paused)
 			g.overlayFocus = 0
 			clear(g.heldActions)
 			clear(g.padHeld)
@@ -679,6 +704,51 @@ func (g *Game) updateDebugGamepads() {
 	}
 }
 
+func (g *Game) setPaused(paused bool) {
+	if paused == g.paused {
+		return
+	}
+	g.paused = paused
+	if paused {
+		g.pausedAt = time.Now()
+	} else if !g.pausedAt.IsZero() {
+		g.pausedDuration += time.Since(g.pausedAt)
+		g.pausedAt = time.Time{}
+	}
+}
+
+func (g *Game) activateOverlay(gameOver bool) {
+	if !gameOver && g.overlayFocus == 0 {
+		g.setPaused(false)
+		return
+	}
+	adjusted := g.overlayFocus
+	if !gameOver {
+		adjusted--
+	}
+	if adjusted == 0 {
+		g.restart()
+	} else {
+		g.backToLobby()
+	}
+}
+
+func (g *Game) updateOverlayKeyboard(gameOver bool) {
+	buttonCount := 3
+	if gameOver {
+		buttonCount = 2
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		g.overlayFocus = (g.overlayFocus - 1 + buttonCount) % buttonCount
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		g.overlayFocus = (g.overlayFocus + 1) % buttonCount
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		g.activateOverlay(gameOver)
+	}
+}
+
 func (g *Game) updateOverlayGamepads(gameOver bool) {
 	buttonCount := 3
 	if gameOver {
@@ -698,26 +768,14 @@ func (g *Game) updateOverlayGamepads(gameOver bool) {
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			if g.paused {
-				g.paused = false
+				g.setPaused(false)
 			} else {
 				g.backToLobby()
 			}
 			return
 		}
 		if inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightBottom) {
-			if !gameOver && g.overlayFocus == 0 {
-				g.paused = false
-				return
-			}
-			adjusted := g.overlayFocus
-			if !gameOver {
-				adjusted--
-			}
-			if adjusted == 0 {
-				g.restart()
-			} else {
-				g.backToLobby()
-			}
+			g.activateOverlay(gameOver)
 			return
 		}
 	}
@@ -757,7 +815,7 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 	}
 	if g.paused || gameOver {
 		if g.paused && resumeButton().contains(x, y) {
-			g.paused = false
+			g.setPaused(false)
 			clear(g.heldActions)
 			return true
 		}
@@ -779,7 +837,7 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 		return true
 	}
 	if len(g.players) == 1 && touchMenuButton().contains(x, y) {
-		g.paused = true
+		g.setPaused(true)
 		g.overlayFocus = 0
 		clear(g.heldActions)
 		return true
@@ -930,7 +988,7 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	drawPaperDoodles(screen)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
 	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
-	drawText(screen, "Touch / gamepad A / keys 1, 2, 3 to join · Enter starts", g.face(24), 42, 92, white)
+	drawText(screen, "Join/leave: keys 1, 2, 3 · Gamepad A joins, B leaves · Enter selects", g.face(22), 42, 92, white)
 	const gap, margin = 20, 40
 	width := (logicalWidth - margin*2 - gap*3) / lobby.MaxPlayers
 	for i := 0; i < lobby.MaxPlayers; i++ {
@@ -1094,6 +1152,7 @@ func (g *Game) drawControllerDebug(screen *ebiten.Image) {
 func (g *Game) drawPlay(screen *ebiten.Image) {
 	screen.Fill(background)
 	drawPaperDoodles(screen)
+	g.drawMatchTitle(screen)
 	if len(g.players) == 0 {
 		return
 	}
@@ -1104,9 +1163,9 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		return
 	}
 	game := g.players[0]
-	const cell = 27
+	const cell = 25
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
-	boardX, boardY := (logicalWidth-boardW)/2, 40
+	boardX, boardY := (logicalWidth-boardW)/2, 84
 	drawBoardFrame(screen, boardX, boardY, boardW, boardH, muted)
 	drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 	for y, row := range game.Board {
@@ -1182,6 +1241,31 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	g.drawDebugPanel(screen)
 }
 
+func (g *Game) elapsedMatchTime() time.Duration {
+	if g.matchStarted.IsZero() {
+		return 0
+	}
+	now := time.Now()
+	if g.paused && !g.pausedAt.IsZero() {
+		now = g.pausedAt
+	}
+	elapsed := now.Sub(g.matchStarted) - g.pausedDuration
+	if elapsed < 0 {
+		return 0
+	}
+	return elapsed
+}
+
+func (g *Game) drawMatchTitle(screen *ebiten.Image) {
+	const x, y, width, height = 400, 14, 480, 52
+	ebitenutil.DrawRect(screen, x-4, y-4, width+8, height+8, boardInk)
+	ebitenutil.DrawRect(screen, x, y, width, height, paperLight)
+	drawText(screen, fmt.Sprintf("EIT 2 · ROUND %d", max(1, g.round)), g.face(24), x+22, y+12, accent)
+	elapsed := g.elapsedMatchTime()
+	clock := fmt.Sprintf("%02d:%02d", int(elapsed.Minutes()), int(elapsed.Seconds())%60)
+	drawText(screen, clock, g.face(24), x+width-88, y+12, white)
+}
+
 func drawBoardFrame(screen *ebiten.Image, x, y, width, height int, border color.RGBA) {
 	// Two slightly offset strokes mimic an inked cardboard cut-out without
 	// allowing random wobble to make the board geometry unclear.
@@ -1223,16 +1307,16 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 	}
 	totalWidth := count*areaWidth + (count-1)*gap
 	groupX := (logicalWidth - totalWidth) / 2
-	cell := (logicalHeight - 125) / core.BoardHeight
+	cell := (logicalHeight - 180) / core.BoardHeight
 	if areaWidth*2/3/core.BoardWidth < cell {
 		cell = areaWidth * 2 / 3 / core.BoardWidth
 	}
 	for i, game := range g.players {
 		x := groupX + i*(areaWidth+gap)
 		boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
-		boardX, boardY := x+8, 72
-		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(22), float64(x+8), 20, white)
-		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(16), float64(x+48), 25, muted)
+		boardX, boardY := x+8, 92
+		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(18), float64(x+8), 68, white)
+		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(14), float64(x+42), 71, muted)
 		drawBoardFrame(screen, boardX, boardY, boardW, boardH, pieceColors[i%7+1])
 		drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 		for y, row := range game.Board {
@@ -1574,8 +1658,8 @@ func drawSettledCell(screen *ebiten.Image, x, y, size, value int, mini, iced boo
 	}
 	// Dark underprint plus two imperfect inset layers gives each cell the
 	// tactile, hand-inked card look without introducing image assets.
-	ebitenutil.DrawRect(screen, float64(x+1), float64(y+2), float64(size-2), float64(size-2), boardInk)
-	ebitenutil.DrawRect(screen, float64(x+2), float64(y+1), float64(size-4), float64(size-4), pieceColors[value])
+	ebitenutil.DrawRect(screen, float64(x+2), float64(y+3), float64(size-4), float64(size-4), boardInk)
+	ebitenutil.DrawRect(screen, float64(x+3), float64(y+2), float64(size-6), float64(size-6), pieceColors[value])
 	if size >= 12 {
 		highlight := color.RGBA{R: 250, G: 247, B: 238, A: 105}
 		ebitenutil.DrawLine(screen, float64(x+5), float64(y+5), float64(x+size-6), float64(y+4), highlight)
