@@ -431,7 +431,7 @@ func (g *Game) updatePlay() {
 		return
 	}
 	g.updateKeyboards()
-	g.updateSoloKeyboardAliases()
+	g.updateSingleKeyboardAliases()
 	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
 	if touchPlayer == nil {
 		touchPlayer = player
@@ -511,76 +511,70 @@ func (g *Game) playAudioEvents() {
 	}
 }
 
-func (g *Game) updateSoloKeyboardAliases() {
-	if len(g.players) != 1 || len(g.Lobby.Slots) != 1 || g.Lobby.Slots[0].Device.Kind != lobby.DeviceKeyboard || g.Lobby.Slots[0].Device.ID != 1 {
+func (g *Game) updateSingleKeyboardAliases() {
+	keyboardPlayer, assignedLayoutID, keyboardCount := -1, 0, 0
+	for playerIndex, slot := range g.Lobby.Slots {
+		if slot.Device.Kind == lobby.DeviceKeyboard {
+			keyboardPlayer = playerIndex
+			assignedLayoutID = slot.Device.ID
+			keyboardCount++
+		}
+	}
+	if keyboardCount != 1 || keyboardPlayer < 0 || keyboardPlayer >= len(g.players) {
 		return
 	}
-	player := g.players[0]
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
+	// A lone keyboard gets both first-class control schemes even when the
+	// other players use touch or gamepads. Keep its explicitly selected third
+	// layout too, but never process an assigned layout twice.
+	for _, layoutID := range []int{controls.KeyboardLayouts[0].ID, controls.KeyboardLayouts[1].ID} {
+		if layoutID != assignedLayoutID {
+			g.updateKeyboardLayout(keyboardPlayer, layoutID)
+		}
+	}
+}
+
+func (g *Game) updateKeyboardLayout(playerIndex, layoutID int) {
+	var layout *keyboardLayout
+	for i := range keyboardLayouts {
+		if keyboardLayouts[i].ID == layoutID {
+			layout = &keyboardLayouts[i]
+			break
+		}
+	}
+	if layout == nil || playerIndex < 0 || playerIndex >= len(g.players) {
+		return
+	}
+	player := g.players[playerIndex]
+	if inpututil.IsKeyJustPressed(layout.Left) {
 		player.MoveInput(-1)
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
+	if inpututil.IsKeyJustPressed(layout.Right) {
 		player.MoveInput(1)
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && ebiten.Tick()%2 == 0 {
+	if ebiten.IsKeyPressed(layout.Down) && ebiten.Tick()%2 == 0 {
 		player.StepDown()
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyComma) {
+	if inpututil.IsKeyJustPressed(layout.RotateCCW) {
 		player.RotateInput(-1)
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyPeriod) {
+	if inpututil.IsKeyJustPressed(layout.RotateCW) || (layout.RotateCWAlt != noKey && inpututil.IsKeyJustPressed(layout.RotateCWAlt)) {
 		player.RotateInput(1)
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyShiftRight) {
+	if inpututil.IsKeyJustPressed(layout.Drop) {
 		player.HardDrop()
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeySlash) {
+	if inpututil.IsKeyJustPressed(layout.Antidote) {
 		player.UseAntidote()
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		g.match.CycleTarget(0)
+	if inpututil.IsKeyJustPressed(layout.Target) {
+		g.match.CycleTarget(playerIndex)
 	}
 }
 
 func (g *Game) updateKeyboards() {
 	for playerIndex, slot := range g.Lobby.Slots {
-		if slot.Device.Kind != lobby.DeviceKeyboard || playerIndex >= len(g.players) {
-			continue
-		}
-		var layout *keyboardLayout
-		for i := range keyboardLayouts {
-			if keyboardLayouts[i].ID == slot.Device.ID {
-				layout = &keyboardLayouts[i]
-				break
-			}
-		}
-		if layout == nil {
-			continue
-		}
-		player := g.players[playerIndex]
-		if inpututil.IsKeyJustPressed(layout.Left) {
-			player.MoveInput(-1)
-		}
-		if inpututil.IsKeyJustPressed(layout.Right) {
-			player.MoveInput(1)
-		}
-		if ebiten.IsKeyPressed(layout.Down) && ebiten.Tick()%2 == 0 {
-			player.StepDown()
-		}
-		if inpututil.IsKeyJustPressed(layout.RotateCCW) {
-			player.RotateInput(-1)
-		}
-		if inpututil.IsKeyJustPressed(layout.RotateCW) || (layout.RotateCWAlt != noKey && inpututil.IsKeyJustPressed(layout.RotateCWAlt)) {
-			player.RotateInput(1)
-		}
-		if inpututil.IsKeyJustPressed(layout.Drop) {
-			player.HardDrop()
-		}
-		if inpututil.IsKeyJustPressed(layout.Antidote) {
-			player.UseAntidote()
-		}
-		if inpututil.IsKeyJustPressed(layout.Target) {
-			g.match.CycleTarget(playerIndex)
+		if slot.Device.Kind == lobby.DeviceKeyboard && playerIndex < len(g.players) {
+			g.updateKeyboardLayout(playerIndex, slot.Device.ID)
 		}
 	}
 }
