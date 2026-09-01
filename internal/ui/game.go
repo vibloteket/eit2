@@ -594,7 +594,9 @@ func (g *Game) updateGamepads() {
 			continue
 		}
 		id := ebiten.GamepadID(slot.Device.ID)
-		if g.disconnectedPlayer < 0 && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
+		matchOver := g.match != nil && g.match.Over
+		soloGameOver := len(g.players) == 1 && g.players[0].GameOver
+		if g.disconnectedPlayer < 0 && !matchOver && !soloGameOver && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonCenterRight) {
 			g.setPaused(!g.paused)
 			g.overlayFocus = 0
 			clear(g.heldActions)
@@ -1159,7 +1161,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	game := g.players[0]
 	const cell = 25
 	boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
-	boardX, boardY := (logicalWidth-boardW)/2, 84
+	boardX, boardY := (logicalWidth-boardW)/2, 96
 	drawBoardFrame(screen, boardX, boardY, boardW, boardH, muted)
 	drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 	for y, row := range game.Board {
@@ -1308,9 +1310,9 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 	for i, game := range g.players {
 		x := groupX + i*(areaWidth+gap)
 		boardW, boardH := core.BoardWidth*cell, core.BoardHeight*cell
-		boardX, boardY := x+8, 92
-		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(18), float64(x+8), 68, white)
-		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(14), float64(x+42), 71, muted)
+		boardX, boardY := x+8, 112
+		drawText(screen, fmt.Sprintf("P%d", i+1), g.face(18), float64(x+8), 76, white)
+		drawText(screen, fmt.Sprintf("%d pts · L%d", game.Score, game.Lines/5), g.face(14), float64(x+42), 79, muted)
 		drawBoardFrame(screen, boardX, boardY, boardW, boardH, pieceColors[i%7+1])
 		drawBoardBackground(screen, boardX, boardY, boardW, boardH, game.BackgroundVariant)
 		for y, row := range game.Board {
@@ -1354,10 +1356,10 @@ func (g *Game) drawCouch(screen *ebiten.Image) {
 		}
 		drawText(screen, stored, g.face(17), float64(hudX), 323, white)
 		statusCenter := float64(boardX + boardW/2)
-		drawCenteredText(screen, fmt.Sprintf("P%d · %d pts · Level %d", i+1, game.Score, game.Lines/5), g.face(15), statusCenter, 625, white)
+		drawCenteredText(screen, fmt.Sprintf("P%d · %d pts · Level %d", i+1, game.Score, game.Lines/5), g.face(15), statusCenter, 656, white)
 		if game.LastEvent != "" {
 			event := fitText(game.LastEvent, g.face(13), float64(boardW+80))
-			drawCenteredText(screen, event, g.face(13), statusCenter, 650, accent)
+			drawCenteredText(screen, event, g.face(13), statusCenter, 680, accent)
 		}
 		if game.GameOver {
 			drawCenteredText(screen, "OUT", g.face(24), float64(boardX+boardW/2), float64(boardY+boardH/2), white)
