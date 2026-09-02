@@ -30,13 +30,16 @@ func TestMusicLoopDecodes(t *testing.T) {
 		t.Fatal(err)
 	}
 	seconds := len(pcm) / (sampleRate * 4)
-	if seconds < 3 || seconds > 5 {
+	if seconds < 30 || seconds > 40 {
 		t.Fatalf("music loop duration = %d seconds", seconds)
 	}
 }
 
 func TestEffectSetIsComplete(t *testing.T) {
-	for _, effect := range []Effect{Lock, Line, FourLine, Pickup, Attack, GameOver} {
+	for _, effect := range []Effect{
+		MenuFocus, MenuSelect, Join, Leave, Rotate, Lock, HardDrop,
+		Line, FourLine, Pickup, Attack, Antidote, GameOver, Winner,
+	} {
 		if filenames[effect] == "" {
 			t.Fatalf("missing filename for %s", effect)
 		}

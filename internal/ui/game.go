@@ -123,6 +123,7 @@ type Game struct {
 	pausedAt            time.Time
 	pausedDuration      time.Duration
 	round               int
+	winnerSoundPlayed   bool
 }
 
 func NewGame() *Game {
@@ -169,7 +170,11 @@ func leaveWebFullscreen() {
 func (g *Game) updateLobby() error {
 	g.gamepadIDs = ebiten.AppendGamepadIDs(g.gamepadIDs[:0])
 	navigate := func(direction controls.MenuDirection) {
+		previous := g.lobbyFocus
 		g.lobbyFocus = controls.NavigateLobby(g.lobbyFocus, direction, !isWeb())
+		if g.lobbyFocus != previous && g.sound != nil {
+			g.sound.Play(sound.MenuFocus)
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
 		navigate(controls.MenuLeft)
@@ -195,6 +200,9 @@ func (g *Game) updateLobby() error {
 			if anyStandardGamepadButtonJustPressed(id) {
 				if _, added := g.Lobby.Join(device); added {
 					g.lobbyFocus = 0
+					if g.sound != nil {
+						g.sound.Play(sound.Join)
+					}
 				}
 			}
 			continue
@@ -237,6 +245,9 @@ func (g *Game) updateLobby() error {
 		}
 		if joined && inpututil.IsStandardGamepadButtonJustPressed(id, ebiten.StandardGamepadButtonRightRight) {
 			g.Lobby.Leave(device)
+			if g.sound != nil {
+				g.sound.Play(sound.Leave)
+			}
 			if g.lobbyFocus == 0 && !g.Lobby.CanStart() {
 				g.lobbyFocus = 1
 			}
@@ -254,6 +265,9 @@ func (g *Game) updateLobby() error {
 		}
 	}
 	if activate {
+		if g.sound != nil {
+			g.sound.Play(sound.MenuSelect)
+		}
 		if g.activateLobbyMenu(g.lobbyFocus) {
 			return ebiten.Termination
 		}
@@ -272,8 +286,14 @@ func (g *Game) updateLobby() error {
 			device := lobby.Device{Kind: lobby.DeviceKeyboard, ID: layout.ID, Name: layout.Name}
 			if g.Lobby.PlayerForDevice(device) >= 0 {
 				g.Lobby.Leave(device)
+				if g.sound != nil {
+					g.sound.Play(sound.Leave)
+				}
 			} else if _, added := g.Lobby.Join(device); added {
 				g.lobbyFocus = 0
+				if g.sound != nil {
+					g.sound.Play(sound.Join)
+				}
 			}
 			if !g.Lobby.CanStart() {
 				g.lobbyFocus = 1
@@ -360,6 +380,7 @@ func (g *Game) start() {
 	g.matchStarted = time.Now()
 	g.pausedAt = time.Time{}
 	g.pausedDuration = 0
+	g.winnerSoundPlayed = false
 	clear(g.heldActions)
 	clear(g.padHeld)
 	g.view = viewPlay
@@ -508,6 +529,8 @@ func (g *Game) playAudioEvents() {
 		core.AudioLock: sound.Lock, core.AudioLine: sound.Line,
 		core.AudioFourLine: sound.FourLine, core.AudioPickup: sound.Pickup,
 		core.AudioAttack: sound.Attack, core.AudioGameOver: sound.GameOver,
+		core.AudioRotate: sound.Rotate, core.AudioHardDrop: sound.HardDrop,
+		core.AudioAntidote: sound.Antidote,
 	}
 	for _, player := range g.players {
 		for _, event := range player.ConsumeAudioEvents() {
@@ -515,6 +538,10 @@ func (g *Game) playAudioEvents() {
 				g.sound.Play(effect)
 			}
 		}
+	}
+	if g.match != nil && g.match.Over && g.match.Winner >= 0 && !g.winnerSoundPlayed {
+		g.sound.Play(sound.Winner)
+		g.winnerSoundPlayed = true
 	}
 }
 

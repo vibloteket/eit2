@@ -21,6 +21,9 @@ const (
 	AudioPickup
 	AudioAttack
 	AudioGameOver
+	AudioRotate
+	AudioHardDrop
+	AudioAntidote
 )
 
 type Special int
@@ -280,6 +283,7 @@ func (g *Game) Rotate(direction int) bool {
 		if g.valid(kicked) {
 			g.Active = kicked
 			g.resetLockDelayIfAirborne()
+			g.audioEvents = append(g.audioEvents, AudioRotate)
 			return true
 		}
 	}
@@ -304,6 +308,7 @@ func (g *Game) HardDrop() {
 	if g.GameOver {
 		return
 	}
+	g.audioEvents = append(g.audioEvents, AudioHardDrop)
 	for g.StepDown() {
 	}
 	g.lock()
@@ -915,6 +920,7 @@ func (g *Game) UseAntidote() bool {
 		return false
 	}
 	g.Antidotes--
+	g.audioEvents = append(g.audioEvents, AudioAntidote)
 	g.Blind = false
 	g.Inverse = false
 	g.FasterStacks = 0

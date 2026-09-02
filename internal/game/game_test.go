@@ -13,16 +13,28 @@ func TestPieceCannotMoveThroughWall(t *testing.T) {
 	}
 }
 
-func TestHardDropEmitsLockAudio(t *testing.T) {
+func TestHardDropEmitsDropThenLockAudio(t *testing.T) {
 	g := New(45)
 	g.ConsumeAudioEvents()
 	g.HardDrop()
 	events := g.ConsumeAudioEvents()
-	if len(events) != 1 || events[0] != AudioLock {
-		t.Fatalf("audio events = %v, want Lock", events)
+	if len(events) != 2 || events[0] != AudioHardDrop || events[1] != AudioLock {
+		t.Fatalf("audio events = %v, want HardDrop then Lock", events)
 	}
 	if len(g.ConsumeAudioEvents()) != 0 {
 		t.Fatal("audio events were not consumed")
+	}
+}
+
+func TestSuccessfulRotationEmitsAudio(t *testing.T) {
+	g := New(46)
+	g.ConsumeAudioEvents()
+	if !g.RotateInput(1) {
+		t.Fatal("rotation failed")
+	}
+	events := g.ConsumeAudioEvents()
+	if len(events) != 1 || events[0] != AudioRotate {
+		t.Fatalf("audio events = %v, want Rotate", events)
 	}
 }
 

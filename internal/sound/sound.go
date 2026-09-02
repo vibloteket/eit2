@@ -15,20 +15,31 @@ const sampleRate = 44100
 type Effect string
 
 const (
-	Lock     Effect = "lock"
-	Line     Effect = "line"
-	FourLine Effect = "four-line"
-	Pickup   Effect = "pickup"
-	Attack   Effect = "attack"
-	GameOver Effect = "game-over"
+	MenuFocus  Effect = "menu-focus"
+	MenuSelect Effect = "menu-select"
+	Join       Effect = "join"
+	Leave      Effect = "leave"
+	Rotate     Effect = "rotate"
+	Lock       Effect = "lock"
+	HardDrop   Effect = "hard-drop"
+	Line       Effect = "line"
+	FourLine   Effect = "four-line"
+	Pickup     Effect = "pickup"
+	Attack     Effect = "attack"
+	Antidote   Effect = "antidote"
+	GameOver   Effect = "game-over"
+	Winner     Effect = "winner"
 )
 
 //go:embed audio/*.wav
 var files embed.FS
 
 var filenames = map[Effect]string{
-	Lock: "lock.wav", Line: "line.wav", FourLine: "four-line.wav",
-	Pickup: "pickup.wav", Attack: "attack.wav", GameOver: "game-over.wav",
+	MenuFocus: "menu-focus.wav", MenuSelect: "menu-select.wav",
+	Join: "join.wav", Leave: "leave.wav", Rotate: "rotate.wav",
+	Lock: "lock.wav", HardDrop: "hard-drop.wav", Line: "line.wav",
+	FourLine: "four-line.wav", Pickup: "pickup.wav", Attack: "attack.wav",
+	Antidote: "antidote.wav", GameOver: "game-over.wav", Winner: "winner.wav",
 }
 
 type Manager struct {
