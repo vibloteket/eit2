@@ -16,8 +16,10 @@ The generated audio is 44.1 kHz, 16-bit stereo PCM WAV. The effects cover menu
 focus/selection, join/leave, rotate, lock, hard drop, line and four-line clears,
 special pickup, incoming attack, Antidote, game over and winner. They combine
 procedural mallet, wood, bell, pop and noise layers to match the hand-made
-Doodle Party theme. `music-loop.wav` is a roughly 36-second, 108 BPM procedural
-mallet/tabletop loop. The source parameters are kept in `scripts/generate-audio`
+Doodle Party theme. `music-loop.wav` is a roughly 30-second, 128 BPM procedural
+Wooden Bounce loop with short marimba notes, syncopated plucked bass, eighth-note
+shaker, wooden beat pulses and cardboard claps. It intentionally has no pads,
+drones or sustained bell tones. The source parameters are kept in `scripts/generate-audio`
 so every shipped file is reproducible and project-owned.
 
 Before adding an asset, record its author, source URL, exact license and any

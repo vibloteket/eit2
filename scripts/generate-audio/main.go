@@ -34,8 +34,14 @@ var effects = map[string][]tone{
 	"winner.wav":      {{0, .10, 392, .18, "mallet"}, {.09, .10, 494, .18, "mallet"}, {.18, .11, 587, .20, "mallet"}, {.28, .35, 784, .18, "bell"}},
 }
 
-var melody = []float64{392, 0, 494, 587, 659, 587, 494, 440, 392, 494, 0, 587, 523, 440, 392, 330}
-var harmony = []float64{196, 220, 165, 196}
+var woodenBounceMelody = []float64{
+	392, 494, 0, 587, 523, 0, 494, 440,
+	392, 0, 440, 494, 587, 523, 494, 0,
+	330, 392, 0, 494, 440, 0, 392, 330,
+	294, 0, 330, 392, 440, 392, 330, 0,
+}
+
+var woodenBounceBass = []float64{196, 196, 220, 220, 165, 165, 196, 196}
 
 func main() {
 	output := "internal/sound/audio"
@@ -56,29 +62,49 @@ func main() {
 }
 
 func renderMusic() []int16 {
-	const bpm = 108.0
+	// Wooden Bounce: fast, dry and grounded. Everything is a short pluck or
+	// tabletop hit; there are deliberately no pads, drones or bell tails.
+	const bpm = 128.0
 	beat := 60 / bpm
+	eighth := beat / 2
 	bars := 16
 	duration := float64(bars) * 4 * beat
-	notes := make([]tone, 0, 220)
-	for beatIndex := 0; beatIndex < bars*4; beatIndex++ {
-		start := float64(beatIndex) * beat
-		bar := beatIndex / 4
-		step := beatIndex % len(melody)
-		if frequency := melody[step]; frequency > 0 {
-			if bar >= 8 && bar%2 == 1 {
+	notes := make([]tone, 0, 520)
+	for step := 0; step < bars*8; step++ {
+		start := float64(step) * eighth
+		bar := step / 8
+		position := step % 8
+
+		if frequency := woodenBounceMelody[step%len(woodenBounceMelody)]; frequency > 0 {
+			// Every fourth bar answers an octave higher, but remains a short,
+			// wooden note rather than a sustained synth lead.
+			if bar%4 == 3 && position >= 4 {
 				frequency *= 2
 			}
-			notes = append(notes, tone{start, beat * .62, frequency, .075, "mallet"})
+			notes = append(notes, tone{start, eighth * .46, frequency, .070, "mallet"})
 		}
-		if beatIndex%4 == 0 {
-			root := harmony[bar%len(harmony)]
-			notes = append(notes, tone{start, beat * 3.7, root, .035, "sine"})
+
+		// Bouncy, syncopated bass: beat one plus the off-beat before beat four.
+		if position == 0 || position == 5 {
+			frequency := woodenBounceBass[bar%len(woodenBounceBass)]
+			if position == 5 {
+				frequency *= 1.5
+			}
+			notes = append(notes, tone{start, eighth * .52, frequency, .062, "bass"})
 		}
-		// Dry tabletop pulse and shaker leave room for gameplay sounds.
-		notes = append(notes, tone{start, .055, 105, .035, "wood"})
-		if beatIndex%2 == 1 {
-			notes = append(notes, tone{start, .065, 1800, .018, "noise"})
+
+		// Shaker on every eighth, wooden kick on each beat, cardboard claps on
+		// beats two and four. Small timing accents avoid a floating feel.
+		shakerVolume := .011
+		if position%2 == 1 {
+			shakerVolume = .019
+		}
+		notes = append(notes, tone{start, .038, 2600, shakerVolume, "noise"})
+		if position%2 == 0 {
+			notes = append(notes, tone{start, .050, 105, .038, "wood"})
+		}
+		if position == 2 || position == 6 {
+			notes = append(notes, tone{start, .075, 950, .032, "clap"})
 		}
 	}
 	return render(notes, duration)
@@ -120,6 +146,14 @@ func wave(kind string, phase float64, sample, seed int) float64 {
 		return .55*sine + .35*math.Sin(phase*2.7) + .18*noise(sample, seed)
 	case "bell":
 		return .7*sine + .24*math.Sin(phase*2.41) + .12*math.Sin(phase*4.08)
+	case "bass":
+		return .72*sine + .20*math.Sin(phase*2) + .08*math.Sin(phase*3)
+	case "clap":
+		burst := noise(sample, seed)
+		if (sample/230)%2 == 1 {
+			burst *= .45
+		}
+		return burst
 	case "square":
 		if sine >= 0 {
 			return 1
