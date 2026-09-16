@@ -103,33 +103,45 @@ try {
   }
   const hash = (b: Uint8Array) => createHash("sha256").update(b).digest("hex");
   async function audioCheck(name: string, sound: boolean) {
-    const result = await page.evaluate(async () => {
-      const p = (window as any).__audioProbe;
-      let squares = 0,
-        count = 0;
-      for (let i = 0; i < 10; i++) {
-        for (const a of p.analysers) {
-          const data = new Float32Array(a.fftSize);
-          a.getFloatTimeDomainData(data);
-          for (const x of data) {
-            squares += x * x;
-            count++;
+    const measure = () =>
+      page.evaluate(async () => {
+        const p = (window as any).__audioProbe;
+        let squares = 0,
+          count = 0;
+        for (let i = 0; i < 10; i++) {
+          for (const a of p.analysers) {
+            const data = new Float32Array(a.fftSize);
+            a.getFloatTimeDomainData(data);
+            for (const x of data) {
+              squares += x * x;
+              count++;
+            }
           }
+          await new Promise((r) => setTimeout(r, 40));
         }
-        await new Promise((r) => setTimeout(r, 40));
-      }
-      return {
-        rms: Math.sqrt(squares / Math.max(1, count)),
-        contexts: p.contexts.map((c) => c.state),
-        analysers: p.analysers.length,
-      };
-    });
+        return {
+          rms: Math.sqrt(squares / Math.max(1, count)),
+          contexts: p.contexts.map((c) => c.state),
+          analysers: p.analysers.length,
+        };
+      });
+    let result = await measure();
+    let settlingWindows = 1;
+    // MUSIC OFF leaves effects enabled. Opening Credits deliberately plays a
+    // select effect; on a cold/busy browser it can finish after click()'s fixed
+    // delay. Require a full quiet measurement window after bounded settling,
+    // rather than treating that transient effect as background music.
+    while (!sound && result.rms > 0.00001 && settlingWindows < 4) {
+      await page.waitForTimeout(250);
+      result = await measure();
+      settlingWindows++;
+    }
     if (
       !result.analysers ||
       (sound ? result.rms < 0.0001 : result.rms > 0.00001)
     )
       throw Error(`Audio check failed: ${name}: ${JSON.stringify(result)}`);
-    audio.push({ name, expectedSound: sound, ...result });
+    audio.push({ name, expectedSound: sound, settlingWindows, ...result });
   }
   await audioCheck("before gesture", false);
   await click(1100, 50);
