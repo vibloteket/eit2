@@ -1,4 +1,4 @@
-// Package sound maps semantic game events to short embedded prototype effects.
+// Package sound plays semantic game effects and scene-specific looping music.
 package sound
 
 import (
@@ -42,11 +42,33 @@ var filenames = map[Effect]string{
 	Antidote: "antidote.wav", GameOver: "game-over.wav", Winner: "winner.wav",
 }
 
+// MusicTrack selects a scene's music without changing the user's audio settings.
+type MusicTrack uint8
+
+const (
+	LobbyMusic MusicTrack = iota
+	MatchMusic
+)
+
+var musicFilenames = map[MusicTrack]string{
+	LobbyMusic: "lobby-badinerie.wav",
+	MatchMusic: "music-loop.wav",
+}
+
+// Keep playback control testable without opening an audio device.
+type musicPlayer interface {
+	Play()
+	Pause()
+	IsPlaying() bool
+	Close() error
+}
+
 type Manager struct {
 	context      *audio.Context
 	pcm          map[Effect][]byte
 	players      map[Effect][]*audio.Player
-	music        *audio.Player
+	music        map[MusicTrack]musicPlayer
+	musicTrack   MusicTrack
 	muted        bool
 	musicEnabled bool
 	mu           sync.Mutex
@@ -57,7 +79,19 @@ func New() (*Manager, error) {
 	if context == nil {
 		context = audio.NewContext(sampleRate)
 	}
-	manager := &Manager{context: context, pcm: make(map[Effect][]byte), players: make(map[Effect][]*audio.Player), musicEnabled: true}
+	manager := &Manager{
+		context: context, pcm: make(map[Effect][]byte), players: make(map[Effect][]*audio.Player),
+		music: make(map[MusicTrack]musicPlayer), musicTrack: LobbyMusic, musicEnabled: true,
+	}
+	// If initialization fails, release any music players already created.
+	initialized := false
+	defer func() {
+		if !initialized {
+			for _, player := range manager.music {
+				_ = player.Close()
+			}
+		}
+	}()
 	for effect, filename := range filenames {
 		data, err := files.ReadFile("audio/" + filename)
 		if err != nil {
@@ -69,50 +103,85 @@ func New() (*Manager, error) {
 		}
 		manager.pcm[effect] = pcm
 	}
-	musicWAV, err := files.ReadFile("audio/music-loop.wav")
-	if err != nil {
-		return nil, fmt.Errorf("read music-loop.wav: %w", err)
+	for _, track := range []MusicTrack{LobbyMusic, MatchMusic} {
+		filename := musicFilenames[track]
+		musicWAV, err := files.ReadFile("audio/" + filename)
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %w", filename, err)
+		}
+		musicPCM, err := decodeWAV(musicWAV)
+		if err != nil {
+			return nil, fmt.Errorf("decode %s: %w", filename, err)
+		}
+		loop := audio.NewInfiniteLoop(bytes.NewReader(musicPCM), int64(len(musicPCM)))
+		player, err := context.NewPlayer(loop)
+		if err != nil {
+			return nil, fmt.Errorf("create %s player: %w", filename, err)
+		}
+		player.SetVolume(.16)
+		manager.music[track] = player
 	}
-	musicPCM, err := decodeWAV(musicWAV)
-	if err != nil {
-		return nil, fmt.Errorf("decode music-loop.wav: %w", err)
-	}
-	loop := audio.NewInfiniteLoop(bytes.NewReader(musicPCM), int64(len(musicPCM)))
-	manager.music, err = context.NewPlayer(loop)
-	if err != nil {
-		return nil, fmt.Errorf("create music player: %w", err)
-	}
-	manager.music.SetVolume(.16)
+	initialized = true
 	return manager, nil
 }
 
-func (m *Manager) Ready() bool { return m != nil && m.context.IsReady() }
+func (m *Manager) Ready() bool { return m != nil && m.context != nil && m.context.IsReady() }
 func (m *Manager) Muted() bool { return m == nil || m.muted }
 func (m *Manager) ToggleMute() bool {
 	m.muted = !m.muted
-	if m.muted && m.music != nil {
-		m.music.Pause()
+	if m.muted {
+		m.pauseMusic()
 	}
 	return m.muted
 }
 
 func (m *Manager) MusicEnabled() bool { return m != nil && m.musicEnabled }
-func (m *Manager) MusicPlaying() bool { return m != nil && m.music != nil && m.music.IsPlaying() }
+func (m *Manager) MusicPlaying() bool {
+	player := m.activeMusic()
+	return player != nil && player.IsPlaying()
+}
 func (m *Manager) ToggleMusic() bool {
 	m.musicEnabled = !m.musicEnabled
-	if !m.musicEnabled && m.music != nil {
-		m.music.Pause()
+	if !m.musicEnabled {
+		m.pauseMusic()
 	}
 	return m.musicEnabled
 }
 
-// Update starts music once the platform audio context becomes ready. Browsers
-// normally reach this state after the first user interaction.
-func (m *Manager) Update() {
-	if m == nil || m.music == nil || m.muted || !m.musicEnabled || !m.context.IsReady() || m.music.IsPlaying() {
+// SetMusicTrack pauses the old scene before selecting the new one. Each track
+// resumes from its previous position: returning to the lobby does not force the
+// same opening again. Selection never overrides mute, music-off or browser gating.
+func (m *Manager) SetMusicTrack(track MusicTrack) {
+	if m == nil || m.musicTrack == track || m.music[track] == nil {
 		return
 	}
-	m.music.Play()
+	m.pauseMusic()
+	m.musicTrack = track
+}
+
+func (m *Manager) activeMusic() musicPlayer {
+	if m == nil {
+		return nil
+	}
+	return m.music[m.musicTrack]
+}
+
+func (m *Manager) pauseMusic() {
+	for _, player := range m.music {
+		player.Pause()
+	}
+}
+
+// Update starts music once the platform audio context becomes ready. Browsers
+// normally reach this state after the first user interaction.
+func (m *Manager) Update() { m.updateMusic(m.Ready()) }
+
+func (m *Manager) updateMusic(ready bool) {
+	player := m.activeMusic()
+	if player == nil || m.muted || !m.musicEnabled || !ready || player.IsPlaying() {
+		return
+	}
+	player.Play()
 }
 
 func (m *Manager) Play(effect Effect) {

@@ -23,9 +23,17 @@ jobs:
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev xvfb
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Reproduce audited lobby music
+        run: |
+          make music
+          bun scripts/music/check-melody.ts
+          git diff --exit-code -- internal/sound/audio/lobby-badinerie.wav
       - name: Verify
-        run: make check
+        run: xvfb-run -a make check
 
   package-linux:
     name: Package Linux x86_64

@@ -1,0 +1,1607 @@
+{
+  "bpm": 108,
+  "form": [
+    "A",
+    "A",
+    "B",
+    "B"
+  ],
+  "sections": {
+    "A": [
+      {
+        "measure": 1,
+        "beats": 1,
+        "notes": [
+          {
+            "key": 83,
+            "beats": 0.5
+          },
+          {
+            "key": 86,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 2,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 3,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 71,
+            "beats": 1
+          },
+          {
+            "key": 66,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 4,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          },
+          {
+            "key": 70,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            42,
+            46,
+            49
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 5,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 71,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.5
+          },
+          {
+            "key": 86,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 6,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 7,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 71,
+            "beats": 1
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 8,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 9,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 73,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 10,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 86,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            38,
+            42,
+            45
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 11,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 77,
+            "beats": 0.5
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            49,
+            53,
+            56
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 12,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 77,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            49,
+            53,
+            56
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 13,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 77,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 14,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 77,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 85,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 77,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 15,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 86,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 77,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 86,
+            "beats": 0.25
+          },
+          {
+            "key": 85,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 16,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 85,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 80,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.5
+          },
+          {
+            "key": 80,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            49,
+            53,
+            56
+          ]
+        ],
+        "section": "A"
+      },
+      {
+        "measure": 17,
+        "beats": 1,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 1
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ]
+        ],
+        "section": "A"
+      }
+    ],
+    "B": [
+      {
+        "measure": 18,
+        "beats": 1,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 19,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 73,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 69,
+            "beats": 0.5
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 69,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 20,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 66,
+            "beats": 1
+          },
+          {
+            "key": 72,
+            "beats": 0.5
+          },
+          {
+            "key": 71,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            49
+          ],
+          [
+            39,
+            42,
+            45
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 21,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 75,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.5
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            52,
+            55
+          ],
+          [
+            47,
+            51,
+            54
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 22,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 79,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 79,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            40,
+            43,
+            47
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 23,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            45,
+            49,
+            52
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 24,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 69,
+            "beats": 1
+          },
+          {
+            "key": 69,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            43,
+            45,
+            49
+          ],
+          [
+            42,
+            45,
+            50
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 25,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            43,
+            47,
+            52
+          ],
+          [
+            45,
+            49,
+            55
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 26,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            38,
+            42,
+            45
+          ],
+          [
+            48,
+            54,
+            57
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 27,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            55
+          ],
+          [
+            45,
+            50,
+            54
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 28,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          },
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            43,
+            47,
+            52
+          ],
+          [
+            40,
+            43,
+            47
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 29,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 81,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            50
+          ],
+          [
+            45,
+            49,
+            55
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 30,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 1
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            38,
+            42,
+            45
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 31,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 86,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            42,
+            45,
+            50
+          ],
+          [
+            38,
+            42,
+            45
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 32,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            45,
+            49,
+            52
+          ],
+          [
+            46,
+            49,
+            52
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 33,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 85,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            46,
+            49,
+            52
+          ],
+          [
+            42,
+            46,
+            49
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 34,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.5
+          },
+          {
+            "key": 86,
+            "beats": 0.25
+          },
+          {
+            "key": 83,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 35,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 81,
+            "beats": 0.25,
+            "ornament": true
+          },
+          {
+            "key": 79,
+            "beats": 0.75
+          },
+          {
+            "key": 79,
+            "beats": 0.5
+          },
+          {
+            "key": 83,
+            "beats": 0.125
+          },
+          {
+            "key": 81,
+            "beats": 0.125
+          },
+          {
+            "key": 79,
+            "beats": 0.125
+          },
+          {
+            "key": 78,
+            "beats": 0.125
+          }
+        ],
+        "chords": [
+          [
+            40,
+            43,
+            47
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 36,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 76,
+            "beats": 1
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 79,
+            "beats": 0.125
+          },
+          {
+            "key": 78,
+            "beats": 0.125
+          },
+          {
+            "key": 76,
+            "beats": 0.125
+          },
+          {
+            "key": 74,
+            "beats": 0.125
+          }
+        ],
+        "chords": [
+          [
+            40,
+            43,
+            47
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 37,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 72,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 79,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 72,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          },
+          {
+            "key": 72,
+            "beats": 0.25
+          },
+          {
+            "key": 71,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            40,
+            43,
+            48
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 38,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 70,
+            "beats": 0.5
+          },
+          {
+            "key": 66,
+            "beats": 0.5
+          },
+          {
+            "key": 67,
+            "beats": 0.5
+          },
+          {
+            "key": 66,
+            "beats": 0.5
+          }
+        ],
+        "chords": [
+          [
+            40,
+            46,
+            49
+          ],
+          [
+            46,
+            49,
+            52
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 39,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 71,
+            "beats": 0.5
+          },
+          {
+            "key": 70,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 76,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            42,
+            47,
+            50
+          ],
+          [
+            42,
+            46,
+            49
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 40,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 74,
+            "beats": 0.5
+          },
+          {
+            "key": 71,
+            "beats": 0.125
+          },
+          {
+            "key": 73,
+            "beats": 0.125
+          },
+          {
+            "key": 74,
+            "beats": 0.125
+          },
+          {
+            "key": 76,
+            "beats": 0.125
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 78,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 41,
+        "beats": 2,
+        "notes": [
+          {
+            "key": 83,
+            "beats": 0.5
+          },
+          {
+            "key": 78,
+            "beats": 0.5
+          },
+          {
+            "key": 76,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          },
+          {
+            "key": 73,
+            "beats": 0.25
+          },
+          {
+            "key": 74,
+            "beats": 0.25
+          }
+        ],
+        "chords": [
+          [
+            50,
+            54,
+            59
+          ],
+          [
+            42,
+            46,
+            49
+          ]
+        ],
+        "section": "B"
+      },
+      {
+        "measure": 42,
+        "beats": 1,
+        "notes": [
+          {
+            "key": 71,
+            "beats": 1
+          }
+        ],
+        "chords": [
+          [
+            47,
+            50,
+            54
+          ]
+        ],
+        "section": "B"
+      }
+    ]
+  },
+  "graceInterpretation": "Measure35 A5 grace takes .25 quarter-note beats from following G5, preserving bar length.",
+  "accompaniment": "Own B2-style sparse pizzicato + procedural two-note pluck, not original orchestration.",
+  "reference": {
+    "composition": "J.S. Bach, BWV1067/VII, public-domain melody",
+    "historicalEdition": "Alfred Dörffel, Bach-Gesellschaft Ausgabe vol.31 (1885), pp.24–39",
+    "historicalScore": "reference/bwv1067-bga1885.pdf",
+    "audit": "melody-crosscheck.json",
+    "scope": "Only the pre-existing melodic pitches/rhythms are retained. Modern source engravings, arrangements, dynamics and performances are not included. See MUSIC-SOURCES.md."
+  }
+}

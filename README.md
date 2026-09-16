@@ -10,7 +10,9 @@ players. It is a clean successor to the original
 Eit 2 is free software licensed under
 [`AGPL-3.0-or-later`](LICENSE). Network users of modified hosted versions must
 be offered the corresponding source code. See [`NOTICE.md`](NOTICE.md) for
-origin and third-party notices and [`ASSETS.md`](ASSETS.md) for asset licensing.
+origin and third-party notices, [`ASSETS.md`](ASSETS.md) for asset licensing,
+[`CREDITS.md`](CREDITS.md) for full credits, and [`MUSIC-SOURCES.md`](MUSIC-SOURCES.md)
+for the music source audit and reproduction instructions.
 
 The current published version is stored in `VERSION` and shown in the lobby.
 Every public deployment must increment it so testers can identify the exact
@@ -42,9 +44,12 @@ This initial technical spike proves the project structure and its first targets:
 - four-second activation messages identify the special, sender and target;
 - an opt-in Debug mode pauses play and can trigger any of all 22 specials using
   normal player and target routing;
-- short project-owned WAV effects for lock, line clears, special pickup,
-  incoming attacks and game over, plus a quiet looping prototype melody, with
-  separate Mute/Music controls and Debug-mode sound status/tests.
+- short project-owned WAV effects, a full Badinerie lobby loop and separate
+  Wooden Bounce match music, with persistent Mute/Music controls;
+- a dedicated Credits screen opened from the lobby, with any fresh key, button,
+  click or tap returning to the lobby without changing players or audio;
+- reproducible audio sources, pinned CC0 sample hashes and a documented
+  public-domain melody/source review.
 
 Two to four joined players receive separate boards, device-routed input,
 cycleable targets, elimination retargeting and a last-player-standing winner.
@@ -73,7 +78,9 @@ the active targets.
 
 ## Develop
 
-Requires Go 1.26 or newer.
+Requires Go 1.26 or newer. On headless Linux, run tests with
+`xvfb-run -a make check`. Regenerating lobby music additionally uses Bun 1.4.2:
+`make music` (normal game builds use the committed WAV and do not require Bun).
 
 ```sh
 make install

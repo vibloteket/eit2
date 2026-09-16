@@ -14,7 +14,7 @@ $destination = Join-Path $root 'dist/verify-windows'
 Remove-Item $destination -Recurse -Force -ErrorAction SilentlyContinue
 Expand-Archive $archive -DestinationPath $destination
 $directory = Join-Path $destination $name
-foreach ($file in @('eit2.exe', 'VERSION.txt', 'LICENSE', 'NOTICE.md', 'ASSETS.md', 'LICENSES/Apache-2.0.txt')) {
+foreach ($file in @('eit2.exe', 'VERSION.txt', 'LICENSE', 'NOTICE.md', 'ASSETS.md', 'CREDITS.md', 'MUSIC-SOURCES.md', 'LICENSES/Apache-2.0.txt', 'LICENSES/CC0-1.0-VSCO2.txt')) {
   if (-not (Test-Path (Join-Path $directory $file))) { throw "Missing package file: $file" }
 }
 $packagedVersion = (Get-Content (Join-Path $directory 'VERSION.txt') -Raw).Trim()

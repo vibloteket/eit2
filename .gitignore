@@ -1,3 +1,4 @@
 dist/
 .tmp/
+/tests/browser/node_modules/
 .DS_Store

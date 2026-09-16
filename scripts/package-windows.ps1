@@ -20,7 +20,7 @@ $env:CGO_ENABLED = '0'
 go build -trimpath -ldflags $ldflags -o (Join-Path $directory 'eit2.exe') ./cmd/eit2
 if ($LASTEXITCODE -ne 0) { throw 'Windows build failed' }
 
-Copy-Item packaging/README.txt, LICENSE, NOTICE.md, ASSETS.md -Destination $directory
+Copy-Item packaging/README.txt, LICENSE, NOTICE.md, ASSETS.md, CREDITS.md, MUSIC-SOURCES.md -Destination $directory
 "$version" | Set-Content (Join-Path $directory 'VERSION.txt') -Encoding ascii
 Copy-Item LICENSES -Destination $directory -Recurse
 Compress-Archive -Path $directory -DestinationPath $archive -CompressionLevel Optimal

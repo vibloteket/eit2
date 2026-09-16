@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-09-16T07:09:28.293Z",
+  "method": "Compare timed melody pitches/durations against an independent 2010 LilyPond transcription, ignoring engraving/phrasing and treating grace interpretation separately.",
+  "referenceURL": "https://github.com/cellist/Lilypond-Sheet-Music/blob/2fc82830d5857d15dc9ed7d993bb556a5532eda2/Fl%2C%20Vl%2C%20Vl%2C%20Vla%2C%20Vlc/Bach%2C%20Johann%20Sebastian/Badinerie/v1.ily",
+  "referenceSHA256": "5eb23c9464f048143bc474a895aa085280383ae783721c54f78c7eda8a890ffd",
+  "referenceFileNotRedistributed": true,
+  "referenceHasNoLicenseGrant": true,
+  "ours": 230,
+  "reference": 230,
+  "beats": 80,
+  "differences": [],
+  "independentGraceNotations": [
+    "a''8 (",
+    "cis''8 ("
+  ],
+  "ornamentPolicy": "Project interpretation: short A5 grace takes .25 beat from G5; final C#5 grace omitted; no source performance/dynamics/ornament realization copied."
+}

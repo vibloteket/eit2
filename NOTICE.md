@@ -23,8 +23,18 @@ Eit 2 currently depends directly on:
 
 Transitive Go dependencies retain their own copyright notices and licenses.
 Their module sources and license metadata are resolved through `go.mod` and
-`go.sum`. Copies of the principal direct-dependency licenses are kept under
-[`LICENSES/`](LICENSES/).
+`go.sum`. Copies of the resolved dependency licenses and copyright notices
+are kept under [`LICENSES/`](LICENSES/). See [`CREDITS.md`](CREDITS.md) for the
+module/version list and full credits.
+
+## Music and samples
+
+The Badinerie composition is public domain; VSCO 2 CE flute/cello samples are
+CC0 1.0 Universal. The project's added arrangement and rendering sources are
+provided under AGPL-3.0-or-later where copyright applies. Those project terms
+do not override the public-domain composition or the samples' CC0 grant.
+See [`MUSIC-SOURCES.md`](MUSIC-SOURCES.md) for the source audit, exclusions and
+reproduction instructions. No external orchestra or YouTube recording is included.
 
 No third-party assets from the original Eit distribution are included in Eit 2
 at this stage.

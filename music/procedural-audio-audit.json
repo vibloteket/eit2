@@ -1,0 +1,83 @@
+{
+  "generator": "scripts/generate-audio/main.go",
+  "license": "AGPL-3.0-or-later",
+  "externalInputs": [],
+  "files": [
+    {
+      "file": "game-over.wav",
+      "sha256": "f93080fa2969af48bbdc42be133e9bd639a0434f187afd3d9e1be3071e6e65c9",
+      "reproduced": true
+    },
+    {
+      "file": "attack.wav",
+      "sha256": "168f0ccd20f37b855060d7419c502a08cc17bba41a81b9594e91189ef05b67aa",
+      "reproduced": true
+    },
+    {
+      "file": "menu-focus.wav",
+      "sha256": "0a12290e8ab50b54323e87c75e35d0c2306d6da12f53d73cde3f50cbace6c40e",
+      "reproduced": true
+    },
+    {
+      "file": "pickup.wav",
+      "sha256": "aa2f661a3317b06f6f2ba860b3295be71d416a29690991f1f4bffda9d9bb0a07",
+      "reproduced": true
+    },
+    {
+      "file": "winner.wav",
+      "sha256": "ed42815c41a94d7ac49bd1e9242627e4db77159b5592ab8d91ea0726cc97252f",
+      "reproduced": true
+    },
+    {
+      "file": "four-line.wav",
+      "sha256": "d3cb664cbd845503f86c741cc1186501a349ca834fd13543eae1224f64bfd652",
+      "reproduced": true
+    },
+    {
+      "file": "line.wav",
+      "sha256": "8f471bd68935e5e1e3d964b935ee5b7226c414ad16b87686780e5a90f24c409f",
+      "reproduced": true
+    },
+    {
+      "file": "leave.wav",
+      "sha256": "f113c1bca05b75ede913952fd9672b1dc7acf035671000e10f27e29c17e31597",
+      "reproduced": true
+    },
+    {
+      "file": "rotate.wav",
+      "sha256": "d79d4b90b10851c025f294aebf6986ce937d5ec6522c0c269c16e97cb91c14d7",
+      "reproduced": true
+    },
+    {
+      "file": "music-loop.wav",
+      "sha256": "383e56740877324fa800c873da372c6d2f5900ad6749a8543ba6a756b79dc746",
+      "reproduced": true
+    },
+    {
+      "file": "join.wav",
+      "sha256": "faa00217da26e99bcc9e8c2fc7427baa647b0abb4ff8aba69e96981f76025c04",
+      "reproduced": true
+    },
+    {
+      "file": "hard-drop.wav",
+      "sha256": "a65d9016dcbd7109a3e96477ddb812e810520c0a9298785cd1b1678839730bef",
+      "reproduced": true
+    },
+    {
+      "file": "menu-select.wav",
+      "sha256": "6e2a3aba89150c5ddb72dea0031092e5b8aa06f17001d788378b63c017ea3057",
+      "reproduced": true
+    },
+    {
+      "file": "antidote.wav",
+      "sha256": "65253dd5dd6af19854c753f526d36066ccdabb9c4fa411ac1cabff91ab365fb3",
+      "reproduced": true
+    },
+    {
+      "file": "lock.wav",
+      "sha256": "9886fef165d61d1c99730083885a68fee3e4f87ebfb6fd37754cc72570ea61bf",
+      "reproduced": true
+    }
+  ],
+  "generatorSHA256": "0736cb15075887dbc7b506912a4f10238c084854fa3e2982dfbf0e74696c2866"
+}

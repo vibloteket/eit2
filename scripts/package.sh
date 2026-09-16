@@ -13,7 +13,9 @@ mkdir -p "$PACKAGES" "$STAGE"
 
 copy_legal() {
   destination=$1
-  cp LICENSE NOTICE.md ASSETS.md "$destination/"
+  cp LICENSE NOTICE.md ASSETS.md CREDITS.md MUSIC-SOURCES.md "$destination/"
+  # Web staging may already contain read-only copied license notices.
+  rm -rf "$destination/LICENSES"
   cp -R LICENSES "$destination/"
 }
 

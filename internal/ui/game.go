@@ -51,7 +51,15 @@ type view int
 const (
 	viewLobby view = iota
 	viewPlay
+	viewCredits
 )
+
+func (v view) musicTrack() sound.MusicTrack {
+	if v == viewPlay {
+		return sound.MatchMusic
+	}
+	return sound.LobbyMusic
+}
 
 type action = controls.Action
 
@@ -148,15 +156,21 @@ func NewGame() *Game {
 
 func (g *Game) Update() error {
 	g.pressedIDs = inpututil.AppendJustPressedTouchIDs(g.pressedIDs[:0])
-	if g.sound != nil {
-		g.sound.Update()
-	}
 	if g.view == viewPlay {
 		g.updatePlay()
 		g.playAudioEvents()
-		return nil
+	} else if g.view == viewCredits {
+		g.updateCredits()
+	} else if err := g.updateLobby(); err != nil {
+		return err
 	}
-	return g.updateLobby()
+	if g.sound != nil {
+		// Select after processing input so start/back transitions change music
+		// in this update, without briefly playing both scene tracks.
+		g.sound.SetMusicTrack(g.view.musicTrack())
+		g.sound.Update()
+	}
+	return nil
 }
 
 func isWeb() bool { return runtime.GOOS == "js" }
@@ -308,6 +322,9 @@ func (g *Game) updateLobby() error {
 			g.sound.ToggleMute()
 		} else if musicButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMusic()
+		} else if creditsButton().contains(x, y) {
+			g.openCredits()
+			return nil
 		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
@@ -328,6 +345,9 @@ func (g *Game) updateLobby() error {
 			g.sound.ToggleMute()
 		} else if musicButton().contains(x, y) && g.sound != nil {
 			g.sound.ToggleMusic()
+		} else if creditsButton().contains(x, y) {
+			g.openCredits()
+			return nil
 		} else if controllerDebugButton().contains(x, y) {
 			g.controllerDebugOpen = !g.controllerDebugOpen
 		} else if g.controllerDebugOpen {
@@ -360,6 +380,8 @@ func (g *Game) activateLobbyMenu(index int) bool {
 	case 4:
 		g.debugEnabled = !g.debugEnabled
 	case 5:
+		g.openCredits()
+	case 6:
 		return !isWeb()
 	}
 	return false
@@ -899,10 +921,11 @@ func controllerDebugButton() imageRect { return imageRect{X: 30, Y: 632, W: 240,
 func muteButton() imageRect            { return imageRect{X: 285, Y: 632, W: 135, H: 60} }
 func musicButton() imageRect           { return imageRect{X: 435, Y: 632, W: 155, H: 60} }
 func debugLobbyButton() imageRect      { return imageRect{X: 605, Y: 632, W: 190, H: 60} }
-func exitButton() imageRect            { return imageRect{X: 810, Y: 632, W: 130, H: 60} }
+func creditsButton() imageRect         { return imageRect{X: 810, Y: 632, W: 160, H: 60} }
+func exitButton() imageRect            { return imageRect{X: 985, Y: 632, W: 130, H: 60} }
 
 func lobbyMenuButtons() []imageRect {
-	buttons := []imageRect{startButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton()}
+	buttons := []imageRect{startButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton(), creditsButton()}
 	if !isWeb() {
 		buttons = append(buttons, exitButton())
 	}
@@ -1010,6 +1033,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawPlay(screen)
 		return
 	}
+	if g.view == viewCredits {
+		g.drawCredits(screen)
+		return
+	}
 	g.drawLobby(screen)
 }
 
@@ -1070,6 +1097,9 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	}
 	ebitenutil.DrawRect(screen, float64(debug.X), float64(debug.Y), float64(debug.W), float64(debug.H), debugFill)
 	drawCenteredText(screen, debugLabel, g.face(17), float64(debug.X+debug.W/2), float64(debug.Y+20), white)
+	credits := creditsButton()
+	ebitenutil.DrawRect(screen, float64(credits.X), float64(credits.Y), float64(credits.W), float64(credits.H), panel)
+	drawCenteredText(screen, "CREDITS", g.face(17), float64(credits.X+credits.W/2), float64(credits.Y+20), white)
 	r := startButton()
 	startFill, startText := accent, background
 	if !g.Lobby.CanStart() {

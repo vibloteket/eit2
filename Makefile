@@ -1,4 +1,4 @@
-.PHONY: install run test lint build build-web package package-linux package-web verify-packages verify-linux verify-web check clean
+.PHONY: install run test lint music build build-web package package-linux package-web verify-packages verify-linux verify-web check clean
 
 install:
 	go mod download
@@ -13,6 +13,9 @@ lint:
 	go vet ./...
 	@test -z "$$(gofmt -l $$(find . -name '*.go' -not -path './dist/*'))" || (gofmt -d $$(gofmt -l $$(find . -name '*.go' -not -path './dist/*')); exit 1)
 
+music:
+	bun scripts/music/render-badinerie.ts
+
 VERSION := $(shell cat VERSION)
 LDFLAGS := -X github.com/vibloteket/eit2/internal/version.Value=$(VERSION)
 
@@ -26,6 +29,9 @@ build-web:
 	sed 's/__VERSION__/$(VERSION)/g' web/index.html > dist/web/index.html
 	cp web/favicon.svg web/favicon-32.png dist/web/
 	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" dist/web/wasm_exec.js
+	cp LICENSE NOTICE.md ASSETS.md CREDITS.md MUSIC-SOURCES.md dist/web/
+	rm -rf dist/web/LICENSES
+	cp -R LICENSES dist/web/
 
 package:
 	./scripts/package.sh

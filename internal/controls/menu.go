@@ -10,12 +10,12 @@ const (
 )
 
 // NavigateLobby follows the visible geometry. Indices: Start, Sound, Music,
-// Controller debug, Debug mode, and optional native Exit. The utility buttons
+// Controller debug, Debug mode, Credits, and optional native Exit. The utility buttons
 // form one left-to-right row; Start sits above its centre.
 func NavigateLobby(focus int, direction MenuDirection, nativeExit bool) int {
-	row := []int{3, 1, 2, 4}
+	row := []int{3, 1, 2, 4, 5}
 	if nativeExit {
-		row = append(row, 5)
+		row = append(row, 6)
 	}
 	if focus == 0 {
 		switch direction {

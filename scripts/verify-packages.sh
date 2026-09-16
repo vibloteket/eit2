@@ -30,6 +30,9 @@ for dir in "$linux" "$windows" "$web"; do
   [ -s "$dir/LICENSE" ]
   [ -s "$dir/NOTICE.md" ]
   [ -s "$dir/ASSETS.md" ]
+  [ -s "$dir/CREDITS.md" ]
+  [ -s "$dir/MUSIC-SOURCES.md" ]
+  [ -s "$dir/LICENSES/CC0-1.0-VSCO2.txt" ]
   [ -s "$dir/LICENSES/Apache-2.0.txt" ]
 done
 

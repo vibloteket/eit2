@@ -34,7 +34,7 @@ else
   [ -s "$directory/eit2.wasm" ]
 fi
 
-for file in LICENSE NOTICE.md ASSETS.md LICENSES/Apache-2.0.txt; do
+for file in LICENSE NOTICE.md ASSETS.md CREDITS.md MUSIC-SOURCES.md LICENSES/Apache-2.0.txt LICENSES/CC0-1.0-VSCO2.txt; do
   [ -s "$directory/$file" ]
 done
 printf '%s package verification passed for v%s\n' "$TARGET" "$VERSION"
