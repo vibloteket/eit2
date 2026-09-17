@@ -1,4 +1,4 @@
-# Credits screen — v0.3.2
+# Credits screen — introduced in v0.3.2, updated in v0.3.3
 
 ## Scope and refinement
 
@@ -12,8 +12,9 @@ preferences and gameplay must not change.
 - MVP: one static screen using the current paper palette and readable type.
   The complete short credits fit the1280x720 design space; automated text-width
   and vertical-bound checks prove no scrolling is needed for this version.
-- Contents: project/original game, Bach, project audio work, VSCO recordists and
-  sample editor, Ebitengine, Go font, licenses and full-source link.
+- Contents: project/original game, Bach, Beethoven, project audio work, Mutopia
+  and its typesetter, VSCO recordists/sample editor, Ebitengine, Go font,
+  licenses and full-source link.
 - No new persistence, external page load, authentication, data sharing,
   interactive links, animations or modal stack. Detailed dependency/legal
   notices ship as `CREDITS.md`, `MUSIC-SOURCES.md` and `LICENSES/`.

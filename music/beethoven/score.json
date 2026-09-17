@@ -1,0 +1,3103 @@
+{
+  "title": "Rage Over a Lost Penny — G1 at 126 BPM",
+  "composer": "Ludwig van Beethoven",
+  "work": "Rondo a capriccio, Op.129",
+  "bpm": 126,
+  "beatsA": 48,
+  "beatsB": 64,
+  "form": [
+    "A",
+    "A",
+    "B",
+    "B"
+  ],
+  "melody": [
+    {
+      "at": 0,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 1,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 1.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 2,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 2.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 3,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 4,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 4.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 4.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 4.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 5,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 6,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 6.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 6.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 6.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 7,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 8,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 9,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 9.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 10,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 10.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 11,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 12,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 12.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 12.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 12.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 13,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 13.5,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 13.75,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 14,
+      "key": 79,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 16,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 16.25,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 16.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 16.75,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 17,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 17.25,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 17.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 17.75,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 18,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 18.5,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 19,
+      "key": 88,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 20,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 20.25,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 20.5,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 20.75,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 21,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 22,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 22.25,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 22.5,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 22.75,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 23,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 24,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 24.25,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 24.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 24.75,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 25,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 25.25,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 25.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 25.75,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 26,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 26.5,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 27,
+      "key": 88,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 28,
+      "key": 85,
+      "beats": 1.8177083333333333,
+      "instrument": "flute"
+    },
+    {
+      "at": 29.760416666666668,
+      "key": 83,
+      "beats": 0.0546875,
+      "instrument": "flute"
+    },
+    {
+      "at": 29.817708333333332,
+      "key": 85,
+      "beats": 0.18229166666666666,
+      "instrument": "flute"
+    },
+    {
+      "at": 30,
+      "key": 86,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 31,
+      "key": 74,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 32,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 33,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 33.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 34,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 34.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 35,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 36,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 36.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 36.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 36.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 37,
+      "key": 81,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 38,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 38.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 38.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 38.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 39,
+      "key": 81,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 40,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 41,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 41.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 42,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 42.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 43,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 44,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 44.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 44.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 44.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 45,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 45.5,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 45.75,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 46,
+      "key": 79,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 48,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 48.25,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 48.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 48.75,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 49,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 49.25,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 49.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 49.75,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 50,
+      "key": 75,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 50.25,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 50.5,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 50.75,
+      "key": 75,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 51,
+      "key": 71,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 51.25,
+      "key": 73,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 51.5,
+      "key": 75,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 51.75,
+      "key": 71,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 52,
+      "key": 67,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 52.25,
+      "key": 69,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 52.5,
+      "key": 71,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 52.75,
+      "key": 67,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 53,
+      "key": 64,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 53.25,
+      "key": 66,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 53.5,
+      "key": 67,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 53.75,
+      "key": 64,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 54,
+      "key": 63,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 54.25,
+      "key": 64,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 54.5,
+      "key": 66,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 54.75,
+      "key": 63,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 55,
+      "key": 59,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 55.25,
+      "key": 61,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 55.5,
+      "key": 63,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 55.75,
+      "key": 59,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 60,
+      "key": 62,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 60.25,
+      "key": 64,
+      "beats": 0.25,
+      "instrument": "pluck"
+    },
+    {
+      "at": 60.5,
+      "key": 66,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 60.75,
+      "key": 67,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 61,
+      "key": 69,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 61.25,
+      "key": 71,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 61.5,
+      "key": 72,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 61.75,
+      "key": 73,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 62,
+      "key": 74,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 62.25,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 62.5,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 62.75,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 63,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 63.25,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 63.5,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 63.75,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 64,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 65,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 65.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 66,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 66.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 67,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 68,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 68.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 68.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 68.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 69,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 70,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 70.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 70.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 70.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 71,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 72,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 73,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 73.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 74,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 74.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 75,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 76,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 76.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 76.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 76.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 77,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 77.5,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 77.75,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 78,
+      "key": 79,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 80,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 80.25,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 80.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 80.75,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 81,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 81.25,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 81.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 81.75,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 82,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 82.5,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 83,
+      "key": 88,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 84,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 84.25,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 84.5,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 84.75,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 85,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 86,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 86.25,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 86.5,
+      "key": 88,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 86.75,
+      "key": 87,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 87,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 88,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 88.25,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 88.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 88.75,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 89,
+      "key": 76,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 89.25,
+      "key": 78,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 89.5,
+      "key": 79,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 89.75,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 90,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 90.5,
+      "key": 83,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 91,
+      "key": 88,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 92,
+      "key": 85,
+      "beats": 1.8177083333333333,
+      "instrument": "flute"
+    },
+    {
+      "at": 93.76041666666667,
+      "key": 83,
+      "beats": 0.0546875,
+      "instrument": "flute"
+    },
+    {
+      "at": 93.81770833333333,
+      "key": 85,
+      "beats": 0.06770833333333333,
+      "instrument": "flute"
+    },
+    {
+      "at": 94,
+      "key": 86,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 95,
+      "key": 74,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 96,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 97,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 97.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 98,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 98.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 99,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 100,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 100.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 100.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 100.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 101,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 102,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 102.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 102.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 102.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 103,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 104,
+      "key": 71,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 105,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 105.5,
+      "key": 74,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 106,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 106.5,
+      "key": 79,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 107,
+      "key": 83,
+      "beats": 1,
+      "instrument": "flute"
+    },
+    {
+      "at": 108,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 108.25,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 108.5,
+      "key": 86,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 108.75,
+      "key": 84,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 109,
+      "key": 81,
+      "beats": 0.5,
+      "instrument": "flute"
+    },
+    {
+      "at": 109.5,
+      "key": 81,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 109.75,
+      "key": 83,
+      "beats": 0.25,
+      "instrument": "flute"
+    },
+    {
+      "at": 110,
+      "key": 79,
+      "beats": 1,
+      "instrument": "flute"
+    }
+  ],
+  "bass": [
+    {
+      "at": 0,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 1,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 2,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 3,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 4,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 5,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 6,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 7,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 8,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 9,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 10,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 11,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 12,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 13,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 14,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 15,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 16,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 17,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 18,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 19,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 20,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 21,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 22,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 23,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 24,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 25,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 26,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 27,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 28,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 29,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 30,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 31,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 32,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 33,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 34,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 35,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 36,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 37,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 38,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 39,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 40,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 41,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 42,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 43,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 44,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 45,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 46,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 47,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 48,
+      "key": 40,
+      "beats": 0.65
+    },
+    {
+      "at": 50,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 52,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 54,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 56,
+      "key": 40,
+      "beats": 0.65
+    },
+    {
+      "at": 57,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 58,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 59,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 60,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 61,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 62,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 64,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 65,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 66,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 67,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 68,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 69,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 70,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 71,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 72,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 73,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 74,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 75,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 76,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 77,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 78,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 79,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 80,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 81,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 82,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 83,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 84,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 85,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 86,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 87,
+      "key": 47,
+      "beats": 0.65
+    },
+    {
+      "at": 88,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 89,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 90,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 91,
+      "key": 52,
+      "beats": 0.65
+    },
+    {
+      "at": 92,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 93,
+      "key": 45,
+      "beats": 0.65
+    },
+    {
+      "at": 94,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 95,
+      "key": 50,
+      "beats": 0.65
+    },
+    {
+      "at": 96,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 97,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 98,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 99,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 100,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 101,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 102,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 103,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 104,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 105,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 106,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 107,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 108,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 109,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 110,
+      "key": 43,
+      "beats": 0.65
+    },
+    {
+      "at": 111,
+      "key": 43,
+      "beats": 0.65
+    }
+  ],
+  "pluck": [
+    {
+      "at": 0,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 0.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 1,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 1.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 2,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 2.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 3,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 3.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 4,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 4.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 5.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 6,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 6.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 7,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 7.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 8,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 8.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 9,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 9.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 10,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 10.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 11,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 11.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 12,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 12.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 13,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 13.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 14,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 14.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 15,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 15.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 16,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 16.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 17,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 17.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 18,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 18.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 19,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 19.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 20,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 20.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 21,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 21.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 22,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 22.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 23,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 23.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 24,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 24.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 25,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 25.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 26,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 26.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 27,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 27.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 28,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 28.5,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 29,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 29.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 30,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 30.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 31,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 31.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 32,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 32.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 33,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 33.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 34,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 34.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 35,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 35.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 36,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 36.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 37,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 37.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 38,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 38.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 39,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 39.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 40,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 40.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 41,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 41.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 42,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 42.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 43,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 43.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 44,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 44.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 45,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 45.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 46,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 46.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 47,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 47.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 48,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 48.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 49.5,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 50,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 50.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 51.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 52,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 52.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 53.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 54,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 54.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 55.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 56,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 56.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 57,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 57.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 58,
+      "key": 61,
+      "beats": 0.5
+    },
+    {
+      "at": 58.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 59,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 59.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 60,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 60.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 61,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 61.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 62,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 62.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 64,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 64.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 65,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 65.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 66,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 66.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 67,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 67.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 68,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 68.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 69,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 69.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 70,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 70.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 71,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 71.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 72,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 72.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 73,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 73.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 74,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 74.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 75,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 75.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 76,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 76.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 77,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 77.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 78,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 78.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 79,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 79.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 80,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 80.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 81,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 81.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 82,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 82.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 83,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 83.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 84,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 84.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 85,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 85.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 86,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 86.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 87,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 87.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 88,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 88.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 89,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 89.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 90,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 90.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 91,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 91.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 92,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 92.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 93,
+      "key": 64,
+      "beats": 0.5
+    },
+    {
+      "at": 93.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 94,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 94.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 95,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 95.5,
+      "key": 69,
+      "beats": 0.5
+    },
+    {
+      "at": 96,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 96.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 97,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 97.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 98,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 98.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 99,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 99.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 100,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 100.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 101,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 101.5,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 102,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 102.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 103,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 103.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 104,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 104.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 105,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 105.5,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 106,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 106.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 107,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 107.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 108,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 108.5,
+      "key": 62,
+      "beats": 0.5
+    },
+    {
+      "at": 109,
+      "key": 66,
+      "beats": 0.5
+    },
+    {
+      "at": 109.5,
+      "key": 60,
+      "beats": 0.5
+    },
+    {
+      "at": 110,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 110.5,
+      "key": 71,
+      "beats": 0.5
+    },
+    {
+      "at": 111,
+      "key": 67,
+      "beats": 0.5
+    },
+    {
+      "at": 111.5,
+      "key": 67,
+      "beats": 0.5
+    }
+  ],
+  "arrangement": "Bars1–56. Highest RH note at each onset carries melody; low RH figures use the existing synthetic pluck, not octave-shifted flute. LH reduced to quarter-note pizzicato and an eighth-note pluck using sounding source pitches. Pickup D at beat111.5 omitted to close on G. Repeats slightly thin accompaniment.",
+  "sourceMIDITracks": {
+    "rightHand": 1,
+    "leftHand": 2
+  },
+  "sourceDivision": 384
+}

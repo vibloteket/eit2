@@ -11,6 +11,7 @@ import (
 )
 
 const sampleRate = 44100
+const effectVolume = .36
 
 type Effect string
 
@@ -52,7 +53,14 @@ const (
 
 var musicFilenames = map[MusicTrack]string{
 	LobbyMusic: "lobby-badinerie.wav",
-	MatchMusic: "music-loop.wav",
+	MatchMusic: "gameplay-beethoven.wav",
+}
+
+// The gameplay track is mastered much louder than the former procedural loop.
+// Keep the selected PCM unchanged, but leave room for lock/drop/line/attack cues.
+var musicVolumes = map[MusicTrack]float64{
+	LobbyMusic: .16,
+	MatchMusic: .08,
 }
 
 // Keep playback control testable without opening an audio device.
@@ -118,7 +126,7 @@ func New() (*Manager, error) {
 		if err != nil {
 			return nil, fmt.Errorf("create %s player: %w", filename, err)
 		}
-		player.SetVolume(.16)
+		player.SetVolume(musicVolumes[track])
 		manager.music[track] = player
 	}
 	initialized = true
@@ -202,7 +210,7 @@ func (m *Manager) Play(effect Effect) {
 		return
 	}
 	player := m.context.NewPlayerFromBytes(m.pcm[effect])
-	player.SetVolume(.36)
+	player.SetVolume(effectVolume)
 	m.players[effect] = append(pool, player)
 	player.Play()
 }

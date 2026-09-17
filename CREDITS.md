@@ -12,14 +12,20 @@ Source: <https://github.com/vibloteket/eit2>
 
 - **Lobby composition:** Johann Sebastian Bach, *Badinerie*, Orchestral Suite
   No.2 in B minor, BWV1067/VII. Public-domain composition.
-- **Lobby arrangement and rendering:** Eit 2 project, full B2 arrangement.
-  This is our generated performance, not a recording by an external orchestra.
+- **Match composition:** Ludwig van Beethoven, *Rondo a capriccio*, Op.129
+  (*Rage Over a Lost Penny*). Public-domain composition.
+- **Arrangements and rendering:** Eit 2 project, full Badinerie B2 and the
+  Beethoven G1 gameplay arrangement at126BPM. These are our generated
+  performances, not recordings by an external orchestra or pianist.
+- **Beethoven score:** [Mutopia Project, item498](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=498),
+  typeset by **Magnus Lewis-Smith**, with a2015 LilyPond update by
+  **Javier Ruiz-Alma**. The typesetter explicitly placed the transcription in
+  the public domain; the credit is voluntary.
 - **Flute and cello samples:** VSCO2 Community Edition, recorded by **Sam Gossner
   and Simon Dalzell**; sample cutting by **Elan Hickler / Soundemote**.
   <https://github.com/sgossner/VSCO-2-CE> — CC0 1.0 Universal.
   The credit is voluntary; retain the included license/disclaimer when
   redistributing the sample sources.
-- **Match music:** *Wooden Bounce*, generated specifically for Eit 2.
 - **Sound effects and synthetic pluck:** generated specifically for Eit 2.
 
 Full source review, historical edition, hashes, exact sample manifest, score
@@ -38,8 +44,8 @@ No YouTube or other third-party music recording is included.
 ## Dependency notices
 
 Versions recorded from the module graph for this release; see `go.mod` and
-`go.sum`. These licenses govern software, not Bach's public-domain melody or
-the CC0 sample library.
+`go.sum`. These licenses govern software, not the public-domain compositions
+or the CC0 sample library.
 
 | Module / source | Version | License | Retained notice |
 |---|---|---|---|

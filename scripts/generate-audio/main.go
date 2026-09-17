@@ -1,8 +1,10 @@
-// Command generate-audio creates project-owned Doodle Party WAV audio.
+// Command generate-audio creates the project's 14 WAV effects.
+// The former Wooden Bounce track is retained as an opt-in historical export.
 package main
 
 import (
 	"encoding/binary"
+	"flag"
 	"math"
 	"os"
 	"path/filepath"
@@ -44,9 +46,14 @@ var woodenBounceMelody = []float64{
 var woodenBounceBass = []float64{196, 196, 220, 220, 165, 165, 196, 196}
 
 func main() {
+	legacyMusic := flag.Bool("legacy-music", false, "also export the historical Wooden Bounce track")
+	flag.Parse()
+	if flag.NArg() > 1 {
+		panic("usage: generate-audio [-legacy-music] [output-directory]")
+	}
 	output := "internal/sound/audio"
-	if len(os.Args) == 2 {
-		output = os.Args[1]
+	if flag.NArg() == 1 {
+		output = flag.Arg(0)
 	}
 	if err := os.MkdirAll(output, 0o755); err != nil {
 		panic(err)
@@ -56,8 +63,10 @@ func main() {
 			panic(err)
 		}
 	}
-	if err := writeWAV(filepath.Join(output, "music-loop.wav"), renderMusic()); err != nil {
-		panic(err)
+	if *legacyMusic {
+		if err := writeWAV(filepath.Join(output, "music-loop.wav"), renderMusic()); err != nil {
+			panic(err)
+		}
 	}
 }
 

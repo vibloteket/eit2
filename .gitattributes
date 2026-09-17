@@ -1,0 +1,6 @@
+# Preserve audited source bytes and PCM across platforms/checkouts.
+/music/** -text
+# Verbatim upstream notation retains its original, hash-verified whitespace.
+/music/beethoven/sources/** -whitespace
+/internal/sound/audio/*.wav binary
+/scripts/generate-audio/main.go text eol=lf

@@ -29,10 +29,11 @@ module/version list and full credits.
 
 ## Music and samples
 
-The Badinerie composition is public domain; VSCO 2 CE flute/cello samples are
-CC0 1.0 Universal. The project's added arrangement and rendering sources are
-provided under AGPL-3.0-or-later where copyright applies. Those project terms
-do not override the public-domain composition or the samples' CC0 grant.
+Bach's Badinerie and Beethoven's Rondo a capriccio, Op.129, are public-domain
+compositions. The Beethoven transcription from Mutopia is explicitly public
+domain; VSCO 2 CE flute/cello samples are CC0 1.0 Universal. The project's added
+arrangements and rendering sources are AGPL-3.0-or-later where copyright applies.
+Those terms do not override the public-domain material or the samples' CC0 grant.
 See [`MUSIC-SOURCES.md`](MUSIC-SOURCES.md) for the source audit, exclusions and
 reproduction instructions. No external orchestra or YouTube recording is included.
 

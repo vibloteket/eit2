@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"testing"
 )
@@ -25,8 +26,8 @@ func TestEmbeddedEffectsDecode(t *testing.T) {
 	}
 }
 
-func TestMusicLoopDecodes(t *testing.T) {
-	data, err := files.ReadFile("audio/music-loop.wav")
+func TestGameplayLoopIsSelected126BPMVersion(t *testing.T) {
+	data, err := files.ReadFile("audio/gameplay-beethoven.wav")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,14 +35,24 @@ func TestMusicLoopDecodes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	seconds := len(pcm) / (sampleRate * 4)
-	if seconds < 30 || seconds > 40 {
-		t.Fatalf("music loop duration = %d seconds", seconds)
+	const selectedHash = "52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a"
+	if got := fmt.Sprintf("%x", sha256.Sum256(data)); got != selectedHash {
+		t.Fatalf("gameplay asset is not the selected 126 BPM loop: %s", got)
+	}
+	if len(pcm) != 4704000*4 {
+		t.Fatalf("gameplay PCM length = %d bytes, want %d", len(pcm), 4704000*4)
+	}
+	for channel := 0; channel < 2; channel++ {
+		first := int(int16(binary.LittleEndian.Uint16(pcm[channel*2:])))
+		last := int(int16(binary.LittleEndian.Uint16(pcm[len(pcm)-4+channel*2:])))
+		if delta := first - last; delta < -328 || delta > 328 {
+			t.Fatalf("gameplay channel %d seam delta = %d", channel, delta)
+		}
 	}
 }
 
 func TestLobbyLoopIsSelectedFullCorrectedVersion(t *testing.T) {
-	if musicFilenames[MatchMusic] != "music-loop.wav" || musicFilenames[LobbyMusic] != "lobby-badinerie.wav" {
+	if musicFilenames[MatchMusic] != "gameplay-beethoven.wav" || musicFilenames[LobbyMusic] != "lobby-badinerie.wav" {
 		t.Fatal("lobby and match must use separate assets")
 	}
 	data, err := files.ReadFile("audio/" + musicFilenames[LobbyMusic])
@@ -104,9 +115,9 @@ func TestAllAudioMatchesSourceAudit(t *testing.T) {
 	if fmt.Sprintf("%x", sha256.Sum256(generator)) != audit.GeneratorSHA256 {
 		t.Fatal("procedural generator changed; reproduce its audio and update the source audit")
 	}
-	known := map[string]bool{"lobby-badinerie.wav": true}
-	if len(audit.Files) != 15 {
-		t.Fatalf("procedural audit contains %d files, want 15", len(audit.Files))
+	known := map[string]bool{"lobby-badinerie.wav": true, "gameplay-beethoven.wav": true}
+	if len(audit.Files) != 14 {
+		t.Fatalf("procedural audit contains %d files, want 14", len(audit.Files))
 	}
 	for _, entry := range audit.Files {
 		b, err := files.ReadFile("audio/" + entry.File)
@@ -126,5 +137,41 @@ func TestAllAudioMatchesSourceAudit(t *testing.T) {
 		if !known[entry.Name()] {
 			t.Fatalf("embedded audio lacks a source audit: %s", entry.Name())
 		}
+	}
+}
+
+func TestGameplayPlaybackLeavesRoomForImportantEffects(t *testing.T) {
+	levels := func(filename string) (peak, rms float64) {
+		t.Helper()
+		data, err := files.ReadFile("audio/" + filename)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pcm, err := decodeWAV(data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var sum float64
+		for i := 0; i < len(pcm); i += 2 {
+			x := float64(int16(binary.LittleEndian.Uint16(pcm[i:]))) / 32768
+			peak = math.Max(peak, math.Abs(x))
+			sum += x * x
+		}
+		return peak, math.Sqrt(sum / float64(len(pcm)/2))
+	}
+	if musicVolumes[LobbyMusic] != .16 || musicVolumes[MatchMusic] != .08 || effectVolume != .36 {
+		t.Fatal("unexpected playback balance")
+	}
+	musicPeak, musicRMS := levels(musicFilenames[MatchMusic])
+	for _, effect := range []Effect{HardDrop, Line, FourLine, Attack} {
+		peak, rms := levels(filenames[effect])
+		marginDB := 20 * math.Log10(rms*effectVolume/(musicRMS*musicVolumes[MatchMusic]))
+		if marginDB < 4 {
+			t.Errorf("%s RMS margin over music = %.2f dB, want at least 4 dB", effect, marginDB)
+		}
+		if musicPeak*musicVolumes[MatchMusic]+peak*effectVolume >= 1 {
+			t.Errorf("%s plus music can clip even without other voices", effect)
+		}
+		t.Logf("%s: RMS margin %.2f dB (signal measure, not a perceptual listening test)", effect, marginDB)
 	}
 }

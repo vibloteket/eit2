@@ -49,11 +49,6 @@
       "reproduced": true
     },
     {
-      "file": "music-loop.wav",
-      "sha256": "383e56740877324fa800c873da372c6d2f5900ad6749a8543ba6a756b79dc746",
-      "reproduced": true
-    },
-    {
       "file": "join.wav",
       "sha256": "faa00217da26e99bcc9e8c2fc7427baa647b0abb4ff8aba69e96981f76025c04",
       "reproduced": true
@@ -79,5 +74,6 @@
       "reproduced": true
     }
   ],
-  "generatorSHA256": "0736cb15075887dbc7b506912a4f10238c084854fa3e2982dfbf0e74696c2866"
+  "generatorSHA256": "cab982384f470bae8c8c95765e98d047ee01f4aa9a6f1b6083abeb74daccf0dd",
+  "legacyMusic": "Wooden Bounce is not embedded; generate with -legacy-music into a separate directory if needed."
 }

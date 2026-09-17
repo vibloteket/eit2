@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-09-16T19:51:16.801Z",
+  "work": "Beethoven Op.129",
+  "typesetter": "Magnus Lewis-Smith",
+  "lilypondUpdate": "Javier Ruiz-Alma (2015)",
+  "edition": "Augener’s Edition, as identified by Mutopia",
+  "mutopiaID": 498,
+  "revision": "2144afd6f52d56c5b6995b8b589ef1268b3139f0",
+  "license": "Public Domain",
+  "sources": [
+    {
+      "file": "sources/mutopia/beethoven_rondo_op129.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/beethoven_rondo_op129.ly",
+      "sha256": "08d04ff80b22dadbb485f798bd01a2d72b12b9727cd6b6aca711f9971ca7c161",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/defs.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/defs.ly",
+      "sha256": "ea815877c0596a30c4ccc219fdc391fb8541cec0fc391b1bfd22cf174f5c6345",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pA.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pA.ly",
+      "sha256": "7d3bbd01f280663cbade8471fbde454aa2f9851cca55fe1da018674b804d64bb",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pB.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pB.ly",
+      "sha256": "1bbf1ecc94323774b321cf560c45db6206895a127e7b62c92c829d28c8750c49",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pC.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pC.ly",
+      "sha256": "cbe45e23209906d4fa5c311c500a573119c11a1ba9b1cfd89c205f48413f3b3e",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pD.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pD.ly",
+      "sha256": "f53026398593cc7615662336634699da4412604488eb0eb6aad411ead075028f",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pE.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pE.ly",
+      "sha256": "372d7fc65b109c9c5c13c0f168eb84fef0910d830782a4ec83681d9463bdb6b4",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/pF.ly",
+      "url": "https://raw.githubusercontent.com/MutopiaProject/MutopiaProject/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129-lys/pF.ly",
+      "sha256": "4c84492e529d6df41fb4b2522fcb6e67128a01d86a08ffc543ea736aa93db2e8",
+      "license": "Public Domain (typesetter declaration in main LilyPond file)"
+    },
+    {
+      "file": "sources/mutopia/beethoven_rondo_op129.mid",
+      "url": "https://www.mutopiaproject.org/ftp/BeethovenLv/O129/beethoven_rondo_op129/beethoven_rondo_op129.mid",
+      "sha256": "1f628f2abf5b0c193dc808dd75000873ac12bc91b9dc8df12275a75c90f905c4",
+      "license": "Generated MIDI accompanying the public-domain Mutopia score"
+    }
+  ],
+  "excluded": {
+    "work": "Handel Op.6 No.7 HWV325 V. Hornpipe",
+    "source": "https://www.kunstderfuge.com/handel.htm",
+    "reason": "Ken Whitcomb/OnClassical MIDI explicitly prohibits commercial use and republication; not used in this pilot."
+  }
+}

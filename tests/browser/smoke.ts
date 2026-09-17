@@ -307,6 +307,34 @@ try {
   await key("1");
   await click(640, 580);
   await audioCheck("match track", true);
+  // Capture a real hard drop while the new background track is playing.
+  // Keyboard layout 1 uses Left Shift for drop. The music-only peak is below
+  // .9 * .08; a higher observed transient proves effects remain in the mix.
+  const dropMeasurement = page.evaluate(async () => {
+    const probe = (window as any).__audioProbe;
+    let peak = 0;
+    for (let i = 0; i < 30; i++) {
+      for (const analyser of probe.analysers) {
+        const samples = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(samples);
+        for (const x of samples) peak = Math.max(peak, Math.abs(x));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    }
+    return peak;
+  });
+  await key("ShiftLeft");
+  const dropPeak = await dropMeasurement;
+  if (dropPeak <= 0.072 || dropPeak >= 1)
+    throw Error("Hard drop/music mix peak is unexpected: " + dropPeak);
+  checks.push(
+    "hard-drop transient exceeds music-only ceiling without clipping",
+  );
+  audio.push({
+    name: "match music with hard drop",
+    peak: dropPeak,
+    expectedSound: true,
+  });
   await key("Escape");
   await key("ArrowDown");
   await key("ArrowDown");

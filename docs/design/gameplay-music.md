@@ -1,0 +1,50 @@
+# Gameplay music — Beethoven G1, v0.3.3
+
+Selected by the user after comparing144BPM and126BPM. The106.67-second126BPM
+loop replaces Wooden Bounce in matches. Badinerie remains unchanged in the
+lobby and the full-screen Credits view.
+
+## Exact audio and source
+
+- Asset: `internal/sound/audio/gameplay-beethoven.wav`.
+- SHA-256: `52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`.
+- PCM16 stereo,44.1kHz,4,704,000 frames,126BPM,224 quarter-note beats.
+- Same pitches, instrument mix, low-flute attack correction and master gain as
+  the selected listening candidate; not a resampled/slowed recording.
+- Excerpt from Beethoven Op.129, bars1–56, arranged AABB. It is not the whole
+  piano work. Lowest RH figures use the original synthetic pluck; the outgoing
+  pickup into the next episode is omitted to make a G-major loop closure.
+- Mutopia score and generated MIDI explicitly public domain;9 source files,
+  notices and hashes are archived in `music/beethoven/`. The source checker
+  reproduces the242 lead events and LH reduction from the archived MIDI.
+- Shared CC0 VSCO sample manifest;11 of the existing12 samples used. No new
+  instrument library or external performance recording.
+
+## Runtime mix
+
+The selected file is unchanged. Its mastered level is higher than the former
+procedural track, so playback uses`.08` rather than the lobby's`.16`. Effects
+remain`.36`. Tests require the drop/line/four-line/attack cues to have at least
+4dB whole-file RMS margin over the music at those playback settings and check
+single-effect-plus-music peak headroom. These are signal measurements, not a
+claim that every possible busy multiplayer mix has been subjectively auditioned.
+
+Scene switching, pause/results behavior, position preservation, mute/music-off
+and browser interaction gating reuse the established manager. No new controls
+or automatic ducking were added.
+
+## Reproduction and checks
+
+`make music` rebuilds both tracks with expected-hash checks before replacing
+assets. `bun scripts/music/check-beethoven.ts` validates the public-domain
+source declaration, all source hashes and the documented note reduction.
+Normal builds use the committed WAVs and do not need Bun or sample downloads.
+
+The SFX generator now emits only14 effects by default. Its historical
+`-legacy-music` option can export Wooden Bounce into a separate directory;
+that old track must not be reintroduced into the embedded audio set. All14
+current effects remain byte-identical, and the source audit inventory is tested.
+
+Credits on-screen and in the distribution include Beethoven and the Mutopia
+typesetter without removing Bach/VSCO credits. The screen still fits without
+scrolling; layout tests and browser checks cover this.
