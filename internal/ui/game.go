@@ -410,6 +410,9 @@ func (g *Game) start() {
 
 func (g *Game) restart() {
 	g.start()
+	if g.sound != nil {
+		g.soundError = g.sound.RestartMusic(sound.MatchMusic)
+	}
 }
 
 func (g *Game) backToLobby() {

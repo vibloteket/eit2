@@ -68,6 +68,7 @@ type musicPlayer interface {
 	Play()
 	Pause()
 	IsPlaying() bool
+	Rewind() error
 	Close() error
 }
 
@@ -165,6 +166,21 @@ func (m *Manager) SetMusicTrack(track MusicTrack) {
 	}
 	m.pauseMusic()
 	m.musicTrack = track
+}
+
+// RestartMusic resets only the requested track. Update resumes it only if it
+// is selected, audio is ready, and the user's mute/music settings allow it.
+// Pausing before Rewind avoids playing part of the old position during reset.
+func (m *Manager) RestartMusic(track MusicTrack) error {
+	if m == nil || m.music[track] == nil {
+		return nil
+	}
+	player := m.music[track]
+	player.Pause()
+	if err := player.Rewind(); err != nil {
+		return fmt.Errorf("restart music %d: %w", track, err)
+	}
+	return nil
 }
 
 func (m *Manager) activeMusic() musicPlayer {

@@ -29,9 +29,11 @@ remain`.36`. Tests require the drop/line/four-line/attack cues to have at least
 single-effect-plus-music peak headroom. These are signal measurements, not a
 claim that every possible busy multiplayer mix has been subjectively auditioned.
 
-Scene switching, pause/results behavior, position preservation, mute/music-off
-and browser interaction gating reuse the established manager. No new controls
-or automatic ducking were added.
+Scene switching, pause/results behavior, mute/music-off and browser interaction
+gating reuse the established manager. Since v0.3.4, explicit Restart resets
+match music to its beginning; Resume and ordinary scene selection do not.
+Restart cannot unmute or enable music, and it does not reset the lobby track.
+No new controls or automatic ducking were added.
 
 ## Reproduction and checks
 

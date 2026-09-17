@@ -337,10 +337,33 @@ try {
   });
   await key("Escape");
   await key("ArrowDown");
+  await key("Enter"); // Pause menu: Restart.
+  await audioCheck("match music playing after Restart", true);
+  checks.push("pause-menu Restart resumes match playback");
+  await key("Escape");
+  await key("Enter"); // Resume is not Restart.
+  await audioCheck("match music playing after Resume", true);
+  await key("Escape");
+  await key("ArrowDown");
   await key("ArrowDown");
   await key("Enter");
   await page.waitForTimeout(500);
   await audioCheck("back to lobby", true);
+
+  await click(510, 660);
+  await audioCheck("music off before restart test", false);
+  await click(640, 580);
+  await key("Escape");
+  await key("ArrowDown");
+  await key("Enter");
+  await audioCheck("Restart respects music off", false);
+  checks.push("Restart does not enable disabled music");
+  await key("Escape");
+  await key("ArrowDown");
+  await key("ArrowDown");
+  await key("Enter");
+  await click(510, 660);
+  await audioCheck("music restored after disabled restart", true);
 
   for (const path of [
     "CREDITS.md",

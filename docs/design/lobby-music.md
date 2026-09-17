@@ -17,8 +17,10 @@ track remains unchanged in v0.3.3; only gameplay music is replaced.
   the same update. Pause/results remain on the match track, as before.
 - Switching scenes pauses the old player before the new one may play. No music
   overlap. Both players retain position: repeated lobby visits do not restart
-  the opening of Badinerie. A round restart within the match view also preserves
-  match music, matching the previous behavior.
+  the opening of Badinerie. Since v0.3.4, an explicit round **Restart** instead
+  pauses and rewinds only the match track. Normal Resume does not rewind.
+  Restart while muted/music-off still resets the position, but remains silent
+  until playback is permitted; the lobby track and all settings are unchanged.
 - Master mute and the independent MUSIC ON/OFF setting persist across scenes.
   They never get reset by track selection. Effects are unaffected by music-off.
 - Browser audio readiness is still required; scene changes cannot bypass the
