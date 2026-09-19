@@ -38,36 +38,28 @@ func TestPauseAndGameOverRestartUseCommonRestartPath(t *testing.T) {
 	}
 }
 
-func TestNewMatchesAlternateButRestartKeepsTrack(t *testing.T) {
+func TestNewMatchesCycleFourTracksButRestartKeepsSelection(t *testing.T) {
 	g := Game{view: viewLobby}
 	g.Lobby.Join(lobby.Device{Kind: lobby.DeviceTouch, Name: "test"})
-	g.start()
-	if g.selectedMusicTrack() != sound.MatchMusic {
-		t.Fatal("first match must use G1")
-	}
-	g.restart()
-	if g.selectedMusicTrack() != sound.MatchMusic || g.nextMatchMusic != 1 {
-		t.Fatal("Restart must not advance playlist")
-	}
-	g.backToLobby()
-	if g.selectedMusicTrack() != sound.LobbyMusic {
-		t.Fatal("lobby music changed")
-	}
-	g.start()
-	if g.selectedMusicTrack() != sound.MatchMusicG2 {
-		t.Fatal("second new match must use G2")
-	}
-	g.restart()
-	if g.selectedMusicTrack() != sound.MatchMusicG2 || g.nextMatchMusic != 0 {
-		t.Fatal("G2 Restart must keep G2")
-	}
-	g.openCredits()
-	if g.selectedMusicTrack() != sound.LobbyMusic {
-		t.Fatal("Credits must keep Badinerie")
-	}
-	g.closeCredits()
-	g.start()
-	if g.selectedMusicTrack() != sound.MatchMusic {
-		t.Fatal("playlist must wrap to G1")
+	want := []sound.MusicTrack{sound.MatchMusic, sound.MatchMusicHandel, sound.MatchMusicBachSonata, sound.MatchMusicVivaldi}
+	for i := 0; i < 10; i++ {
+		g.start()
+		if g.selectedMusicTrack() != want[i%len(want)] || g.round != 1 {
+			t.Fatalf("new match %d: track=%v round=%d", i, g.selectedMusicTrack(), g.round)
+		}
+		next := g.nextMatchMusic
+		g.restart()
+		if g.selectedMusicTrack() != want[i%len(want)] || g.nextMatchMusic != next || g.round != 2 {
+			t.Fatal("Restart changed playlist or failed to reset round")
+		}
+		g.backToLobby()
+		if g.selectedMusicTrack() != sound.LobbyMusic {
+			t.Fatal("lobby music changed")
+		}
+		g.openCredits()
+		if g.selectedMusicTrack() != sound.LobbyMusic {
+			t.Fatal("credits music changed")
+		}
+		g.closeCredits()
 	}
 }

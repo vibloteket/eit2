@@ -45,7 +45,7 @@ This initial technical spike proves the project structure and its first targets:
 - an opt-in Debug mode pauses play and can trigger any of all 22 specials using
   normal player and target routing;
 - short project-owned WAV effects, a full Badinerie lobby loop and separate
-  Beethoven G1/G2 match music, alternating on new matches from the lobby,
+  four Bach/Handel/Vivaldi match loops, cycling on new matches from the lobby,
   with persistent Mute/Music controls and Restart replaying the same track;
 - a dedicated Credits screen opened from the lobby, with any fresh key, button,
   click or tap returning to the lobby without changing players or audio;

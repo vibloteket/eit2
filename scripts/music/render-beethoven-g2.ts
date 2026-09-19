@@ -441,7 +441,7 @@ if (!calibrating && digest(preview) !== config.expectedPreviewSHA256)
 await Bun.write(output + "/beethoven-gameplay-G2-112-preview.wav", preview);
 if (!calibrating)
   await Bun.write(
-    root + "/internal/sound/audio/gameplay-beethoven-g2.wav",
+    root + "/dist/audio/legacy/gameplay-beethoven-g2.wav",
     loop,
   );
 const report = {

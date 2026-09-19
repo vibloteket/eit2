@@ -26,33 +26,8 @@ func TestEmbeddedEffectsDecode(t *testing.T) {
 	}
 }
 
-func TestGameplayLoopIsSelected126BPMVersion(t *testing.T) {
-	data, err := files.ReadFile("audio/gameplay-beethoven.wav")
-	if err != nil {
-		t.Fatal(err)
-	}
-	pcm, err := decodeWAV(data)
-	if err != nil {
-		t.Fatal(err)
-	}
-	const selectedHash = "52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a"
-	if got := fmt.Sprintf("%x", sha256.Sum256(data)); got != selectedHash {
-		t.Fatalf("gameplay asset is not the selected 126 BPM loop: %s", got)
-	}
-	if len(pcm) != 4704000*4 {
-		t.Fatalf("gameplay PCM length = %d bytes, want %d", len(pcm), 4704000*4)
-	}
-	for channel := 0; channel < 2; channel++ {
-		first := int(int16(binary.LittleEndian.Uint16(pcm[channel*2:])))
-		last := int(int16(binary.LittleEndian.Uint16(pcm[len(pcm)-4+channel*2:])))
-		if delta := first - last; delta < -328 || delta > 328 {
-			t.Fatalf("gameplay channel %d seam delta = %d", channel, delta)
-		}
-	}
-}
-
 func TestLobbyLoopIsSelectedFullCorrectedVersion(t *testing.T) {
-	if musicFilenames[MatchMusic] != "gameplay-beethoven.wav" || musicFilenames[LobbyMusic] != "lobby-badinerie.wav" {
+	if musicFilenames[MatchMusic] != "gameplay-bach-bourrees.wav" || musicFilenames[LobbyMusic] != "lobby-badinerie.wav" {
 		t.Fatal("lobby and match must use separate assets")
 	}
 	data, err := files.ReadFile("audio/" + musicFilenames[LobbyMusic])
@@ -115,7 +90,10 @@ func TestAllAudioMatchesSourceAudit(t *testing.T) {
 	if fmt.Sprintf("%x", sha256.Sum256(generator)) != audit.GeneratorSHA256 {
 		t.Fatal("procedural generator changed; reproduce its audio and update the source audit")
 	}
-	known := map[string]bool{"lobby-badinerie.wav": true, "gameplay-beethoven.wav": true, "gameplay-beethoven-g2.wav": true}
+	known := map[string]bool{}
+	for _, filename := range musicFilenames {
+		known[filename] = true
+	}
 	if len(audit.Files) != 14 {
 		t.Fatalf("procedural audit contains %d files, want 14", len(audit.Files))
 	}
@@ -162,7 +140,7 @@ func TestGameplayPlaybackLeavesRoomForImportantEffects(t *testing.T) {
 	if musicVolumes[LobbyMusic] != .16 || musicVolumes[MatchMusic] != .08 || effectVolume != .36 {
 		t.Fatal("unexpected playback balance")
 	}
-	for _, track := range []MusicTrack{MatchMusic, MatchMusicG2} {
+	for _, track := range []MusicTrack{MatchMusic, MatchMusicHandel, MatchMusicBachSonata, MatchMusicVivaldi} {
 		musicPeak, musicRMS := levels(musicFilenames[track])
 		for _, effect := range []Effect{HardDrop, Line, FourLine, Attack} {
 			peak, rms := levels(filenames[effect])
@@ -178,28 +156,59 @@ func TestGameplayPlaybackLeavesRoomForImportantEffects(t *testing.T) {
 	}
 }
 
-func TestSecondGameplayLoopIsAuditedG2(t *testing.T) {
-	if musicFilenames[MatchMusicG2] != "gameplay-beethoven-g2.wav" || musicVolumes[MatchMusicG2] != .08 {
-		t.Fatal("G2 mapping/volume")
-	}
-	data, err := files.ReadFile("audio/" + musicFilenames[MatchMusicG2])
+func TestFourGameplayLoopsMatchAuditedSources(t *testing.T) {
+	data, err := os.ReadFile("../../music/classical/manifest.json")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if fmt.Sprintf("%x", sha256.Sum256(data)) != "dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c" {
-		t.Fatal("G2 does not match verified source render")
+	var manifest struct {
+		Tracks []struct {
+			File   string `json:"file"`
+			SHA256 string `json:"sha256"`
+			Frames int    `json:"frames"`
+		} `json:"tracks"`
 	}
-	pcm, err := decodeWAV(data)
-	if err != nil {
+	if err := json.Unmarshal(data, &manifest); err != nil {
 		t.Fatal(err)
 	}
-	if len(pcm) != 4772250*4 {
-		t.Fatalf("G2 PCM size %d", len(pcm))
+	if len(manifest.Tracks) != 4 || len(musicFilenames) != 5 {
+		t.Fatal("want four gameplay tracks plus unchanged lobby")
 	}
-	for c := 0; c < 2; c++ {
-		d := int(int16(binary.LittleEndian.Uint16(pcm[c*2:]))) - int(int16(binary.LittleEndian.Uint16(pcm[len(pcm)-4+c*2:])))
-		if d < -328 || d > 328 {
-			t.Fatal("G2 loop seam")
+	seen := map[string]bool{}
+	for _, item := range manifest.Tracks {
+		if seen[item.File] {
+			t.Fatal("duplicate gameplay file")
+		}
+		seen[item.File] = true
+		b, err := files.ReadFile("audio/" + item.File)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if fmt.Sprintf("%x", sha256.Sum256(b)) != item.SHA256 {
+			t.Fatalf("%s differs from verified render", item.File)
+		}
+		pcm, err := decodeWAV(b)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item.Frames != 2268000 || len(pcm) != item.Frames*4 {
+			t.Fatal("not the 96-beat periodic loop")
+		}
+		for c := 0; c < 2; c++ {
+			d := int(int16(binary.LittleEndian.Uint16(pcm[c*2:]))) - int(int16(binary.LittleEndian.Uint16(pcm[len(pcm)-4+c*2:])))
+			if d < -328 || d > 328 {
+				t.Fatalf("%s seam delta=%d", item.File, d)
+			}
+		}
+	}
+	for _, track := range []MusicTrack{MatchMusic, MatchMusicHandel, MatchMusicBachSonata, MatchMusicVivaldi} {
+		if !seen[musicFilenames[track]] || musicVolumes[track] != .08 {
+			t.Fatal("unverified gameplay mapping or level")
+		}
+	}
+	for _, legacy := range []string{"gameplay-beethoven.wav", "gameplay-beethoven-g2.wav"} {
+		if _, err := files.ReadFile("audio/" + legacy); err == nil {
+			t.Fatal("legacy Beethoven still embedded")
 		}
 	}
 }

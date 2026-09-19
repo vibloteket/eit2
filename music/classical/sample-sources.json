@@ -1,0 +1,167 @@
+{
+  "revision": "6dd651d55dde97fd4028699be9d4481f26917891",
+  "license": "CC0-1.0",
+  "files": [
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/LICENSE",
+      "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+      "bytes": 6555,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "FluteStac.sfz",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/FluteStac.sfz",
+      "sha256": "8036c112cd3a1614a40e7980bd8c8249ce18bc8df2e4fd8d3bed961b602c10fa",
+      "bytes": 5546,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "FluteSusNV.sfz",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/FluteSusNV.sfz",
+      "sha256": "0c3e15abe738778c38f93aa69e1d994e3b6e32b68ab7977b9138c4e079f99661",
+      "bytes": 2246,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "CelloEnsPizz.sfz",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/CelloEnsPizz.sfz",
+      "sha256": "84e586f7518b99c11da5efddb321a9ea4b9edc4149b96f3e9621f4c7e9fc3cca",
+      "bytes": 5637,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_E3_v3_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_E3_v3_1.wav",
+      "sha256": "3226ecd95142e09f1c1b6db0834265da845ea0ce48ea2570131c558eb8ad8f66",
+      "bytes": 2814822,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_C4_v3_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_C4_v3_1.wav",
+      "sha256": "9e09ce606f8fe31c8dd071c717de54d40c38029e3c2e947500defac474e8cd7d",
+      "bytes": 2539512,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_C4_v3_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_C4_v3_rr1.wav",
+      "sha256": "99dce3b0ef1d89d1dbc87d1e29ff6b11bcc78dc2ae4dfdeb18e2fa35241a6672",
+      "bytes": 216276,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+      "sha256": "0d57d2bae924f0c0ad587165013030f167429b1f116b0b3332b56ff6cc043549",
+      "bytes": 252444,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_E4_v3_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_E4_v3_1.wav",
+      "sha256": "670c72afcd4d437236f0a9f33a532c46fd56145615aad775eb7aab1c5ab6c24d",
+      "bytes": 2449278,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_A3_v3_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_A3_v3_1.wav",
+      "sha256": "8a24758e25e1b6036fc8ca55cdff129d18d70b0719cdb63f6eb6dc756b41cfc7",
+      "bytes": 2765718,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_A4_v3_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_A4_v3_1.wav",
+      "sha256": "9958014f58a16b5b28b8a8b3afe2e28a9f5af5b68c9bc9057ea2cbdfcadbf4df",
+      "bytes": 2147490,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_C5_v2_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_C5_v2_1.wav",
+      "sha256": "7c9414267bade75f432e38aa893edea9fb7146b5b1b3e0ae1f97a475fa89db0f",
+      "bytes": 2382720,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_A4_v2_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_A4_v2_rr1.wav",
+      "sha256": "92b4993b763f185209a6b2aad79cc163465ed9f94dcec360a2e3b24cc0b57ed8",
+      "bytes": 200514,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_A3_v2_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_A3_v2_rr1.wav",
+      "sha256": "d951b3e2883a6011c16cce815d92454da66b0b698c7567ec00b3dda2b41264f3",
+      "bytes": 206022,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_B1_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_B1_v1_RR1.wav",
+      "sha256": "33bbfc9664e8536e8931fba5c53ab4e06abeb6f75fc3b6186bcdb159d6000604",
+      "bytes": 890366,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_D2_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_D2_v1_RR1.wav",
+      "sha256": "434925e6b7d154cfa7c17e89ccc8e4a126e01a970cabee22fe09a9fb0e462bb6",
+      "bytes": 723014,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_G1_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_G1_v1_RR1.wav",
+      "sha256": "4bfeddd80e7dd07d71f627d16b7458231c6b14118b8b8b3fe039ba8b73d88236",
+      "bytes": 852008,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_E1_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_E1_v1_RR1.wav",
+      "sha256": "9fed783345f57619ccc7ac1eff282c4e5ec6ff30b7b935ee96da204efb6b6c59",
+      "bytes": 842720,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_C5_v2_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_C5_v2_rr1.wav",
+      "sha256": "11eefb155e4d6dced1059363a00915c3b606ab05e41c98bd83e19e57cd1ca9e7",
+      "bytes": 176460,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_F2_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_F2_v1_RR1.wav",
+      "sha256": "ff44e135372083b7c7989fc741c2ebc97bf91f11c5ba7d3c99bcf2c967f6c4e8",
+      "bytes": 662600,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Strings/Cello Section/pizzT/pizzT_C1_v1_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Strings/Cello%20Section/pizzT/pizzT_C1_v1_RR1.wav",
+      "sha256": "9032689650e38cb7a967616d15f3434bd52865637200e785bf89c3a1a88b29ce",
+      "bytes": 829634,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/susNV/LDFlute_susNV_E5_v2_1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/susNV/LDFlute_susNV_E5_v2_1.wav",
+      "sha256": "c9617b571d5a40e70b1a1c93120e6ab37691c98902ce319b0a8ca50705858594",
+      "bytes": 2121246,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "Woodwinds/Flute/stac/LDFlute_stac_E5_v2_rr1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/6dd651d55dde97fd4028699be9d4481f26917891/Woodwinds/Flute/stac/LDFlute_stac_E5_v2_rr1.wav",
+      "sha256": "af5eac8faf4416fef53574f537d612f29778810d9faa5dcc1f2b5db38cd91e52",
+      "bytes": 231450,
+      "license": "CC0-1.0"
+    }
+  ]
+}

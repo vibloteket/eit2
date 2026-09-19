@@ -1,0 +1,213 @@
+{
+  "title": "Bach: Bourrée II, BWV 1067",
+  "segments": [
+    {
+      "name": "First strain",
+      "meter": "2/2",
+      "key": "B minor",
+      "bars": [
+        {
+          "n": 0,
+          "beats": 1,
+          "lead": [
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "A#4",
+              0.5
+            ]
+          ],
+          "bass": [
+            [
+              "r",
+              1
+            ]
+          ]
+        },
+        {
+          "n": 1,
+          "beats": 4,
+          "lead": [
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "C#5",
+              0.5
+            ],
+            [
+              "D5",
+              0.5
+            ],
+            [
+              "F#5",
+              0.5
+            ],
+            [
+              "E5",
+              0.5
+            ],
+            [
+              "D5",
+              0.5
+            ],
+            [
+              "C#5",
+              0.5
+            ],
+            [
+              "B4",
+              0.5
+            ]
+          ],
+          "bass": [
+            [
+              "r",
+              1
+            ],
+            [
+              "B3",
+              1
+            ],
+            [
+              "G3",
+              1
+            ],
+            [
+              "E3",
+              1
+            ]
+          ]
+        },
+        {
+          "n": 2,
+          "beats": 4,
+          "lead": [
+            [
+              "A#4",
+              0.5
+            ],
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "A#4",
+              0.5
+            ],
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "C#5",
+              0.5
+            ],
+            [
+              "F#4",
+              0.5
+            ],
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "A#4",
+              0.5
+            ]
+          ],
+          "bass": [
+            [
+              "F#3",
+              2
+            ],
+            [
+              "r",
+              2
+            ]
+          ]
+        },
+        {
+          "n": 3,
+          "beats": 4,
+          "lead": [
+            [
+              "B4",
+              0.5
+            ],
+            [
+              "C#5",
+              0.5
+            ],
+            [
+              "D5",
+              0.5
+            ],
+            [
+              "F#5",
+              0.5
+            ],
+            [
+              "E5",
+              0.5
+            ],
+            [
+              "D5",
+              0.5
+            ],
+            [
+              "C#5",
+              0.5
+            ],
+            [
+              "B4",
+              0.5
+            ]
+          ],
+          "bass": [
+            [
+              "r",
+              1
+            ],
+            [
+              "B3",
+              1
+            ],
+            [
+              "G3",
+              1
+            ],
+            [
+              "E3",
+              1
+            ]
+          ]
+        },
+        {
+          "n": 4,
+          "beats": 3,
+          "lead": [
+            [
+              "F#5",
+              3
+            ]
+          ],
+          "bass": [
+            [
+              "F#3",
+              3
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "graces": [],
+  "uncertain": [],
+  "remarks": [
+    "Bar 0 is the one-quarter pickup; bar 4 is the complementary three-quarter ending. The first strain ends at the repeat sign on page 12, before eight bars. Repeat bars 0–4 once; repeat not expanded here."
+  ]
+}

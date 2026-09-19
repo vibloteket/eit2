@@ -1,6 +1,6 @@
 # Music and audio source audit
 
-Reviewed **2026-09-19** for v0.3.5 (Badinerie audit retained from v0.3.2). This record distinguishes public-domain music,
+Reviewed **2026-09-19** for v0.3.6 (Badinerie audit retained from v0.3.2). This record distinguishes public-domain music,
 sample-library permissions, project-created work, and modern reference files.
 It is not a claim that every file found online is freely licensed.
 
@@ -71,87 +71,101 @@ Library: **VS Chamber Orchestra 2, Community Edition (VSCO2 CE)**.
 - [Upstream repository](https://github.com/sgossner/VSCO-2-CE/tree/SFZ)
 - Pinned revision: `6dd651d55dde97fd4028699be9d4481f26917891` (2019-01-17).
 - License: **CC0 1.0 Universal**. Full text: `LICENSES/CC0-1.0-VSCO2.txt`.
-- Used mappings: `FluteStac.sfz` and `CelloEnsPizz.sfz`.
-- **13 distinct WAV samples** across three tracks, not the whole library.
-  Badinerie uses12, G1 uses11, and G2 uses12 (including one additional low cello sample).
-
-All12 used samples, both mappings, README author credits and LICENSE were
-fetched from that exact revision. Their bytes match the development copies.
-`music/badinerie/sample-sources.json` records all16 source URLs, sizes and
-SHA-256 hashes. The renderer verifies hashes before using cached/downloaded
-files. A mismatch fails rather than silently changing the music.
-
-G2 adds only `Strings/Cello Section/pizzT/pizzT_C1_v1_RR1.wav` from the same
-pinned CC0 revision. Its hash and the full G2 input set are recorded in
-`music/beethoven/sample-sources-g2.json`; no other sample library is introduced.
+- Mappings: `FluteStac.sfz`, `FluteSusNV.sfz`, `CelloEnsPizz.sfz`.
+- Exact input inventories, URLs, sizes and SHA-256 hashes are retained in
+  `music/badinerie/sample-sources.json` and `music/classical/sample-sources.json`.
+- The classical manifest contains23 pinned source files (samples, three mappings
+  and LICENSE). The new sustain files were checked against the same upstream
+  revision. Runtime rendering rejects undeclared or hash-mismatched sources.
+- The lobby's original12-sample source audit, mapping, author credits and PCM
+  are unchanged. No additional sample library is introduced.
 
 CC0 does not require attribution, but the creators are credited voluntarily in
 the game and `CREDITS.md`. No third-party recording credit is required for this
 project-created rendering. CC0's limitations/disclaimer still apply.
 
-## 3. Match music: Beethoven, Rondo a capriccio, Op.129
+## 3. Four classical gameplay arrangements (v0.3.6)
 
-**Composer:** Ludwig van Beethoven (1770–1827), *Rage Over a Lost Penny*.
-The composition is public domain. This track uses an explicitly public-domain
-Mutopia transcription, not an unlicensed commercial MIDI performance.
+These replace Beethoven G1/G2, not Badinerie. The user approved all four motif
+arrangements. They are arranged excerpts, **not complete movements**. Each is
+96 quarter-note beats at112BPM:2,268,000 frames /51.428571s, PCM16 stereo44.1kHz.
 
-- [Mutopia item498](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=498).
-- Typesetter/maintainer: **Magnus Lewis-Smith**. LilyPond update by
-  **Javier Ruiz-Alma**,2015. The transcription identifies Augener's Edition
-  as its source.
-- Pinned source revision: `2144afd6f52d56c5b6995b8b589ef1268b3139f0` in
-  [MutopiaProject](https://github.com/MutopiaProject/MutopiaProject/tree/2144afd6f52d56c5b6995b8b589ef1268b3139f0/ftp/BeethovenLv/O129/beethoven_rondo_op129).
-- The main LilyPond file explicitly declares `license = "Public Domain"` and
-  says it is placed in the public domain by the typesetter, **free to distribute,
-  modify and perform**. This is a PD declaration, not a CC0 label.
-- All8 LilyPond source files and Mutopia's accompanying LilyPond-generated MIDI
-  are bundled under `music/beethoven/sources/mutopia/`. Source URLs and SHA-256
-  hashes are recorded in `music/beethoven/sources.json`.
+| Order | Asset | Public-domain musical material |
+|---|---|---|
+| A | `gameplay-bach-bourrees.wav` | J.S. Bach BWV1067, opening strains of Bourrée I and II; I–II–II–I |
+| B | `gameplay-handel-allegro.wav` | G.F. Handel HWV369, IV Allegro, first8 bars repeated |
+| C | `gameplay-bach-sonata.wav` | J.S. Bach BWV1035, II Allegro, first16 full bars three times |
+| D | `gameplay-vivaldi-allegro.wav` | Antonio Vivaldi RV428, III Allegro, solo episode bars16–31 repeated |
 
-The first project arrangement is **G1 at126BPM**, not the earlier144BPM test.
-It uses bars1–56: A=1–24, B=25–56, with AABB repeats for224 quarter-note beats
-and106.66667 seconds (~1:47). It is an arranged excerpt, not the entire work.
-The final outgoing D pickup is omitted to close on G before the loop repeats.
-The highest RH note at each onset supplies the lead;11 low RH figures use the
-project pluck at their written pitches rather than forcing them into flute
-range. LH notes are reduced to a quarter-note pizzicato bass and an eighth-note
-pluck from sounding source pitches. Repeats thin a few accompaniment notes.
+### Historical sources and independent notation data
 
-`scripts/music/check-beethoven.ts` verifies all9 archived input hashes, the
-explicit PD statement, MIDI format and the complete reduction into242 lead
-events plus accompaniment. It ignores the source piano patch, tempo and
-performance dynamics: the selected126BPM, mix and render are project choices.
-No pianist's recording or external synthesized audio is used.
+All production notation, source snapshots, hashes and audits are bundled in
+`music/classical/`. No third-party performance recording or restricted MIDI
+is a production input.
 
-The selected PCM file is reproduced **unchanged**, including the B2 low-flute
-50ms lead-in correction and original G1 master gain. Only its in-game playback
-volume is lower than the lobby track (`.08` versus `.16`, effects remain`.36`).
-This leaves a measured RMS margin above4dB for drop/line/four-line/attack cues;
-that is a signal-level check, not a universal perceptual guarantee.
+- **A:** Alfred Dörffel/Bach-Gesellschaft vol.31,1885; the same historic suite
+  edition identified above, PDF12–13. New image-derived notation, separately
+  checked for both selected strains (including bass staff and octaves).
+- **B:** Friedrich Chrysander, *Georg Friedrich Händels Werke*, vol.27,1879,
+  IMSLP **#275444**, PDF2. Handel died1759, Chrysander1901; this historical
+  composition/edition is public domain. A fresh image-only transcription of
+  all8 bars and both voices is retained in `audits/handel-historical.json`.
+  All146 note/rest events agree with the previously auditioned score; the
+  comparison is recorded separately. **Production uses this independent
+  historical transcription**, not the modern engraving used for the pilot.
+- **C:** Paul Waldersee/Bach-Gesellschaft vol.43.1,1894, IMSLP **#02310**,
+  PDF3–4. Waldersee died1906. The pickup and first16 bars were independently
+  checked; production omits the standalone pickup to make an exact96-beat
+  cycle. Its closing D-sharp leads back to E without an extra half-beat.
+- **D:** Broude Brothers/Kalmus flute and cello/bass parts, IMSLP **#731718**
+  and **#731722**, catalogued as Public Domain. These are reprints of the
+  public-domain music, not a newly added piano realization. The first-edition
+  Le Cène flute part, ca1728, **#336745**, is also retained as a provenance
+  reference. A full note-for-note collation against that first edition is not
+  claimed. Targeted independent pitch/octave checks are retained. Despite
+  misleading filenames saying “in F”, the actual work is D major, RV428;
+  the final movement's meter is **3/4**, not an early thumbnail reading3/8.
 
-### Additional gameplay loop G2 (v0.3.5)
+Source catalogue links:
+- <https://imslp.org/wiki/Recorder_Sonata_in_F_major,_HWV_369_(Handel,_George_Frideric)>
+- <https://imslp.org/wiki/Flute_Sonata_in_E_major,_BWV_1035_(Bach,_Johann_Sebastian)>
+- <https://imslp.org/wiki/Flute_Concerto_in_D_major,_RV_428_(Vivaldi,_Antonio)>
 
-G2 uses different, previously unused sections of the **same Beethoven work**:
-unfolded source beats112–314 (written bars57–128 with the source repeats).
-It does not reuse G1's source range0–112 and is not a tempo-only variant of G1.
-The G-minor episodes, varied return and E-major episode create a contrasting
-loop; the final D harmony resolves to the G-minor opening. No new composition
-or external arrangement is claimed.
+**Do not retroactively relicense the Handel pilot.** Its digital reference was
+Björn Sothmann's2008 Mutopia item1397, CC BY-SA3.0. That prototype and modern
+engraving retain their original terms. The engraving files are not shipped as
+inputs to the new production arrangements and are not labeled CC0. Using it
+as a comparison reference does not relicense it. The new production source
+is the independently transcribed1879 score. No modern compositional additions,
+engraving/layout or external synthesized performance are copied into production.
 
-G2 runs at112BPM,202 beats,108.21429 seconds. It uses the same relative mix,
-articulations and reduction algorithm as G1;83 low RH figures use the pluck.
-The new master is leveled close to G1 with peak headroom, and playback remains
-at.08. The existing G1 and Badinerie WAVs are unchanged.
+### Arrangement and loop construction
 
+The approved flute/pizzicato/procedural-pluck palette is retained. Longer flute
+notes use a recorded sustained articulation instead of stretching a short
+staccato sound into silence. The selected50ms low-staccato lead-in correction
+remains. Trills/short grace notes are simplified to principal notes; C's explicit
+bar5–6 tie is joined. Bass register/rhythm and continuous pluck are project
+arrangement choices, not a literal historical continuo realization.
 
-Every new match started from the lobby alternates G1/G2 (G1 first); each starts
-at its beginning. Restart resets the current selection without advancing the
-playlist. Returning to Credits/lobby still preserves Badinerie's position.
+Release/pluck tails are folded across the cycle and room delays are periodic.
+No ending fade, listening tail or zero padding is embedded. C starts on the
+first full-bar E rather than including the audition's unmatched opening pickup.
+Each loop is RMS-matched to approximately.06 with peak headroom. Playback is
+.08; lobby stays.16 and effects.36. Automated tests retain at least4dB whole-file
+RMS margin for important effects. These are signal tests, not subjective claims.
 
-The same explicitly public-domain Mutopia inputs are used. Run
-`bun scripts/music/check-beethoven.ts --g2` to reproduce the504 lead events
-and accompaniment in `music/beethoven/score-g2.json`. Source hashes, waveform
-hashes, note ranges and loop boundaries are verified before publication.
+Fresh matches cycle A→B→C→D→A without consuming gameplay RNG. Each begins from
+its start. Restart rewinds the current selection without advancing; Resume does
+not rewind. Lobby/Credits resume the original Badinerie position. Independent
+mute/music-off settings and browser interaction gating remain unchanged.
+
+### Historical Beethoven sources
+
+Beethoven is no longer embedded. Its public-domain source bundle remains under
+`music/beethoven/`; the former arrangements and rights are documented in
+`music/beethoven/HISTORICAL-v0.3.5.md`. The optional legacy renderers write to
+`dist/audio/legacy/`, not back into the game's embedded audio directory.
 
 ## 4. Sound effects and historical procedural music
 
@@ -166,7 +180,7 @@ Its historical generator remains available with `-legacy-music`, for example:
 `go run ./scripts/generate-audio -legacy-music .tmp/legacy-audio`.
 Do not put that optional legacy export back in the game's audio directory.
 
-These project sources are AGPL-3.0-or-later. Both classical arrangements' plucked
+These project sources are AGPL-3.0-or-later. The classical arrangements' plucked
 synthesizer tones are generated mathematically by the project renderers.
 
 ## 5. Playback software, credits and exclusions
@@ -181,51 +195,42 @@ recordings.
 listening reference), Virtual Playing Orchestra, GeneralUser GS, commercial
 orchestra recordings, the rejected bowed-string C mix, or assets from the old
 Eit game, or the rejected noncommercial Ken Whitcomb/OnClassical Handel MIDI.
-Proposed Handel/Brahms/etc. tracks have not been added.
+The former Beethoven audio and rejected pilot mixes are not embedded.
 
 ## 6. Reproduce and verify
 
-From the repository root, with Bun1.4.2 (verified on Linux x86_64):
+From the repository root, Bun1.4.2 (verified on Linux x86_64):
 
 ```sh
 make music
+bun scripts/music/check-melody.ts
+bun scripts/music/check-classical.ts
+make check
+make verify-packages
 ```
 
 This fetches only declared, pinned CC0 sources into ignored `.tmp/music-sources`,
-verifies their SHA-256 hashes, renders all three documented tracks and checks the
-approved output hashes **before replacing each game asset**. It requires no
-workspace notes, earlier preview files or secret keys. The Beethoven score/MIDI
-inputs are public-domain files bundled in this repository.
-Listening exports and render reports are written to `dist/audio/`.
+checks hashes, and reproduces the unchanged lobby plus four new gameplay WAVs.
+Every output hash is checked **before replacing an embedded asset**. It requires
+no workspace notes, pilot files, vision model or secret keys. Normal builds use
+the committed PCM files without downloading samples.
 
-- Badinerie lobby loop SHA-256:
-  `d41d29242ea46c8df0014eb84910dc72ced90f1ecd7149d06346e943d95361b5`
-- Badinerie listening export SHA-256:
-  `42874174f2c9f863f0b821f104b7e9efbbfef199819162d5af0ad2b9451bafef`
-- Beethoven gameplay loop SHA-256:
-  `52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`
-- Beethoven G1 listening preview SHA-256:
-  `63f4791ddfe446b2b2c10451fbb8b723a471facf46a1bd377e1917587a2f824a`
-- Beethoven G2 loop SHA-256:
-  `dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c`
+Expected hashes, score/source hashes and loop frame counts are pinned in
+`music/classical/manifest.json`. Render reports go to `dist/audio/classical/`.
+`check-classical.ts` checks notation durations, source hashes, historical Handel
+agreement, PCM framing/hash, RMS, peaks, seams including wrap-window energy,
+sample provenance, absence of Beethoven and the unchanged Badinerie hash:
+`d41d29242ea46c8df0014eb84910dc72ced90f1ecd7149d06346e943d95361b5`.
 
-```sh
-go run ./scripts/generate-audio .tmp/regenerated-effects
-bun scripts/music/check-melody.ts
-bun scripts/music/check-beethoven.ts
-bun scripts/music/check-beethoven.ts --g2
-make check
-```
-
-`make check` validates embedded assets and scene controls; the CI music step
-also reproduces all three music WAVs and checks for any diff. A different math/runtime
-implementation could change PCM rounding; do not bypass a failed output-hash
-check without reviewing it.
+CI reproduces the audio and rejects diffs. A different math/runtime implementation
+could alter rounding; do not bypass a failed hash check without review. Checks
+are technical and machine-assisted source checks, not a claim of subjective
+listening, perfect universal perception or complete historical collation.
 
 ## Distribution summary
 
-Bach's and Beethoven's compositions remain public domain; the Mutopia
-transcription is explicitly public domain; raw VSCO samples remain CC0. The
+Bach's, Handel's and Vivaldi's compositions and the historical musical material
+remain public domain; raw VSCO samples remain CC0. The
 project's added arrangement, synthesis/rendering source and other original
 contributions are provided under the project's AGPL-3.0-or-later license where
 copyright applies; that does not restrict the underlying public-domain music

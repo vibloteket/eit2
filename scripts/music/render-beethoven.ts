@@ -441,7 +441,7 @@ const preview = wav(p.L, p.R, gain);
 if (digest(preview) !== config.expectedPreviewSHA256)
   throw Error("Gameplay preview hash differs; game asset not replaced");
 await Bun.write(output + "/beethoven-gameplay-G1-126-preview.wav", preview);
-await Bun.write(root + "/internal/sound/audio/gameplay-beethoven.wav", loop);
+await Bun.write(root + "/dist/audio/legacy/gameplay-beethoven.wav", loop);
 const report = {
   title: score.title,
   bpm,

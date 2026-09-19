@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "path": "sources/bach1035.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/3/3a/IMSLP02310-Bach_-_BGA_-_BWV_1035.pdf",
+      "sha256": "cecb2ed562cd2b6f0a8f13a831b0e17c78811ff52a249236932e13c267d09bd3",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    },
+    {
+      "path": "sources/bwv1067-bga1885.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/9/98/IMSLP01467-BWV1067.pdf",
+      "sha256": "80a189067e4a8db605f356880975fd4bbde80e1039144469bb0e5fcf7be8cc31",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    },
+    {
+      "path": "sources/handel-pd.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/4/46/IMSLP275444-PMLP447298-handel_sonata_flauta_chrysander_369.pdf",
+      "sha256": "8a9bd4670410ddb097dd277e8661715b17652c12c8c95018d32f2946c42b9c64",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    },
+    {
+      "path": "sources/vivaldi-flute.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/c/c4/IMSLP336745-PMLP543704-vivaldi_op10_n3_flauta.pdf",
+      "sha256": "406702f887f43bc0b8a9d8ffe0fe8ce242a2c4e1cb89e17f6dd256aeb4980ada",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    },
+    {
+      "path": "sources/vivaldi-731718.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/c/ce/IMSLP731718-PMLP543704-01._VIVALDI_-_FLUTE_CONCERTO_IN_F%2C_RV._428_-_Flute.pdf",
+      "sha256": "697a7f9145785159ffd2badf9e8b3a08c71a517b7e62499ce008aec35a029399",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    },
+    {
+      "path": "sources/vivaldi-731722.pdf",
+      "url": "https://s9.imslp.org/files/imglnks/usimg/3/37/IMSLP731722-PMLP543704-05._VIVALDI_-_FLUTE_CONCERTO_IN_F%2C_RV._428_-_Cellos-Basses.pdf",
+      "sha256": "67dde7dce60c676a85b0f7367082071e71e391e6fa103a7d71b50a6b1803c321",
+      "rights": "Public-domain historical musical material; see MUSIC-SOURCES.md for edition/collation scope"
+    }
+  ]
+}

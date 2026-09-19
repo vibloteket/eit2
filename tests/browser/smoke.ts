@@ -365,9 +365,9 @@ try {
   await click(510, 660);
   await audioCheck("music restored after disabled restart", true);
 
-  // The second new match above selected G2 while muted. Check the next two
-  // matches with audio enabled: G1 then G2. Restart must keep the latter.
-  for (const name of ["G1 after playlist wrap", "G2 second gameplay loop"]) {
+  // A then B were selected above. Exercise C, D, A and B with audio enabled.
+  // Restart must preserve each selection, and the four-track playlist wraps.
+  for (const name of ["Bach sonata C", "Vivaldi D", "Bourrees A after playlist wrap", "Handel B"]) {
     await click(640, 580);
     await audioCheck(name, true);
     await key("Escape");
@@ -380,9 +380,9 @@ try {
     await key("Enter");
   }
   checks.push(
-    "alternating new-match playlist and same-track Restart exercised",
+    "four-track new-match playlist and same-track Restart exercised",
   );
-  await audioCheck("lobby after G2", true);
+  await audioCheck("unchanged lobby after four-track rotation", true);
 
   for (const path of [
     "CREDITS.md",

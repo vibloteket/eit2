@@ -11,9 +11,8 @@ Assets and sources:
 | Generated game graphics | Drawn in code | AGPL-3.0-or-later |
 | Go Regular font embedded through `golang.org/x/image/font/gofont/goregular` | The Go Authors | BSD 3-Clause |
 | Fourteen Doodle Party WAV effects | Generated specifically for Eit 2 by `scripts/generate-audio` | AGPL-3.0-or-later |
-| `internal/sound/audio/gameplay-beethoven.wav` | Beethoven, Op.129; project G1 arrangement at126BPM from Mutopia item498, with VSCO 2 CE samples and original pluck | Public-domain composition/transcription; CC0-1.0 samples; project contributions AGPL-3.0-or-later. |
 | `internal/sound/audio/lobby-badinerie.wav` | J.S. Bach, BWV 1067/VII; project B2 rendering with VSCO 2 CE flute/cello and original synthetic pluck | Public-domain composition; CC0-1.0 samples; project contributions AGPL-3.0-or-later. See the source audit below. |
-| `internal/sound/audio/gameplay-beethoven-g2.wav` | Another section of the same PD Beethoven/Mutopia work, G2 at112BPM | Public-domain score; same CC0 library; project contributions AGPL-3.0-or-later. |
+| `internal/sound/audio/gameplay-*.wav` (four loops) | Bach BWV1067 Bourrées and BWV1035 II; Handel HWV369 IV; Vivaldi RV428 III; project arrangements of public-domain historical material | Public-domain music; CC0-1.0 samples; project contributions AGPL-3.0-or-later. See MUSIC-SOURCES.md for historical-source and pilot-license distinctions. |
 
 The generated audio is 44.1 kHz, 16-bit stereo PCM WAV. The effects cover menu
 focus/selection, join/leave, rotate, lock, hard drop, line and four-line clears,
@@ -42,32 +41,33 @@ The source audit is in [MUSIC-SOURCES.md](MUSIC-SOURCES.md), with credits in
 
 The reproducible source bundle is now in `music/badinerie/` and
 `scripts/music/render-badinerie.ts`; it has no private workspace dependency.
-Use `make music` to fetch verified sources and reproduce all three music loops.
+Use `make music` to fetch verified sources and reproduce the lobby and four gameplay loops.
 The audit does not grant rights to the modern reference repositories or imply
 that their score files are CC0; only the pre-existing melody is retained.
 
-## Beethoven gameplay music
+## Four classical gameplay loops
 
-The chosen G1 arrangement is126BPM, AABB,224 beats,106.66667 seconds.
-The loop (not the preview or144BPM prototype) has SHA-256:
-`52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`.
+All four are PCM16 stereo44.1kHz,96 quarter beats at112BPM (51.428571s).
+File identities, hashes, score/source snapshots and audits are in
+`music/classical/manifest.json`. `render-classical.ts` reproduces them;
+`check-classical.ts` checks the source and signal contract.
 
-Mutopia item498 explicitly places its transcription in the public domain.
-Typesetter: Magnus Lewis-Smith; LilyPond update: Javier Ruiz-Alma. All8 source
-files and the generated MIDI are included under `music/beethoven/sources/`,
-with their original notices and hashes. See `music/beethoven/sources.json` and
-[MUSIC-SOURCES.md](MUSIC-SOURCES.md) for exact source URLs and the documented
-piano-to-gameplay reduction. No external performance recording is used.
+The four arrangements retain the approved light flute/pizzicato/pluck sound,
+with sustained flute for long notes and continuous quiet backing. Release tails
+and ambience wrap without silence/fades. They replace Beethoven G1/G2; lobby
+Badinerie and all14 effects are unchanged. Runtime levels remain gameplay.08,
+lobby.16 and effects.36. Restart preserves the current track; fresh matches
+cycle through the four in order.
 
-`scripts/music/render-beethoven.ts` reproduces the selected PCM unchanged;
-`scripts/music/check-beethoven.ts` verifies the source hashes, rights statement
-and derived notes. Runtime playback volume is separately set to`.08` for
-match-effect headroom; the lobby remains`.16` and effects`.36`.
+Handel production is based on a new, independent transcription of Chrysander1879,
+checked for all146 events against the audition. The private pilot's modern
+Mutopia engraving remains CC BY-SA3.0; it is neither relabeled CC0 nor shipped
+as a production input. This independent historical derivation is documented
+in MUSIC-SOURCES.md and the source audits.
 
-G2 adds a second match loop using source beats112–314 at112BPM,108.21429s.
-Its SHA-256 is `dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c`.
-Its checked score/config are in `music/beethoven/*-g2.json`; one extra CC0
-cello sample is declared in its source manifest. G1 and the lobby are unchanged.
+Historical Beethoven sources and their original notices remain in
+`music/beethoven/`, but its WAVs are no longer embedded. Optional legacy
+renderers write to `dist/audio/legacy/` only.
 
 Before adding an asset, record its author, source URL, exact license and any
 required attribution here. Do not copy legacy Eit assets whose rights or source

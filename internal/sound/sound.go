@@ -49,21 +49,26 @@ type MusicTrack uint8
 const (
 	LobbyMusic MusicTrack = iota
 	MatchMusic
-	MatchMusicG2
+	MatchMusicHandel
+	MatchMusicBachSonata
+	MatchMusicVivaldi
 )
 
 var musicFilenames = map[MusicTrack]string{
-	LobbyMusic:   "lobby-badinerie.wav",
-	MatchMusic:   "gameplay-beethoven.wav",
-	MatchMusicG2: "gameplay-beethoven-g2.wav",
+	LobbyMusic:           "lobby-badinerie.wav",
+	MatchMusic:           "gameplay-bach-bourrees.wav",
+	MatchMusicHandel:     "gameplay-handel-allegro.wav",
+	MatchMusicBachSonata: "gameplay-bach-sonata.wav",
+	MatchMusicVivaldi:    "gameplay-vivaldi-allegro.wav",
 }
 
-// The gameplay track is mastered much louder than the former procedural loop.
-// Keep the selected PCM unchanged, but leave room for lock/drop/line/attack cues.
+// The four gameplay loops are RMS-matched; leave room for lock/drop/line/attack cues.
 var musicVolumes = map[MusicTrack]float64{
-	LobbyMusic:   .16,
-	MatchMusic:   .08,
-	MatchMusicG2: .08,
+	LobbyMusic:           .16,
+	MatchMusic:           .08,
+	MatchMusicHandel:     .08,
+	MatchMusicBachSonata: .08,
+	MatchMusicVivaldi:    .08,
 }
 
 // Keep playback control testable without opening an audio device.
@@ -115,7 +120,7 @@ func New() (*Manager, error) {
 		}
 		manager.pcm[effect] = pcm
 	}
-	for _, track := range []MusicTrack{LobbyMusic, MatchMusic, MatchMusicG2} {
+	for _, track := range []MusicTrack{LobbyMusic, MatchMusic, MatchMusicHandel, MatchMusicBachSonata, MatchMusicVivaldi} {
 		filename := musicFilenames[track]
 		musicWAV, err := files.ReadFile("audio/" + filename)
 		if err != nil {

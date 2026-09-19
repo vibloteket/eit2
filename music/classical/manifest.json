@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "bpm": 112,
+  "quarterBeats": 96,
+  "frames": 2268000,
+  "tracks": [
+    {
+      "id": "A",
+      "title": "Bach — BWV1067 Bourrée I/II",
+      "file": "gameplay-bach-bourrees.wav",
+      "bpm": 112,
+      "beats": 96,
+      "seconds": 51.42857142857143,
+      "frames": 2268000,
+      "activeSeconds": 51.42857142857143,
+      "rms": 0.060000000000000005,
+      "peak": 0.2488321185481617,
+      "minimumBacking100msRms": 0.001268982779404389,
+      "stats": {
+        "staccato": 92,
+        "sustained": 40,
+        "bass": 96,
+        "pluck": 192,
+        "fluteSampleShortages": 0
+      },
+      "sha256": "71aac4dda29edbfe0bcbc805348f5273c81ed584cbf60fa595764d8c1e634f68"
+    },
+    {
+      "id": "B",
+      "title": "Handel — HWV369 IV Allegro",
+      "file": "gameplay-handel-allegro.wav",
+      "bpm": 112,
+      "beats": 96,
+      "seconds": 51.42857142857143,
+      "frames": 2268000,
+      "activeSeconds": 51.42857142857143,
+      "rms": 0.06,
+      "peak": 0.29553869236200864,
+      "minimumBacking100msRms": 0.0014946919726935982,
+      "stats": {
+        "staccato": 156,
+        "sustained": 6,
+        "bass": 64,
+        "pluck": 192,
+        "fluteSampleShortages": 0
+      },
+      "sha256": "bf8b9edf9aaf6261b40fe4d1a72d5b15ede848e8a9ab1a22e33a99c606d60641"
+    },
+    {
+      "id": "C",
+      "title": "Bach — BWV1035 II Allegro",
+      "file": "gameplay-bach-sonata.wav",
+      "bpm": 112,
+      "beats": 96,
+      "seconds": 51.42857142857143,
+      "frames": 2268000,
+      "activeSeconds": 51.42857142857143,
+      "rms": 0.06,
+      "peak": 0.2553480197776462,
+      "minimumBacking100msRms": 0.0013167699752173515,
+      "stats": {
+        "staccato": 288,
+        "sustained": 9,
+        "bass": 96,
+        "pluck": 192,
+        "fluteSampleShortages": 0
+      },
+      "sha256": "ca1837131411023a0f279997f1106cdf0f81b9b017458eed29fba1a136dbe49f"
+    },
+    {
+      "id": "D",
+      "title": "Vivaldi — RV428 III Allegro, solo episode",
+      "file": "gameplay-vivaldi-allegro.wav",
+      "bpm": 112,
+      "beats": 96,
+      "seconds": 51.42857142857143,
+      "frames": 2268000,
+      "activeSeconds": 51.42857142857143,
+      "rms": 0.06,
+      "peak": 0.22752708580673975,
+      "minimumBacking100msRms": 0.0012146703529597022,
+      "stats": {
+        "staccato": 116,
+        "sustained": 38,
+        "bass": 96,
+        "pluck": 192,
+        "fluteSampleShortages": 0
+      },
+      "sha256": "3e972d40f611b518395293959d04ab0f0d87b420e2efe1ef0fc64e3daf84a33d"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scores/D.json",
+      "sha256": "bda4af599ff704a1c69e87957ef8d82f1f20887331920db5fdcfc49aceb18af8"
+    },
+    {
+      "path": "scores/C.json",
+      "sha256": "e75917bb64eda675d853e693a0fbe56a6176ccb3f1ff546c33e85aa45478bbfa"
+    },
+    {
+      "path": "scores/A1.json",
+      "sha256": "22c30961d69e1a557e5869593941be87b90ffab59755c29fb0af934ebf9bc94d"
+    },
+    {
+      "path": "scores/B.json",
+      "sha256": "808593af5e516bc57fc3281c8ac473a37d5a7616e8c4ebf352563f41c4ffa114"
+    },
+    {
+      "path": "scores/A2.json",
+      "sha256": "03eb7141229db778b0c1d8b10f67639b6ba8c4b911ccfd5e9adee04b12d490db"
+    },
+    {
+      "path": "sources/handel-pd.pdf",
+      "sha256": "8a9bd4670410ddb097dd277e8661715b17652c12c8c95018d32f2946c42b9c64"
+    },
+    {
+      "path": "sources/vivaldi-flute.pdf",
+      "sha256": "406702f887f43bc0b8a9d8ffe0fe8ce242a2c4e1cb89e17f6dd256aeb4980ada"
+    },
+    {
+      "path": "sources/vivaldi-731722.pdf",
+      "sha256": "67dde7dce60c676a85b0f7367082071e71e391e6fa103a7d71b50a6b1803c321"
+    },
+    {
+      "path": "sources/bwv1067-bga1885.pdf",
+      "sha256": "80a189067e4a8db605f356880975fd4bbde80e1039144469bb0e5fcf7be8cc31"
+    },
+    {
+      "path": "sources/vivaldi-731718.pdf",
+      "sha256": "697a7f9145785159ffd2badf9e8b3a08c71a517b7e62499ce008aec35a029399"
+    },
+    {
+      "path": "sources/bach1035.pdf",
+      "sha256": "cecb2ed562cd2b6f0a8f13a831b0e17c78811ff52a249236932e13c267d09bd3"
+    }
+  ]
+}

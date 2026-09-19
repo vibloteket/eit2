@@ -1,71 +1,85 @@
-# Gameplay music — Beethoven G1 and G2
+# Gameplay music — four classical loops (v0.3.6)
 
-Selected by the user after comparing144BPM and126BPM. The106.67-second126BPM
-loop replaces Wooden Bounce in matches. Badinerie remains unchanged in the
-lobby and the full-screen Credits view.
+## Approved scope
 
-## Additional G2 loop (v0.3.5)
+User approved all four flute/pizzicato/pluck auditions on2026-09-19, then
+explicitly approved replacing Beethoven while keeping title/lobby music.
+The finished loops retain those motif arrangements, not newly expanded full
+movements. Historical G1/G2 design is in `gameplay-music-v0.3.5.md`.
 
-G2 uses previously unused source beats112–314 of the same PD Beethoven work,
-not a new composition. The G-minor and E-major episodes give it a contrasting
-character. At112BPM its202 beats last108.21429s. G1 stays unchanged at126BPM.
-Both share the light flute/pizzicato/pluck palette and similar mastered levels;
-G2 adds only the lowest CC0 cello pizzicato region from the same pinned library.
+1. Bach BWV1067 Bourrée I/II: first strains, I–II–II–I.
+2. Handel HWV369 IV Allegro: first8 bars repeated.
+3. Bach BWV1035 II Allegro: first16 full bars three times, no unmatched pickup.
+4. Vivaldi RV428 III Allegro: solo episode bars16–31 repeated; not the opening
+   tutti where flute is frequently resting.
 
-New matches from the lobby alternate G1/G2, starting with G1 after launch.
-Restart resets the current choice without advancing. Credits/lobby keep Bach.
-This deterministic playlist does not consume the gameplay RNG. The loop is
-built from source repeats and varied episodes, not copies of G1.
+All four:112 quarter-note BPM,96 quarter beats,2,268,000 stereo frames at44.1kHz
+(51.428571s). The approved Badinerie title/lobby/Credits PCM is unchanged.
 
-`render-beethoven-g2.ts` reproduces the new asset; `check-beethoven.ts --g2`
-checks its504 lead events and source reduction. Raw PCM is deliberately retained
-for verified fidelity/looping; a future compressed/streamed format requires its
-own tests. The additional track increases the web download size.
+## Arrangement and boundaries
 
-## G1 audio and source
+Short flute articulations and longer sustained samples share the approved
+palette. Pizzicato bass and a quiet synthetic pluck continue through melodic
+breathing spaces. No bowed-string pad, piano, percussion addition or external
+recording. Bass register/rhythm and ornaments are explicitly adapted, not a
+literal full orchestral/continuo performance.
 
-- Asset: `internal/sound/audio/gameplay-beethoven.wav`.
-- SHA-256: `52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`.
-- PCM16 stereo,44.1kHz,4,704,000 frames,126BPM,224 quarter-note beats.
-- Same pitches, instrument mix, low-flute attack correction and master gain as
-  the selected listening candidate; not a resampled/slowed recording.
-- Excerpt from Beethoven Op.129, bars1–56, arranged AABB. It is not the whole
-  piano work. Lowest RH figures use the original synthetic pluck; the outgoing
-  pickup into the next episode is omitted to make a G-major loop closure.
-- Mutopia score and generated MIDI explicitly public domain;9 source files,
-  notices and hashes are archived in `music/beethoven/`. The source checker
-  reproduces the242 lead events and LH reduction from the archived MIDI.
-- Shared CC0 VSCO sample manifest;11 of the existing12 samples used. No new
-  instrument library or external performance recording.
+The audition's ending fade/tail is not embedded. Sample/pluck releases fold
+into the next cycle and ambience is calculated periodically. C omits its
+initial standalone eighth-note pickup; its final D-sharp leads back to the
+first E on a proper bar boundary. No clock correction, silence padding or
+in-game crossfade is required. Rendering pins expected hashes before writing.
 
-## Runtime mix
+## Playback and settings
 
-The selected file is unchanged. Its mastered level is higher than the former
-procedural track, so playback uses`.08` rather than the lobby's`.16`. Effects
-remain`.36`. Tests require the drop/line/four-line/attack cues to have at least
-4dB whole-file RMS margin over the music at those playback settings and check
-single-effect-plus-music peak headroom. These are signal measurements, not a
-claim that every possible busy multiplayer mix has been subjectively auditioned.
+Fresh lobby matches cycle A→B→C→D, starting with A after launch. Each fresh match
+rewinds that selection. Restart rewinds the current track without advancing;
+Resume does not rewind. No gameplay RNG is consumed. Lobby/Credits use their
+original player and preserve playback position. User mute/music-off and browser
+interaction readiness remain independent gates. No new controls or persistence
+format changes.
 
-Scene switching, pause/results behavior, mute/music-off and browser interaction
-gating reuse the established manager. Since v0.3.4, explicit Restart resets
-match music to its beginning; Resume does not. Since v0.3.5 a fresh match
-explicitly starts the next selection from its beginning.
-Restart cannot unmute or enable music, and it does not reset the lobby track.
-No new controls or automatic ducking were added.
+All four loops are RMS-matched near.06. Runtime gameplay gain stays.08; lobby.16
+and effects.36. Drop/line/four-line/attack tests require at least4dB signal-RMS
+margin and single-effect-plus-music peak headroom. This is not a subjective
+claim about every multiplayer mix.
 
-## Reproduction and checks
+## Sources and licensing
 
-`make music` rebuilds both tracks with expected-hash checks before replacing
-assets. `bun scripts/music/check-beethoven.ts` validates the public-domain
-source declaration, all source hashes and the documented note reduction.
-Normal builds use the committed WAVs and do not need Bun or sample downloads.
+`music/classical/` contains production notation, historical-source snapshots,
+source/output hashes, sample provenance and audit records. The new Handel
+production notation is independently read from Chrysander1879, with all146
+note/rest events agreeing with the pilot. Its modern CC BY-SA pilot engraving
+is not a production input, and its old license is not retroactively changed.
+See `MUSIC-SOURCES.md` for the detailed, limited claims for each edition.
 
-The SFX generator now emits only14 effects by default. Its historical
-`-legacy-music` option can export Wooden Bounce into a separate directory;
-that old track must not be reintroduced into the embedded audio set. All14
-current effects remain byte-identical, and the source audit inventory is tested.
+## Refinement decisions and acceptance
 
-Credits on-screen and in the distribution include Beethoven and the Mutopia
-typesetter without removing Bach/VSCO credits. The screen still fits without
-scrolling; layout tests and browser checks cover this.
+The previously discussed requirements answer the refinement checklist:
+- Problem/users/outcome: local couch gameplay needs unobtrusive musical drive
+  without conspicuous holes; all four auditions musically accepted.
+- Scope: finished loops, deterministic playlist, credits/provenance, tests and
+  deployment; no new game rules, controls, sample library or lobby changes.
+- Inputs/outputs: pinned historical notation + CC0 samples → reproducible PCM.
+- Platforms/performance: Go/Ebitengine native and WASM; committed PCM needs no
+  runtime downloads. Four short gameplay loops replace two longer ones.
+- Failures/security: source/output mismatches fail; never substitute unreviewed
+  MIDI, recordings or license grants. Existing initialization cleanup retained.
+- Settings/state: unchanged audio preferences/input gating; same-track Restart;
+  deterministic per-launch playlist counter, no new persisted fields.
+- Delivery: original auditions/old release remain archived; public packages
+  retain credits and notices; increment VERSION for public deployment.
+- Proof/closure: music reproducibility, source/timing/PCM/hash/seam checks,
+  all-five-player gating, multi-cycle UI selection, unchanged lobby/effects,
+  full build/test/package verification, browser smoke and green release CI.
+
+## Reproduction
+
+`make music` renders the lobby and four gameplay loops, then checks the new
+music contract. `make check` and `make verify-packages` test/build/package the
+normal game. Normal builds use committed WAVs and do not invoke AI, download
+samples, or require private workspace files. `check-classical.ts` can rerun the
+source/signal audit after rendering.
+
+Legacy Beethoven renderers are optional historical tools and now write their
+loop WAVs to `dist/audio/legacy/`, not to embedded game audio.

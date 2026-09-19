@@ -12,15 +12,18 @@ Source: <https://github.com/vibloteket/eit2>
 
 - **Lobby composition:** Johann Sebastian Bach, *Badinerie*, Orchestral Suite
   No.2 in B minor, BWV1067/VII. Public-domain composition.
-- **Match composition:** Ludwig van Beethoven, *Rondo a capriccio*, Op.129
-  (*Rage Over a Lost Penny*). Public-domain composition.
-- **Arrangements and rendering:** Eit 2 project, full Badinerie B2 and the
-  Beethoven gameplay arrangements G1 at126BPM and G2 at112BPM. These are our generated
-  performances, not recordings by an external orchestra or pianist.
-- **Beethoven score:** [Mutopia Project, item498](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=498),
-  typeset by **Magnus Lewis-Smith**, with a2015 LilyPond update by
-  **Javier Ruiz-Alma**. The typesetter explicitly placed the transcription in
-  the public domain; the credit is voluntary.
+- **Match compositions:** J.S. Bach, Bourrées I/II (BWV1067) and Flute Sonata
+  in E major, II Allegro (BWV1035); G.F. Handel, Recorder Sonata in F major,
+  IV Allegro (HWV369); Antonio Vivaldi, *Il gardellino*, III Allegro (RV428).
+  These compositions are public domain.
+- **Historical score sources:** Dörffel/Bach-Gesellschaft1885; Waldersee/
+  Bach-Gesellschaft1894; Chrysander/Deutsche Händelgesellschaft1879; public-domain
+  Broude/Kalmus Vivaldi parts and Le Cène ca1728 reference. See MUSIC-SOURCES.md
+  for exact source IDs, independent transcription scope and reference distinctions.
+- **Arrangements and rendering:** Eit 2 project. Full Badinerie B2 remains
+  unchanged; the four112BPM gameplay arrangements are newly rendered excerpts,
+  not complete movements or external recordings. The independently transcribed
+  historical Handel score replaces the modern CC BY-SA source of the private pilot.
 - **Flute and cello samples:** VSCO2 Community Edition, recorded by **Sam Gossner
   and Simon Dalzell**; sample cutting by **Elan Hickler / Soundemote**.
   <https://github.com/sgossner/VSCO-2-CE> — CC0 1.0 Universal.

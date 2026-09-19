@@ -389,11 +389,15 @@ func (g *Game) activateLobbyMenu(index int) bool {
 	return false
 }
 
-var gameplayMusicOrder = [...]sound.MusicTrack{sound.MatchMusic, sound.MatchMusicG2}
+var gameplayMusicOrder = [...]sound.MusicTrack{sound.MatchMusic, sound.MatchMusicHandel, sound.MatchMusicBachSonata, sound.MatchMusicVivaldi}
 
 func (g *Game) selectedMusicTrack() sound.MusicTrack {
-	if g.view == viewPlay && g.matchMusic == sound.MatchMusicG2 {
-		return sound.MatchMusicG2
+	if g.view == viewPlay {
+		for _, track := range gameplayMusicOrder {
+			if g.matchMusic == track {
+				return track
+			}
+		}
 	}
 	return g.view.musicTrack()
 }
