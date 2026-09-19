@@ -20,7 +20,7 @@ var creditLines = []struct {
 	{"Based on the original Eit by Victor Blomqvist", 222, 22, false},
 	{"MUSIC & AUDIO", 265, 18, true},
 	{"Lobby: J. S. Bach — Badinerie, BWV 1067/VII", 293, 23, false},
-	{"Match: Beethoven — Rage Over a Lost Penny, Op. 129", 321, 22, false},
+	{"Match: Beethoven — Rage Over a Lost Penny (G1 & G2)", 321, 22, false},
 	{"Arrangement, rendering & effects: Eit 2 project", 349, 22, false},
 	{"Flute & cello: VSCO 2 CE — Sam Gossner and Simon Dalzell", 377, 22, false},
 	{"Sample editing: Elan Hickler / Soundemote · Samples: CC0", 405, 22, false},

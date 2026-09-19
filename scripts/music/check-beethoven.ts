@@ -4,7 +4,12 @@ import { createHash } from "node:crypto";
 
 const root = import.meta.dir + "/../../music/beethoven";
 const manifest = await Bun.file(root + "/sources.json").json();
-const score = await Bun.file(root + "/score.json").json();
+const g2 = Bun.argv.includes("--g2");
+const score = await Bun.file(
+  root + (g2 ? "/score-g2.json" : "/score.json"),
+).json();
+const start = g2 ? 112 : 0,
+  end = g2 ? 314 : 112;
 for (const file of manifest.sources) {
   const bytes = new Uint8Array(
     await Bun.file(root + "/" + file.file).arrayBuffer(),
@@ -98,19 +103,19 @@ while (pos < b.length) {
 if (tracks.length !== 3) throw Error("Expected control/RH/LH tracks");
 const groups = new Map<number, (typeof tracks)[number]>();
 for (const note of tracks[1])
-  if (note.at < 112) {
+  if (note.at >= start && note.at < end) {
     const group = groups.get(note.at) ?? [];
     group.push(note);
     groups.set(note.at, group);
   }
 const melody = [];
 for (const [at, group] of [...groups].sort((a, b) => a[0] - b[0])) {
-  if (at >= 111.5) continue; // Omit the pickup into the next episode; close on G.
+  if (!g2 && at >= 111.5) continue; // Omit the pickup into the next episode; close on G.
   const top = group.reduce((a, b) => (a.key > b.key ? a : b));
   melody.push({
-    at,
+    at: at - start,
     key: top.key,
-    beats: Math.min(top.beats, 112 - at),
+    beats: Math.min(top.beats, end - at),
     instrument: top.key >= 65 ? "flute" : "pluck",
   });
 }
@@ -121,27 +126,41 @@ function fold(key: number, low: number, high: number) {
   while (key > high) key -= 12;
   return key;
 }
-for (let at = 0; at < 112; at += 0.5) {
+for (let at = start; at < end; at += 0.5) {
   const active = tracks[2]
     .filter((n) => n.at <= at + 1e-8 && n.at + n.beats > at + 1e-8)
     .map((n) => n.key)
     .sort((a, b) => a - b);
   if (!active.length) continue;
   if (Number.isInteger(at))
-    bass.push({ at, key: fold(active[0], 36, 54), beats: 0.65 });
+    bass.push({ at: at - start, key: fold(active[0], 36, 54), beats: 0.65 });
   const upper = [
     ...new Set(
       active.slice(active.length > 1 ? 1 : 0).map((n) => fold(n, 60, 76)),
     ),
   ].sort((a, b) => a - b);
-  pluck.push({ at, key: upper[Math.round(at * 2) % upper.length], beats: 0.5 });
+  pluck.push({
+    at: at - start,
+    key: upper[Math.round((at - start) * 2) % upper.length],
+    beats: 0.5,
+  });
 }
 for (const [name, derived] of Object.entries({ melody, bass, pluck })) {
   if (JSON.stringify(score[name]) !== JSON.stringify(derived))
     throw Error("Score reduction differs: " + name);
 }
-if (score.bpm !== 126 || JSON.stringify(score.form) !== '["A","A","B","B"]')
-  throw Error("Unapproved tempo/form");
+if (
+  score.bpm !== (g2 ? 112 : 126) ||
+  JSON.stringify(score.form) !== (g2 ? '["A","B"]' : '["A","A","B","B"]')
+)
+  throw Error("Unexpected tempo/form");
+if (
+  g2 &&
+  (score.sourceStartBeat !== 112 ||
+    score.sourceEndBeat !== 314 ||
+    score.totalBeats !== 202)
+)
+  throw Error("Unexpected G2 source range");
 console.log(
-  `PASS: ${manifest.sources.length} PD source files verified; ${melody.length} lead events and accompaniment reproduced; 126 BPM/AABB.`,
+  `PASS: ${manifest.sources.length} PD source files verified; ${melody.length} lead events and accompaniment reproduced; ${score.bpm} BPM/${score.form.join("")}.`,
 );

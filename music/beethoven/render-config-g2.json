@@ -1,0 +1,88 @@
+{
+  "referenceRms": 0.15359948064238213,
+  "baseCalibration": {
+    "fluteTrims": [
+      {
+        "key": 83,
+        "normalizedRms": 0.383590239364748,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_C5_v2_rr1.wav",
+        "trimDB": -0.42981991784860263
+      },
+      {
+        "key": 86,
+        "normalizedRms": 0.30740288734284804,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_E5_v2_rr1.wav",
+        "trimDB": 0.0509781093024121
+      },
+      {
+        "key": 78,
+        "normalizedRms": 0.3206066887657418,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+        "trimDB": -0.04034507243861178
+      },
+      {
+        "key": 74,
+        "normalizedRms": 0.3219234083534696,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+        "trimDB": -0.04924496450935165
+      },
+      {
+        "key": 71,
+        "normalizedRms": 0.30320333231702923,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_C4_v3_rr1.wav",
+        "trimDB": 0.08084797098591355
+      },
+      {
+        "key": 66,
+        "normalizedRms": 0.20129800793647173,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_A3_v2_rr1.wav",
+        "trimDB": 0.8
+      },
+      {
+        "key": 73,
+        "normalizedRms": 0.2926084038975308,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_C4_v3_rr1.wav",
+        "trimDB": 0.15808384530752972
+      },
+      {
+        "key": 70,
+        "normalizedRms": 0.2658317444862132,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_A3_v2_rr1.wav",
+        "trimDB": 0.36648361476931735
+      },
+      {
+        "key": 76,
+        "normalizedRms": 0.32515024388385766,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+        "trimDB": -0.07090259926196534
+      },
+      {
+        "key": 77,
+        "normalizedRms": 0.32359359424916573,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_E4_v2_rr1.wav",
+        "trimDB": -0.06048175817931039
+      },
+      {
+        "key": 81,
+        "normalizedRms": 0.30811325105381987,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_A4_v2_rr1.wav",
+        "trimDB": 0.04596593890516766
+      },
+      {
+        "key": 80,
+        "normalizedRms": 0.3147049429332732,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_A4_v2_rr1.wav",
+        "trimDB": 0
+      },
+      {
+        "key": 85,
+        "normalizedRms": 0.36315326643138923,
+        "sample": "Woodwinds/Flute/stac/LDFlute_stac_C5_v2_rr1.wav",
+        "trimDB": -0.31093195297454007
+      }
+    ]
+  },
+  "targetRms": 0.14800414816520016,
+  "expectedLoopSHA256": "dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c",
+  "expectedPreviewSHA256": "d362996cf161a2f0725cfb8b5d02bc9a4d9b5cde835dee4a1aa51f2c191bc1b2"
+}

@@ -32,6 +32,7 @@ jobs:
           make music
           bun scripts/music/check-melody.ts
           bun scripts/music/check-beethoven.ts
+          bun scripts/music/check-beethoven.ts --g2
           git diff --exit-code -- internal/sound/audio/
       - name: Verify
         run: xvfb-run -a make check

@@ -115,7 +115,7 @@ func TestAllAudioMatchesSourceAudit(t *testing.T) {
 	if fmt.Sprintf("%x", sha256.Sum256(generator)) != audit.GeneratorSHA256 {
 		t.Fatal("procedural generator changed; reproduce its audio and update the source audit")
 	}
-	known := map[string]bool{"lobby-badinerie.wav": true, "gameplay-beethoven.wav": true}
+	known := map[string]bool{"lobby-badinerie.wav": true, "gameplay-beethoven.wav": true, "gameplay-beethoven-g2.wav": true}
 	if len(audit.Files) != 14 {
 		t.Fatalf("procedural audit contains %d files, want 14", len(audit.Files))
 	}
@@ -162,16 +162,44 @@ func TestGameplayPlaybackLeavesRoomForImportantEffects(t *testing.T) {
 	if musicVolumes[LobbyMusic] != .16 || musicVolumes[MatchMusic] != .08 || effectVolume != .36 {
 		t.Fatal("unexpected playback balance")
 	}
-	musicPeak, musicRMS := levels(musicFilenames[MatchMusic])
-	for _, effect := range []Effect{HardDrop, Line, FourLine, Attack} {
-		peak, rms := levels(filenames[effect])
-		marginDB := 20 * math.Log10(rms*effectVolume/(musicRMS*musicVolumes[MatchMusic]))
-		if marginDB < 4 {
-			t.Errorf("%s RMS margin over music = %.2f dB, want at least 4 dB", effect, marginDB)
+	for _, track := range []MusicTrack{MatchMusic, MatchMusicG2} {
+		musicPeak, musicRMS := levels(musicFilenames[track])
+		for _, effect := range []Effect{HardDrop, Line, FourLine, Attack} {
+			peak, rms := levels(filenames[effect])
+			marginDB := 20 * math.Log10(rms*effectVolume/(musicRMS*musicVolumes[track]))
+			if marginDB < 4 {
+				t.Errorf("%s RMS margin over music = %.2f dB, want at least 4 dB", effect, marginDB)
+			}
+			if musicPeak*musicVolumes[track]+peak*effectVolume >= 1 {
+				t.Errorf("%s plus music can clip even without other voices", effect)
+			}
+			t.Logf("track %d / %s: RMS margin %.2f dB (signal measure, not a perceptual listening test)", track, effect, marginDB)
 		}
-		if musicPeak*musicVolumes[MatchMusic]+peak*effectVolume >= 1 {
-			t.Errorf("%s plus music can clip even without other voices", effect)
+	}
+}
+
+func TestSecondGameplayLoopIsAuditedG2(t *testing.T) {
+	if musicFilenames[MatchMusicG2] != "gameplay-beethoven-g2.wav" || musicVolumes[MatchMusicG2] != .08 {
+		t.Fatal("G2 mapping/volume")
+	}
+	data, err := files.ReadFile("audio/" + musicFilenames[MatchMusicG2])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fmt.Sprintf("%x", sha256.Sum256(data)) != "dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c" {
+		t.Fatal("G2 does not match verified source render")
+	}
+	pcm, err := decodeWAV(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pcm) != 4772250*4 {
+		t.Fatalf("G2 PCM size %d", len(pcm))
+	}
+	for c := 0; c < 2; c++ {
+		d := int(int16(binary.LittleEndian.Uint16(pcm[c*2:]))) - int(int16(binary.LittleEndian.Uint16(pcm[len(pcm)-4+c*2:])))
+		if d < -328 || d > 328 {
+			t.Fatal("G2 loop seam")
 		}
-		t.Logf("%s: RMS margin %.2f dB (signal measure, not a perceptual listening test)", effect, marginDB)
 	}
 }

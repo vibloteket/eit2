@@ -16,6 +16,7 @@ lint:
 music:
 	bun scripts/music/render-badinerie.ts
 	bun scripts/music/render-beethoven.ts
+	bun scripts/music/render-beethoven-g2.ts
 
 VERSION := $(shell cat VERSION)
 LDFLAGS := -X github.com/vibloteket/eit2/internal/version.Value=$(VERSION)

@@ -16,9 +16,10 @@ track remains unchanged in v0.3.3; only gameplay music is replaced.
 - UI selects music after processing input, so start/back changes take effect in
   the same update. Pause/results remain on the match track, as before.
 - Switching scenes pauses the old player before the new one may play. No music
-  overlap. Both players retain position: repeated lobby visits do not restart
-  the opening of Badinerie. Since v0.3.4, an explicit round **Restart** instead
-  pauses and rewinds only the match track. Normal Resume does not rewind.
+  overlap. Repeated lobby visits do not restart Badinerie. Since v0.3.5,
+  fresh matches from the lobby alternate G1/G2 and start the selected track at
+  its beginning. **Restart** rewinds that same selection without advancing the
+  playlist. Normal Resume does not rewind.
   Restart while muted/music-off still resets the position, but remains silent
   until playback is permitted; the lobby track and all settings are unchanged.
 - Master mute and the independent MUSIC ON/OFF setting persist across scenes.

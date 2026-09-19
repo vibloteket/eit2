@@ -1,6 +1,6 @@
 # Music and audio source audit
 
-Reviewed **2026-09-17** for v0.3.3 (Badinerie audit retained from v0.3.2). This record distinguishes public-domain music,
+Reviewed **2026-09-19** for v0.3.5 (Badinerie audit retained from v0.3.2). This record distinguishes public-domain music,
 sample-library permissions, project-created work, and modern reference files.
 It is not a claim that every file found online is freely licensed.
 
@@ -72,14 +72,18 @@ Library: **VS Chamber Orchestra 2, Community Edition (VSCO2 CE)**.
 - Pinned revision: `6dd651d55dde97fd4028699be9d4481f26917891` (2019-01-17).
 - License: **CC0 1.0 Universal**. Full text: `LICENSES/CC0-1.0-VSCO2.txt`.
 - Used mappings: `FluteStac.sfz` and `CelloEnsPizz.sfz`.
-- **12 WAV samples** across both tracks, not the whole orchestra library.
-  Badinerie uses all12; Beethoven uses an11-sample subset of the same source set.
+- **13 distinct WAV samples** across three tracks, not the whole library.
+  Badinerie uses12, G1 uses11, and G2 uses12 (including one additional low cello sample).
 
 All12 used samples, both mappings, README author credits and LICENSE were
 fetched from that exact revision. Their bytes match the development copies.
 `music/badinerie/sample-sources.json` records all16 source URLs, sizes and
 SHA-256 hashes. The renderer verifies hashes before using cached/downloaded
 files. A mismatch fails rather than silently changing the music.
+
+G2 adds only `Strings/Cello Section/pizzT/pizzT_C1_v1_RR1.wav` from the same
+pinned CC0 revision. Its hash and the full G2 input set are recorded in
+`music/beethoven/sample-sources-g2.json`; no other sample library is introduced.
 
 CC0 does not require attribution, but the creators are credited voluntarily in
 the game and `CREDITS.md`. No third-party recording credit is required for this
@@ -104,7 +108,7 @@ Mutopia transcription, not an unlicensed commercial MIDI performance.
   are bundled under `music/beethoven/sources/mutopia/`. Source URLs and SHA-256
   hashes are recorded in `music/beethoven/sources.json`.
 
-The selected project arrangement is **G1 at126BPM**, not the earlier144BPM test.
+The first project arrangement is **G1 at126BPM**, not the earlier144BPM test.
 It uses bars1–56: A=1–24, B=25–56, with AABB repeats for224 quarter-note beats
 and106.66667 seconds (~1:47). It is an arranged excerpt, not the entire work.
 The final outgoing D pickup is omitted to close on G before the loop repeats.
@@ -124,6 +128,30 @@ The selected PCM file is reproduced **unchanged**, including the B2 low-flute
 volume is lower than the lobby track (`.08` versus `.16`, effects remain`.36`).
 This leaves a measured RMS margin above4dB for drop/line/four-line/attack cues;
 that is a signal-level check, not a universal perceptual guarantee.
+
+### Additional gameplay loop G2 (v0.3.5)
+
+G2 uses different, previously unused sections of the **same Beethoven work**:
+unfolded source beats112–314 (written bars57–128 with the source repeats).
+It does not reuse G1's source range0–112 and is not a tempo-only variant of G1.
+The G-minor episodes, varied return and E-major episode create a contrasting
+loop; the final D harmony resolves to the G-minor opening. No new composition
+or external arrangement is claimed.
+
+G2 runs at112BPM,202 beats,108.21429 seconds. It uses the same relative mix,
+articulations and reduction algorithm as G1;83 low RH figures use the pluck.
+The new master is leveled close to G1 with peak headroom, and playback remains
+at.08. The existing G1 and Badinerie WAVs are unchanged.
+
+
+Every new match started from the lobby alternates G1/G2 (G1 first); each starts
+at its beginning. Restart resets the current selection without advancing the
+playlist. Returning to Credits/lobby still preserves Badinerie's position.
+
+The same explicitly public-domain Mutopia inputs are used. Run
+`bun scripts/music/check-beethoven.ts --g2` to reproduce the504 lead events
+and accompaniment in `music/beethoven/score-g2.json`. Source hashes, waveform
+hashes, note ranges and loop boundaries are verified before publication.
 
 ## 4. Sound effects and historical procedural music
 
@@ -164,7 +192,7 @@ make music
 ```
 
 This fetches only declared, pinned CC0 sources into ignored `.tmp/music-sources`,
-verifies their SHA-256 hashes, renders both documented scores and checks the
+verifies their SHA-256 hashes, renders all three documented tracks and checks the
 approved output hashes **before replacing each game asset**. It requires no
 workspace notes, earlier preview files or secret keys. The Beethoven score/MIDI
 inputs are public-domain files bundled in this repository.
@@ -176,18 +204,21 @@ Listening exports and render reports are written to `dist/audio/`.
   `42874174f2c9f863f0b821f104b7e9efbbfef199819162d5af0ad2b9451bafef`
 - Beethoven gameplay loop SHA-256:
   `52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`
-- Beethoven listening preview SHA-256:
+- Beethoven G1 listening preview SHA-256:
   `63f4791ddfe446b2b2c10451fbb8b723a471facf46a1bd377e1917587a2f824a`
+- Beethoven G2 loop SHA-256:
+  `dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c`
 
 ```sh
 go run ./scripts/generate-audio .tmp/regenerated-effects
 bun scripts/music/check-melody.ts
 bun scripts/music/check-beethoven.ts
+bun scripts/music/check-beethoven.ts --g2
 make check
 ```
 
 `make check` validates embedded assets and scene controls; the CI music step
-also reproduces both music WAVs and checks for any diff. A different math/runtime
+also reproduces all three music WAVs and checks for any diff. A different math/runtime
 implementation could change PCM rounding; do not bypass a failed output-hash
 check without reviewing it.
 

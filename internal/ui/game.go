@@ -131,6 +131,8 @@ type Game struct {
 	pausedAt            time.Time
 	pausedDuration      time.Duration
 	round               int
+	matchMusic          sound.MusicTrack
+	nextMatchMusic      int
 	winnerSoundPlayed   bool
 }
 
@@ -167,7 +169,7 @@ func (g *Game) Update() error {
 	if g.sound != nil {
 		// Select after processing input so start/back transitions change music
 		// in this update, without briefly playing both scene tracks.
-		g.sound.SetMusicTrack(g.view.musicTrack())
+		g.sound.SetMusicTrack(g.selectedMusicTrack())
 		g.sound.Update()
 	}
 	return nil
@@ -387,11 +389,23 @@ func (g *Game) activateLobbyMenu(index int) bool {
 	return false
 }
 
+var gameplayMusicOrder = [...]sound.MusicTrack{sound.MatchMusic, sound.MatchMusicG2}
+
+func (g *Game) selectedMusicTrack() sound.MusicTrack {
+	if g.view == viewPlay && g.matchMusic == sound.MatchMusicG2 {
+		return sound.MatchMusicG2
+	}
+	return g.view.musicTrack()
+}
+
 func (g *Game) start() {
-	if g.view == viewPlay {
+	newMatch := g.view != viewPlay
+	if !newMatch {
 		g.round++
 	} else {
 		g.round = 1
+		g.matchMusic = gameplayMusicOrder[g.nextMatchMusic]
+		g.nextMatchMusic = (g.nextMatchMusic + 1) % len(gameplayMusicOrder)
 	}
 	g.match = matchcore.NewSeeded(len(g.Lobby.Slots), uint64(time.Now().UnixNano()))
 	g.players = g.match.Players
@@ -406,12 +420,15 @@ func (g *Game) start() {
 	clear(g.heldActions)
 	clear(g.padHeld)
 	g.view = viewPlay
+	if newMatch && g.sound != nil {
+		g.soundError = g.sound.RestartMusic(g.selectedMusicTrack())
+	}
 }
 
 func (g *Game) restart() {
 	g.start()
 	if g.sound != nil {
-		g.soundError = g.sound.RestartMusic(sound.MatchMusic)
+		g.soundError = g.sound.RestartMusic(g.selectedMusicTrack())
 	}
 }
 

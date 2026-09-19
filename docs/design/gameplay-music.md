@@ -1,10 +1,28 @@
-# Gameplay music — Beethoven G1, v0.3.3
+# Gameplay music — Beethoven G1 and G2
 
 Selected by the user after comparing144BPM and126BPM. The106.67-second126BPM
 loop replaces Wooden Bounce in matches. Badinerie remains unchanged in the
 lobby and the full-screen Credits view.
 
-## Exact audio and source
+## Additional G2 loop (v0.3.5)
+
+G2 uses previously unused source beats112–314 of the same PD Beethoven work,
+not a new composition. The G-minor and E-major episodes give it a contrasting
+character. At112BPM its202 beats last108.21429s. G1 stays unchanged at126BPM.
+Both share the light flute/pizzicato/pluck palette and similar mastered levels;
+G2 adds only the lowest CC0 cello pizzicato region from the same pinned library.
+
+New matches from the lobby alternate G1/G2, starting with G1 after launch.
+Restart resets the current choice without advancing. Credits/lobby keep Bach.
+This deterministic playlist does not consume the gameplay RNG. The loop is
+built from source repeats and varied episodes, not copies of G1.
+
+`render-beethoven-g2.ts` reproduces the new asset; `check-beethoven.ts --g2`
+checks its504 lead events and source reduction. Raw PCM is deliberately retained
+for verified fidelity/looping; a future compressed/streamed format requires its
+own tests. The additional track increases the web download size.
+
+## G1 audio and source
 
 - Asset: `internal/sound/audio/gameplay-beethoven.wav`.
 - SHA-256: `52285ceff9158e6fb683af7c25d58c898344e5a1c4f6532e7dcd0a8e9ea3470a`.
@@ -31,7 +49,8 @@ claim that every possible busy multiplayer mix has been subjectively auditioned.
 
 Scene switching, pause/results behavior, mute/music-off and browser interaction
 gating reuse the established manager. Since v0.3.4, explicit Restart resets
-match music to its beginning; Resume and ordinary scene selection do not.
+match music to its beginning; Resume does not. Since v0.3.5 a fresh match
+explicitly starts the next selection from its beginning.
 Restart cannot unmute or enable music, and it does not reset the lobby track.
 No new controls or automatic ducking were added.
 

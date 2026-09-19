@@ -49,18 +49,21 @@ type MusicTrack uint8
 const (
 	LobbyMusic MusicTrack = iota
 	MatchMusic
+	MatchMusicG2
 )
 
 var musicFilenames = map[MusicTrack]string{
-	LobbyMusic: "lobby-badinerie.wav",
-	MatchMusic: "gameplay-beethoven.wav",
+	LobbyMusic:   "lobby-badinerie.wav",
+	MatchMusic:   "gameplay-beethoven.wav",
+	MatchMusicG2: "gameplay-beethoven-g2.wav",
 }
 
 // The gameplay track is mastered much louder than the former procedural loop.
 // Keep the selected PCM unchanged, but leave room for lock/drop/line/attack cues.
 var musicVolumes = map[MusicTrack]float64{
-	LobbyMusic: .16,
-	MatchMusic: .08,
+	LobbyMusic:   .16,
+	MatchMusic:   .08,
+	MatchMusicG2: .08,
 }
 
 // Keep playback control testable without opening an audio device.
@@ -112,7 +115,7 @@ func New() (*Manager, error) {
 		}
 		manager.pcm[effect] = pcm
 	}
-	for _, track := range []MusicTrack{LobbyMusic, MatchMusic} {
+	for _, track := range []MusicTrack{LobbyMusic, MatchMusic, MatchMusicG2} {
 		filename := musicFilenames[track]
 		musicWAV, err := files.ReadFile("audio/" + filename)
 		if err != nil {

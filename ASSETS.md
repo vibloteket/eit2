@@ -13,6 +13,7 @@ Assets and sources:
 | Fourteen Doodle Party WAV effects | Generated specifically for Eit 2 by `scripts/generate-audio` | AGPL-3.0-or-later |
 | `internal/sound/audio/gameplay-beethoven.wav` | Beethoven, Op.129; project G1 arrangement at126BPM from Mutopia item498, with VSCO 2 CE samples and original pluck | Public-domain composition/transcription; CC0-1.0 samples; project contributions AGPL-3.0-or-later. |
 | `internal/sound/audio/lobby-badinerie.wav` | J.S. Bach, BWV 1067/VII; project B2 rendering with VSCO 2 CE flute/cello and original synthetic pluck | Public-domain composition; CC0-1.0 samples; project contributions AGPL-3.0-or-later. See the source audit below. |
+| `internal/sound/audio/gameplay-beethoven-g2.wav` | Another section of the same PD Beethoven/Mutopia work, G2 at112BPM | Public-domain score; same CC0 library; project contributions AGPL-3.0-or-later. |
 
 The generated audio is 44.1 kHz, 16-bit stereo PCM WAV. The effects cover menu
 focus/selection, join/leave, rotate, lock, hard drop, line and four-line clears,
@@ -41,7 +42,7 @@ The source audit is in [MUSIC-SOURCES.md](MUSIC-SOURCES.md), with credits in
 
 The reproducible source bundle is now in `music/badinerie/` and
 `scripts/music/render-badinerie.ts`; it has no private workspace dependency.
-Use `make music` to fetch verified sources and reproduce both approved loops.
+Use `make music` to fetch verified sources and reproduce all three music loops.
 The audit does not grant rights to the modern reference repositories or imply
 that their score files are CC0; only the pre-existing melody is retained.
 
@@ -62,6 +63,11 @@ piano-to-gameplay reduction. No external performance recording is used.
 `scripts/music/check-beethoven.ts` verifies the source hashes, rights statement
 and derived notes. Runtime playback volume is separately set to`.08` for
 match-effect headroom; the lobby remains`.16` and effects`.36`.
+
+G2 adds a second match loop using source beats112–314 at112BPM,108.21429s.
+Its SHA-256 is `dcce479a4a5dd5b521e4eded4ff3247ee5e9ac4b2c0345082ebd8d66a1ed520c`.
+Its checked score/config are in `music/beethoven/*-g2.json`; one extra CC0
+cello sample is declared in its source manifest. G1 and the lobby are unchanged.
 
 Before adding an asset, record its author, source URL, exact license and any
 required attribution here. Do not copy legacy Eit assets whose rights or source

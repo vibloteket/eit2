@@ -37,3 +37,37 @@ func TestPauseAndGameOverRestartUseCommonRestartPath(t *testing.T) {
 		t.Fatal("game-over Restart did not use the same restart path")
 	}
 }
+
+func TestNewMatchesAlternateButRestartKeepsTrack(t *testing.T) {
+	g := Game{view: viewLobby}
+	g.Lobby.Join(lobby.Device{Kind: lobby.DeviceTouch, Name: "test"})
+	g.start()
+	if g.selectedMusicTrack() != sound.MatchMusic {
+		t.Fatal("first match must use G1")
+	}
+	g.restart()
+	if g.selectedMusicTrack() != sound.MatchMusic || g.nextMatchMusic != 1 {
+		t.Fatal("Restart must not advance playlist")
+	}
+	g.backToLobby()
+	if g.selectedMusicTrack() != sound.LobbyMusic {
+		t.Fatal("lobby music changed")
+	}
+	g.start()
+	if g.selectedMusicTrack() != sound.MatchMusicG2 {
+		t.Fatal("second new match must use G2")
+	}
+	g.restart()
+	if g.selectedMusicTrack() != sound.MatchMusicG2 || g.nextMatchMusic != 0 {
+		t.Fatal("G2 Restart must keep G2")
+	}
+	g.openCredits()
+	if g.selectedMusicTrack() != sound.LobbyMusic {
+		t.Fatal("Credits must keep Badinerie")
+	}
+	g.closeCredits()
+	g.start()
+	if g.selectedMusicTrack() != sound.MatchMusic {
+		t.Fatal("playlist must wrap to G1")
+	}
+}

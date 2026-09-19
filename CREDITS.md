@@ -15,7 +15,7 @@ Source: <https://github.com/vibloteket/eit2>
 - **Match composition:** Ludwig van Beethoven, *Rondo a capriccio*, Op.129
   (*Rage Over a Lost Penny*). Public-domain composition.
 - **Arrangements and rendering:** Eit 2 project, full Badinerie B2 and the
-  Beethoven G1 gameplay arrangement at126BPM. These are our generated
+  Beethoven gameplay arrangements G1 at126BPM and G2 at112BPM. These are our generated
   performances, not recordings by an external orchestra or pianist.
 - **Beethoven score:** [Mutopia Project, item498](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=498),
   typeset by **Magnus Lewis-Smith**, with a2015 LilyPond update by

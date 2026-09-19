@@ -257,3 +257,33 @@ func TestGameplayInfiniteLoopCanRewindToExactOpening(t *testing.T) {
 		t.Fatal("rewound loop differs from the opening PCM")
 	}
 }
+
+func TestSecondGameplayTrackSwitchAndRestart(t *testing.T) {
+	m, lobby, first := musicTestManager()
+	second := &fakeMusicPlayer{position: 500}
+	m.music[MatchMusicG2] = second
+	m.SetMusicTrack(MatchMusic)
+	m.updateMusic(true)
+	first.position = 123
+	m.SetMusicTrack(MatchMusicG2)
+	m.updateMusic(true)
+	if first.playing || lobby.playing || !second.playing {
+		t.Fatal("only G2 should play")
+	}
+	if err := m.RestartMusic(MatchMusicG2); err != nil {
+		t.Fatal(err)
+	}
+	if second.position != 0 || second.rewinds != 1 || first.position != 123 || first.rewinds != 0 {
+		t.Fatal("Restart must reset only selected G2")
+	}
+	m.ToggleMusic()
+	m.updateMusic(true)
+	if second.playing {
+		t.Fatal("music-off must gate G2")
+	}
+	m.ToggleMusic()
+	m.updateMusic(true)
+	if !second.playing || first.playing {
+		t.Fatal("G2 must resume alone")
+	}
+}
