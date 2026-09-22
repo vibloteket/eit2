@@ -72,8 +72,13 @@
       "file": "lock.wav",
       "sha256": "9886fef165d61d1c99730083885a68fee3e4f87ebfb6fd37754cc72570ea61bf",
       "reproduced": true
+    },
+    {
+      "file": "count-in.wav",
+      "sha256": "730975881a6b799445bb6b3bf86e587341840bf7f63e9a34ac4252c1e75b82e8",
+      "reproduced": true
     }
   ],
-  "generatorSHA256": "cab982384f470bae8c8c95765e98d047ee01f4aa9a6f1b6083abeb74daccf0dd",
+  "generatorSHA256": "f8d7eb7ba08142d36611ae93a981bb452321328d58042c3bab5aa49ef20f13ed",
   "legacyMusic": "Wooden Bounce is not embedded; generate with -legacy-music into a separate directory if needed."
 }

@@ -134,6 +134,10 @@ type Game struct {
 	matchMusic          sound.MusicTrack
 	nextMatchMusic      int
 	winnerSoundPlayed   bool
+	countIn             countInState
+	countDownKeys       map[ebiten.Key]bool
+	countTouches        map[ebiten.TouchID]bool
+	countPads           map[int]bool
 }
 
 func NewGame() *Game {
@@ -170,6 +174,7 @@ func (g *Game) Update() error {
 		// Select after processing input so start/back transitions change music
 		// in this update, without briefly playing both scene tracks.
 		g.sound.SetMusicTrack(g.selectedMusicTrack())
+		g.sound.SetMusicSuspended(g.view == viewPlay && g.countIn.active)
 		g.sound.Update()
 	}
 	return nil
@@ -417,26 +422,30 @@ func (g *Game) start() {
 	g.debugOpen = false
 	g.debugPlayer = 0
 	g.disconnectedPlayer = -1
-	g.matchStarted = time.Now()
+	g.matchStarted = time.Time{}
 	g.pausedAt = time.Time{}
 	g.pausedDuration = 0
 	g.winnerSoundPlayed = false
 	clear(g.heldActions)
 	clear(g.padHeld)
 	g.view = viewPlay
-	if newMatch && g.sound != nil {
+	g.countIn = countInState{active: true}
+	clear(g.countDownKeys)
+	clear(g.countTouches)
+	clear(g.countPads)
+	if g.sound != nil {
+		g.sound.SetMusicSuspended(true)
 		g.soundError = g.sound.RestartMusic(g.selectedMusicTrack())
 	}
+	g.updateCountIn() // First visible preparation beat belongs to this start update.
 }
 
 func (g *Game) restart() {
 	g.start()
-	if g.sound != nil {
-		g.soundError = g.sound.RestartMusic(g.selectedMusicTrack())
-	}
 }
 
 func (g *Game) backToLobby() {
+	g.countIn = countInState{}
 	g.paused = false
 	clear(g.heldActions)
 	g.view = viewLobby
@@ -444,6 +453,7 @@ func (g *Game) backToLobby() {
 
 func (g *Game) updatePlay() {
 	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
+	g.releaseCountInTouches()
 	g.updateControllerConnections()
 	if len(g.players) == 0 {
 		return
@@ -493,8 +503,15 @@ func (g *Game) updatePlay() {
 	}
 	if g.paused || soloGameOver || matchOver {
 		gameOver := soloGameOver || matchOver
+		previousMatch := g.match
 		g.updateOverlayKeyboard(gameOver)
+		if g.view != viewPlay || g.match != previousMatch {
+			return
+		}
 		g.updateOverlayGamepads(gameOver)
+		if g.view != viewPlay || g.match != previousMatch {
+			return
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		g.setPaused(!g.paused)
@@ -504,6 +521,12 @@ func (g *Game) updatePlay() {
 	if g.paused || soloGameOver || matchOver {
 		return
 	}
+	if g.countIn.active {
+		g.consumeCountInInputs()
+	}
+	if g.updateCountIn() {
+		return // Includes GO: no buffered control can act in the starting update.
+	}
 	g.updateKeyboards()
 	g.updateSingleKeyboardAliases()
 	touchPlayer := g.playerForDevice(lobby.DeviceTouch)
@@ -512,6 +535,9 @@ func (g *Game) updatePlay() {
 	}
 	activeActions := make(map[action]bool)
 	for _, id := range g.touchIDs {
+		if g.touchBlockedByCountIn(id) {
+			continue
+		}
 		x, y := ebiten.TouchPosition(id)
 		for _, control := range touchButtons() {
 			if control.Rect.contains(x, y) {
@@ -631,7 +657,8 @@ func (g *Game) updateKeyboardLayout(playerIndex, layoutID int) {
 	if inpututil.IsKeyJustPressed(layout.Right) {
 		player.MoveInput(1)
 	}
-	if ebiten.IsKeyPressed(layout.Down) && ebiten.Tick()%2 == 0 {
+	downHeld := ebiten.IsKeyPressed(layout.Down)
+	if !g.blockDownUntilReleased(layout.Down, downHeld) && downHeld && ebiten.Tick()%2 == 0 {
 		player.StepDown()
 	}
 	if inpututil.IsKeyJustPressed(layout.RotateCCW) {
@@ -683,6 +710,9 @@ func (g *Game) updateGamepads() {
 			clear(g.padHeld)
 		}
 		if g.paused || (g.match != nil && g.match.Over) {
+			continue
+		}
+		if g.countInBlocksPad(playerIndex, id) {
 			continue
 		}
 		xAxis := ebiten.StandardGamepadAxisValue(id, ebiten.StandardGamepadAxisLeftStickHorizontal)
@@ -785,6 +815,7 @@ func (g *Game) setPaused(paused bool) {
 		return
 	}
 	g.paused = paused
+	g.countIn.last = time.Now() // Paused time never advances the preparation.
 	if paused {
 		g.pausedAt = time.Now()
 	} else if !g.pausedAt.IsZero() {
@@ -906,7 +937,7 @@ func (g *Game) handlePlayMenuPointer(x, y int, gameOver bool) bool {
 		}
 		return true // The modal menu consumes all pointer input.
 	}
-	if g.debugEnabled && debugPlayButton().contains(x, y) {
+	if g.debugEnabled && !g.countIn.active && debugPlayButton().contains(x, y) {
 		g.debugOpen = true
 		g.debugFocus = 0
 		clear(g.heldActions)
@@ -1251,6 +1282,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	}
 	if len(g.players) > 1 {
 		g.drawCouch(screen)
+		g.drawCountIn(screen)
 		g.drawMatchOverlay(screen)
 		g.drawDebugPanel(screen)
 		return
@@ -1330,6 +1362,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 		drawControlIcon(screen, control, g.face(22), fill)
 	}
 
+	g.drawCountIn(screen)
 	g.drawMatchOverlay(screen)
 	g.drawDebugPanel(screen)
 }

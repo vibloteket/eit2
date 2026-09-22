@@ -306,6 +306,7 @@ try {
   await audioCheck("unmute", true);
   await key("1");
   await click(640, 580);
+  await page.waitForTimeout(3200); // Let the musical count-in finish.
   await audioCheck("match track", true);
   // Capture a real hard drop while the new background track is playing.
   // Keyboard layout 1 uses Left Shift for drop. The music-only peak is below
@@ -338,6 +339,7 @@ try {
   await key("Escape");
   await key("ArrowDown");
   await key("Enter"); // Pause menu: Restart.
+  await page.waitForTimeout(3200);
   await audioCheck("match music playing after Restart", true);
   checks.push("pause-menu Restart resumes match playback");
   await key("Escape");
@@ -353,9 +355,11 @@ try {
   await click(510, 660);
   await audioCheck("music off before restart test", false);
   await click(640, 580);
+  await page.waitForTimeout(3200); // Let the musical count-in finish.
   await key("Escape");
   await key("ArrowDown");
   await key("Enter");
+  await page.waitForTimeout(3200);
   await audioCheck("Restart respects music off", false);
   checks.push("Restart does not enable disabled music");
   await key("Escape");
@@ -367,21 +371,26 @@ try {
 
   // A then B were selected above. Exercise C, D, A and B with audio enabled.
   // Restart must preserve each selection, and the four-track playlist wraps.
-  for (const name of ["Bach sonata C", "Vivaldi D", "Bourrees A after playlist wrap", "Handel B"]) {
+  for (const name of [
+    "Bach sonata C",
+    "Vivaldi D",
+    "Bourrees A after playlist wrap",
+    "Handel B",
+  ]) {
     await click(640, 580);
+    await page.waitForTimeout(3200); // Let the musical count-in finish.
     await audioCheck(name, true);
     await key("Escape");
     await key("ArrowDown");
     await key("Enter");
+    await page.waitForTimeout(3200);
     await audioCheck(name + " after Restart", true);
     await key("Escape");
     await key("ArrowDown");
     await key("ArrowDown");
     await key("Enter");
   }
-  checks.push(
-    "four-track new-match playlist and same-track Restart exercised",
-  );
+  checks.push("four-track new-match playlist and same-track Restart exercised");
   await audioCheck("unchanged lobby after four-track rotation", true);
 
   for (const path of [

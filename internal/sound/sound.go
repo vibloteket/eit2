@@ -16,6 +16,7 @@ const effectVolume = .36
 type Effect string
 
 const (
+	CountIn    Effect = "count-in"
 	MenuFocus  Effect = "menu-focus"
 	MenuSelect Effect = "menu-select"
 	Join       Effect = "join"
@@ -36,6 +37,7 @@ const (
 var files embed.FS
 
 var filenames = map[Effect]string{
+	CountIn:   "count-in.wav",
 	MenuFocus: "menu-focus.wav", MenuSelect: "menu-select.wav",
 	Join: "join.wav", Leave: "leave.wav", Rotate: "rotate.wav",
 	Lock: "lock.wav", HardDrop: "hard-drop.wav", Line: "line.wav",
@@ -81,14 +83,15 @@ type musicPlayer interface {
 }
 
 type Manager struct {
-	context      *audio.Context
-	pcm          map[Effect][]byte
-	players      map[Effect][]*audio.Player
-	music        map[MusicTrack]musicPlayer
-	musicTrack   MusicTrack
-	muted        bool
-	musicEnabled bool
-	mu           sync.Mutex
+	context        *audio.Context
+	pcm            map[Effect][]byte
+	players        map[Effect][]*audio.Player
+	music          map[MusicTrack]musicPlayer
+	musicTrack     MusicTrack
+	muted          bool
+	musicEnabled   bool
+	musicSuspended bool
+	mu             sync.Mutex
 }
 
 func New() (*Manager, error) {
@@ -204,13 +207,25 @@ func (m *Manager) pauseMusic() {
 	}
 }
 
+// SetMusicSuspended is a temporary presentation gate, not a user preference.
+// Effects (including preparation clicks) retain their normal mute/readiness rules.
+func (m *Manager) SetMusicSuspended(suspended bool) {
+	if m == nil || m.musicSuspended == suspended {
+		return
+	}
+	m.musicSuspended = suspended
+	if suspended {
+		m.pauseMusic()
+	}
+}
+
 // Update starts music once the platform audio context becomes ready. Browsers
 // normally reach this state after the first user interaction.
 func (m *Manager) Update() { m.updateMusic(m.Ready()) }
 
 func (m *Manager) updateMusic(ready bool) {
 	player := m.activeMusic()
-	if player == nil || m.muted || !m.musicEnabled || !ready || player.IsPlaying() {
+	if player == nil || m.muted || !m.musicEnabled || m.musicSuspended || !ready || player.IsPlaying() {
 		return
 	}
 	player.Play()

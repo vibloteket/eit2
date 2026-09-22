@@ -1,6 +1,11 @@
 {
   "private": true,
   "type": "module",
-  "scripts": { "test": "bun smoke.ts" },
-  "devDependencies": { "playwright": "1.63.0" }
+  "scripts": {
+    "test": "bun smoke.ts && bun countin.ts"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0"
+  }
 }

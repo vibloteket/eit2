@@ -10,13 +10,14 @@ Assets and sources:
 | Favicon and retained favicon concepts | Created for Eit 2 | AGPL-3.0-or-later |
 | Generated game graphics | Drawn in code | AGPL-3.0-or-later |
 | Go Regular font embedded through `golang.org/x/image/font/gofont/goregular` | The Go Authors | BSD 3-Clause |
-| Fourteen Doodle Party WAV effects | Generated specifically for Eit 2 by `scripts/generate-audio` | AGPL-3.0-or-later |
+| Fifteen Doodle Party WAV effects | Generated specifically for Eit 2 by `scripts/generate-audio` | AGPL-3.0-or-later |
 | `internal/sound/audio/lobby-badinerie.wav` | J.S. Bach, BWV 1067/VII; project B2 rendering with VSCO 2 CE flute/cello and original synthetic pluck | Public-domain composition; CC0-1.0 samples; project contributions AGPL-3.0-or-later. See the source audit below. |
 | `internal/sound/audio/gameplay-*.wav` (four loops) | Bach BWV1067 Bourrées and BWV1035 II; Handel HWV369 IV; Vivaldi RV428 III; project arrangements of public-domain historical material | Public-domain music; CC0-1.0 samples; project contributions AGPL-3.0-or-later. See MUSIC-SOURCES.md for historical-source and pilot-license distinctions. |
 
 The generated audio is 44.1 kHz, 16-bit stereo PCM WAV. The effects cover menu
 focus/selection, join/leave, rotate, lock, hard drop, line and four-line clears,
-special pickup, incoming attack, Antidote, game over and winner. They combine
+special pickup, incoming attack, Antidote, game over, winner and the new
+count-in tap. They combine
 procedural mallet, wood, bell, pop and noise layers to match the hand-made
 Doodle Party theme. The source parameters are kept in `scripts/generate-audio`
 so those generated files are reproducible and project-owned. The former
@@ -37,7 +38,7 @@ The source audit is in [MUSIC-SOURCES.md](MUSIC-SOURCES.md), with credits in
 - the exclusion of unlicensed modern score files, added arrangements and recordings;
 - all12 CC0 samples, mapping files, author credits and pinned upstream hashes;
 - project-created accompaniment, performance and synthetic pluck;
-- byte-exact regeneration of the lobby loop and all14 procedural effects.
+- byte-exact regeneration of the lobby loop and the original14 procedural effects.
 
 The reproducible source bundle is now in `music/badinerie/` and
 `scripts/music/render-badinerie.ts`; it has no private workspace dependency.
@@ -55,7 +56,8 @@ File identities, hashes, score/source snapshots and audits are in
 The four arrangements retain the approved light flute/pizzicato/pluck sound,
 with sustained flute for long notes and continuous quiet backing. Release tails
 and ambience wrap without silence/fades. They replace Beethoven G1/G2; lobby
-Badinerie and all14 effects are unchanged. Runtime levels remain gameplay.08,
+Badinerie and the original14 effects are unchanged; v0.3.7 adds one new count-in
+effect without altering them. Runtime levels remain gameplay.08,
 lobby.16 and effects.36. Restart preserves the current track; fresh matches
 cycle through the four in order.
 
@@ -68,6 +70,15 @@ in MUSIC-SOURCES.md and the source audits.
 Historical Beethoven sources and their original notices remain in
 `music/beethoven/`, but its WAVs are no longer embedded. Optional legacy
 renderers write to `dist/audio/legacy/` only.
+
+## Count-in click and baton (v0.3.7)
+
+`count-in.wav` is a new55ms project-generated wooden tap with a small noise
+transient, made by `scripts/generate-audio/main.go`. No recording is imported.
+It is played three times before a fresh match or Restart. The baton, stand and
+three visible markers are drawn in Go, not imported artwork. These project
+contributions use AGPL-3.0-or-later where copyright applies. The effect hash and
+updated generator hash are in `music/procedural-audio-audit.json`.
 
 Before adding an asset, record its author, source URL, exact license and any
 required attribution here. Do not copy legacy Eit assets whose rights or source

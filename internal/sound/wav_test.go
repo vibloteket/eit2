@@ -59,7 +59,7 @@ func TestLobbyLoopIsSelectedFullCorrectedVersion(t *testing.T) {
 
 func TestEffectSetIsComplete(t *testing.T) {
 	for _, effect := range []Effect{
-		MenuFocus, MenuSelect, Join, Leave, Rotate, Lock, HardDrop,
+		CountIn, MenuFocus, MenuSelect, Join, Leave, Rotate, Lock, HardDrop,
 		Line, FourLine, Pickup, Attack, Antidote, GameOver, Winner,
 	} {
 		if filenames[effect] == "" {
@@ -94,8 +94,8 @@ func TestAllAudioMatchesSourceAudit(t *testing.T) {
 	for _, filename := range musicFilenames {
 		known[filename] = true
 	}
-	if len(audit.Files) != 14 {
-		t.Fatalf("procedural audit contains %d files, want 14", len(audit.Files))
+	if len(audit.Files) != 15 {
+		t.Fatalf("procedural audit contains %d files, want 15", len(audit.Files))
 	}
 	for _, entry := range audit.Files {
 		b, err := files.ReadFile("audio/" + entry.File)

@@ -47,6 +47,8 @@ This initial technical spike proves the project structure and its first targets:
 - short project-owned WAV effects, a full Badinerie lobby loop and separate
   four Bach/Handel/Vivaldi match loops, cycling on new matches from the lobby,
   with persistent Mute/Music controls and Restart replaying the same track;
+- a short musical count-in before new matches and Restart: three wooden taps,
+  visible baton beats, then simultaneous game/music start; no new count on Resume;
 - a dedicated Credits screen opened from the lobby, with any fresh key, button,
   click or tap returning to the lobby without changing players or audio;
 - reproducible audio sources, pinned CC0 sample hashes and a documented

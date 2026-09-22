@@ -83,3 +83,11 @@ source/signal audit after rendering.
 
 Legacy Beethoven renderers are optional historical tools and now write their
 loop WAVs to `dist/audio/legacy/`, not to embedded game audio.
+
+## Start preparation (v0.3.7)
+
+New matches and Restart now include the brief musical preparation documented
+in `count-in.md`. Music is rewound but temporarily held while boards wait;
+the downbeat releases music and simulation in the same update. Normal Resume
+does not introduce a new count-in. The five music WAVs and their levels remain
+unchanged; one separately generated wooden-tap effect is added.

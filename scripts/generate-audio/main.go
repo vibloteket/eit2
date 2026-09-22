@@ -1,4 +1,4 @@
-// Command generate-audio creates the project's 14 WAV effects.
+// Command generate-audio creates the project's 15 WAV effects.
 // The former Wooden Bounce track is retained as an opt-in historical export.
 package main
 
@@ -20,6 +20,7 @@ type tone struct {
 }
 
 var effects = map[string][]tone{
+	"count-in.wav":    {{0, .055, 1180, .20, "wood"}, {0, .012, 2400, .025, "noise"}},
 	"menu-focus.wav":  {{0, .055, 740, .13, "wood"}},
 	"menu-select.wav": {{0, .07, 520, .18, "wood"}, {.045, .10, 780, .13, "mallet"}},
 	"join.wav":        {{0, .08, 392, .17, "mallet"}, {.07, .10, 523, .18, "mallet"}, {.15, .15, 659, .16, "mallet"}},
