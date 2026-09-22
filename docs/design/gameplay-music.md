@@ -91,3 +91,12 @@ in `count-in.md`. Music is rewound but temporarily held while boards wait;
 the downbeat releases music and simulation in the same update. Normal Resume
 does not introduce a new count-in. The five music WAVs and their levels remain
 unchanged; one separately generated wooden-tap effect is added.
+
+## Now-playing label (v0.3.8)
+
+A small static `♪ Composer — work` label appears at the top right of the lobby
+and match views. It identifies the selected track without opening Credits and
+avoids the bottom-right touch/status areas. If music is muted or disabled, the
+same selected title is shown with `· OFF`; it does not claim audible playback.
+Credits remains the full source/license list. The label has no effect on input,
+settings, playlist order or audio state.

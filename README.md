@@ -49,6 +49,7 @@ This initial technical spike proves the project structure and its first targets:
   with persistent Mute/Music controls and Restart replaying the same track;
 - a short musical count-in before new matches and Restart: three wooden taps,
   visible baton beats, then simultaneous game/music start; no new count on Resume;
+- a subtle top-right Now playing label for the current lobby or match piece;
 - a dedicated Credits screen opened from the lobby, with any fresh key, button,
   click or tap returning to the lobby without changing players or audio;
 - reproducible audio sources, pinned CC0 sample hashes and a documented

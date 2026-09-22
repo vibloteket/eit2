@@ -132,6 +132,12 @@ try {
       ),
     ].join(",");
   const card = (img: any) => pixel(img, 458, 260) === "44,82,91";
+  const hasInk = (img: any, x0: number, y0: number, x1: number, y1: number) => {
+    for (let y = y0; y < y1; y++)
+      for (let x = x0; x < x1; x++)
+        if (pixel(img, x, y) !== "242,238,226") return true;
+    return false;
+  };
   const back = async () => {
     await key("Escape");
     await key("ArrowDown");
@@ -202,6 +208,10 @@ try {
   await key("Enter");
   const ready = await capture();
   check(card(ready), "Restart shows baton preparation");
+  check(
+    hasInk(ready, 900, 15, 1240, 45),
+    "now-playing label visible during preparation",
+  );
   await Bun.write(output + "/countin.png", PNG.sync.write(ready));
   await page.waitForTimeout(2500);
   await back();

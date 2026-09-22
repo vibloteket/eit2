@@ -1100,6 +1100,7 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 	drawPaperDoodles(screen)
 	drawText(screen, "EIT 2", g.face(64), 40, 24, accent)
 	drawText(screen, "v"+version.Value, g.face(20), 1135, 35, muted)
+	g.drawNowPlaying(screen, 62)
 	drawText(screen, "Join/leave: keys 1, 2, 3 · Any gamepad button joins, B leaves · Enter selects", g.face(21), 42, 92, white)
 	const gap, margin = 20, 40
 	width := (logicalWidth - margin*2 - gap*3) / lobby.MaxPlayers
@@ -1277,6 +1278,7 @@ func (g *Game) drawPlay(screen *ebiten.Image) {
 	screen.Fill(background)
 	drawPaperDoodles(screen)
 	g.drawMatchTitle(screen)
+	g.drawNowPlaying(screen, 20)
 	if len(g.players) == 0 {
 		return
 	}
