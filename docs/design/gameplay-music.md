@@ -96,7 +96,14 @@ unchanged; one separately generated wooden-tap effect is added.
 
 A small static `♪ Composer — work` label appears at the top right of the lobby
 and match views. It identifies the selected track without opening Credits and
-avoids the bottom-right touch/status areas. If music is muted or disabled, the
-same selected title is shown with `· OFF`; it does not claim audible playback.
-Credits remains the full source/license list. The label has no effect on input,
-settings, playlist order or audio state.
+avoids the bottom-right touch/status areas. If music is muted, disabled or set
+to 0% volume, the same selected title is shown with `· OFF`; it does not claim
+audible playback. Credits remains the full source/license list. The label has
+no effect on input, playlist order or audio state.
+
+## Settings and volume (v0.3.9)
+
+Sound, Music, session-scoped Music volume, debug tools and About/Credits live
+under the lobby's Settings button; see `settings.md`. Music volume defaults to
+100%, preserving the established lobby/match balance, and resets on application
+start until persistence is added later.

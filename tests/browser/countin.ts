@@ -106,6 +106,20 @@ try {
           .map((s) => ({ ...s, t: s.t - t })),
       t,
     );
+  const settleAudio = async () => {
+    const started = await mark();
+    for (let i = 0; i < 40; i++) {
+      await page.waitForTimeout(100);
+      const now = await mark();
+      const elapsed = now - started;
+      if (elapsed < 0.3) continue;
+      const recent = (await since(started)).filter(
+        (s) => s.t >= elapsed - 0.25,
+      );
+      if (recent.every((s) => s.rms < 0.0001)) return;
+    }
+    throw Error("Audio did not become quiet after Settings");
+  };
   const mean = (a: any[], lo: number, hi: number) => {
     const x = a.filter((v) => v.t >= lo && v.t <= hi);
     if (!x.length) throw Error("empty audio window");
@@ -145,9 +159,28 @@ try {
     await key("Enter");
     await page.waitForTimeout(350);
   };
+  const openSettings = async () => {
+    await click(640, 660);
+  };
+  const closeSettings = async () => {
+    await key("Escape");
+    await page.waitForTimeout(600); // Let the settings select effect decay.
+  };
+  const toggleMusic = async (expectQuiet = false) => {
+    await openSettings();
+    await click(640, 256);
+    await closeSettings();
+    if (expectQuiet) await settleAudio();
+  };
+  const toggleSound = async (expectQuiet = false) => {
+    await openSettings();
+    await click(640, 192);
+    await closeSettings();
+    if (expectQuiet) await settleAudio();
+  };
   await key("1");
   await page.waitForTimeout(400);
-  await click(510, 660);
+  await toggleMusic(true);
   await page.waitForTimeout(400); // Music off, effects on.
   let start = await mark();
   await page.mouse.click(640, 580, { delay: 60 });
@@ -170,7 +203,6 @@ try {
     output + "/first-trace.json",
     JSON.stringify({ onsets, samples: a }, null, 2),
   );
-  console.log("first onsets", onsets);
   check(
     onsets.length === 3,
     "three preparation clicks; no queued rotate/drop sound",
@@ -215,8 +247,8 @@ try {
   await Bun.write(output + "/countin.png", PNG.sync.write(ready));
   await page.waitForTimeout(2500);
   await back();
-  await click(510, 660);
-  await click(350, 660);
+  await toggleMusic();
+  await toggleSound(true);
   await page.waitForTimeout(350); // Music on; master mute.
   start = await mark();
   await page.mouse.click(640, 580, { delay: 50 });
@@ -230,7 +262,7 @@ try {
     "master mute silences preparation and music",
   );
   await back();
-  await click(350, 660);
+  await toggleSound();
   await page.waitForTimeout(400);
   start = await mark();
   await page.mouse.click(640, 580, { delay: 50 });

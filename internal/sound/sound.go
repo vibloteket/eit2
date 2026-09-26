@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -80,6 +81,7 @@ type musicPlayer interface {
 	IsPlaying() bool
 	Rewind() error
 	Close() error
+	SetVolume(volume float64)
 }
 
 type Manager struct {
@@ -91,6 +93,7 @@ type Manager struct {
 	muted          bool
 	musicEnabled   bool
 	musicSuspended bool
+	musicVolume    float64
 	mu             sync.Mutex
 }
 
@@ -102,6 +105,7 @@ func New() (*Manager, error) {
 	manager := &Manager{
 		context: context, pcm: make(map[Effect][]byte), players: make(map[Effect][]*audio.Player),
 		music: make(map[MusicTrack]musicPlayer), musicTrack: LobbyMusic, musicEnabled: true,
+		musicVolume: 1,
 	}
 	// If initialization fails, release any music players already created.
 	initialized := false
@@ -138,7 +142,7 @@ func New() (*Manager, error) {
 		if err != nil {
 			return nil, fmt.Errorf("create %s player: %w", filename, err)
 		}
-		player.SetVolume(musicVolumes[track])
+		player.SetVolume(musicVolumes[track] * manager.musicVolume)
 		manager.music[track] = player
 	}
 	initialized = true
@@ -156,6 +160,27 @@ func (m *Manager) ToggleMute() bool {
 }
 
 func (m *Manager) MusicEnabled() bool { return m != nil && m.musicEnabled }
+
+// MusicVolumePercent is the session-scoped user volume multiplier. It is not
+// persisted yet; 100 preserves the established per-track lobby/match balance.
+func (m *Manager) MusicVolumePercent() int {
+	if m == nil {
+		return 0
+	}
+	return int(math.Round(m.musicVolume * 100))
+}
+
+func (m *Manager) SetMusicVolumePercent(percent int) {
+	if m == nil {
+		return
+	}
+	percent = max(0, min(100, percent))
+	m.musicVolume = float64(percent) / 100
+	for track, player := range m.music {
+		player.SetVolume(musicVolumes[track] * m.musicVolume)
+	}
+}
+
 func (m *Manager) MusicPlaying() bool {
 	player := m.activeMusic()
 	return player != nil && player.IsPlaying()

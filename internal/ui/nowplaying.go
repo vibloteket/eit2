@@ -27,7 +27,7 @@ func nowPlayingLabelFor(track sound.MusicTrack, audible bool) string {
 }
 
 func (g *Game) nowPlayingLabel() string {
-	audible := g.sound != nil && !g.sound.Muted() && g.sound.MusicEnabled()
+	audible := g.sound != nil && !g.sound.Muted() && g.sound.MusicEnabled() && g.sound.MusicVolumePercent() > 0
 	return nowPlayingLabelFor(g.selectedMusicTrack(), audible)
 }
 

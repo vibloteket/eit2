@@ -51,6 +51,7 @@ type view int
 const (
 	viewLobby view = iota
 	viewPlay
+	viewSettings
 	viewCredits
 )
 
@@ -103,41 +104,43 @@ func (r imageRect) contains(x, y int) bool {
 }
 
 type Game struct {
-	Lobby               lobby.Lobby
-	gamepadIDs          []ebiten.GamepadID
-	touchIDs            []ebiten.TouchID
-	pressedIDs          []ebiten.TouchID
-	heldActions         map[action]int
-	padHeld             map[int]map[action]int
-	fontSource          *text.GoTextFaceSource
-	view                view
-	players             []*core.Game
-	match               *matchcore.Match
-	paused              bool
-	debugEnabled        bool
-	debugOpen           bool
-	debugPlayer         int
-	controllerDebugOpen bool
-	disconnectedPlayer  int
-	lobbyFocus          int
-	overlayFocus        int
-	debugFocus          int
-	stickX              map[int]int
-	stickY              map[int]int
-	sound               *sound.Manager
-	soundError          error
-	touchDevice         lobby.Device
-	matchStarted        time.Time
-	pausedAt            time.Time
-	pausedDuration      time.Duration
-	round               int
-	matchMusic          sound.MusicTrack
-	nextMatchMusic      int
-	winnerSoundPlayed   bool
-	countIn             countInState
-	countDownKeys       map[ebiten.Key]bool
-	countTouches        map[ebiten.TouchID]bool
-	countPads           map[int]bool
+	Lobby                   lobby.Lobby
+	gamepadIDs              []ebiten.GamepadID
+	touchIDs                []ebiten.TouchID
+	pressedIDs              []ebiten.TouchID
+	heldActions             map[action]int
+	padHeld                 map[int]map[action]int
+	fontSource              *text.GoTextFaceSource
+	view                    view
+	players                 []*core.Game
+	match                   *matchcore.Match
+	paused                  bool
+	debugEnabled            bool
+	debugOpen               bool
+	debugPlayer             int
+	controllerDebugOpen     bool
+	creditsReturnToSettings bool
+	disconnectedPlayer      int
+	lobbyFocus              int
+	settingsFocus           int
+	overlayFocus            int
+	debugFocus              int
+	stickX                  map[int]int
+	stickY                  map[int]int
+	sound                   *sound.Manager
+	soundError              error
+	touchDevice             lobby.Device
+	matchStarted            time.Time
+	pausedAt                time.Time
+	pausedDuration          time.Duration
+	round                   int
+	matchMusic              sound.MusicTrack
+	nextMatchMusic          int
+	winnerSoundPlayed       bool
+	countIn                 countInState
+	countDownKeys           map[ebiten.Key]bool
+	countTouches            map[ebiten.TouchID]bool
+	countPads               map[int]bool
 }
 
 func NewGame() *Game {
@@ -155,7 +158,7 @@ func NewGame() *Game {
 		stickX:             make(map[int]int),
 		stickY:             make(map[int]int),
 		disconnectedPlayer: -1,
-		lobbyFocus:         3,
+		lobbyFocus:         1,
 		touchDevice:        lobby.Device{Kind: lobby.DeviceTouch, Name: "Touch controls"},
 	}
 }
@@ -165,6 +168,8 @@ func (g *Game) Update() error {
 	if g.view == viewPlay {
 		g.updatePlay()
 		g.playAudioEvents()
+	} else if g.view == viewSettings {
+		g.updateSettings()
 	} else if g.view == viewCredits {
 		g.updateCredits()
 	} else if err := g.updateLobby(); err != nil {
@@ -325,19 +330,8 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.TouchPosition(id)
 		if !isWeb() && exitButton().contains(x, y) {
 			return ebiten.Termination
-		} else if muteButton().contains(x, y) && g.sound != nil {
-			g.sound.ToggleMute()
-		} else if musicButton().contains(x, y) && g.sound != nil {
-			g.sound.ToggleMusic()
-		} else if creditsButton().contains(x, y) {
-			g.openCredits()
-			return nil
-		} else if controllerDebugButton().contains(x, y) {
-			g.controllerDebugOpen = !g.controllerDebugOpen
-		} else if g.controllerDebugOpen {
-			g.controllerDebugOpen = false
-		} else if debugLobbyButton().contains(x, y) {
-			g.debugEnabled = !g.debugEnabled
+		} else if settingsButton().contains(x, y) {
+			g.openSettings()
 		} else if g.Lobby.CanStart() && startButton().contains(x, y) {
 			g.start()
 		} else {
@@ -348,19 +342,8 @@ func (g *Game) updateLobby() error {
 		x, y := ebiten.CursorPosition()
 		if !isWeb() && exitButton().contains(x, y) {
 			return ebiten.Termination
-		} else if muteButton().contains(x, y) && g.sound != nil {
-			g.sound.ToggleMute()
-		} else if musicButton().contains(x, y) && g.sound != nil {
-			g.sound.ToggleMusic()
-		} else if creditsButton().contains(x, y) {
-			g.openCredits()
-			return nil
-		} else if controllerDebugButton().contains(x, y) {
-			g.controllerDebugOpen = !g.controllerDebugOpen
-		} else if g.controllerDebugOpen {
-			g.controllerDebugOpen = false
-		} else if debugLobbyButton().contains(x, y) {
-			g.debugEnabled = !g.debugEnabled
+		} else if settingsButton().contains(x, y) {
+			g.openSettings()
 		} else if g.Lobby.CanStart() && startButton().contains(x, y) {
 			g.start()
 		}
@@ -375,20 +358,8 @@ func (g *Game) activateLobbyMenu(index int) bool {
 			g.start()
 		}
 	case 1:
-		if g.sound != nil {
-			g.sound.ToggleMute()
-		}
+		g.openSettings()
 	case 2:
-		if g.sound != nil {
-			g.sound.ToggleMusic()
-		}
-	case 3:
-		g.controllerDebugOpen = !g.controllerDebugOpen
-	case 4:
-		g.debugEnabled = !g.debugEnabled
-	case 5:
-		g.openCredits()
-	case 6:
 		return !isWeb()
 	}
 	return false
@@ -971,16 +942,12 @@ func apply(game *core.Game, action action) {
 	}
 }
 
-func startButton() imageRect           { return imageRect{X: 490, Y: 550, W: 300, H: 64} }
-func controllerDebugButton() imageRect { return imageRect{X: 30, Y: 632, W: 240, H: 60} }
-func muteButton() imageRect            { return imageRect{X: 285, Y: 632, W: 135, H: 60} }
-func musicButton() imageRect           { return imageRect{X: 435, Y: 632, W: 155, H: 60} }
-func debugLobbyButton() imageRect      { return imageRect{X: 605, Y: 632, W: 190, H: 60} }
-func creditsButton() imageRect         { return imageRect{X: 810, Y: 632, W: 160, H: 60} }
-func exitButton() imageRect            { return imageRect{X: 985, Y: 632, W: 130, H: 60} }
+func startButton() imageRect    { return imageRect{X: 490, Y: 550, W: 300, H: 64} }
+func settingsButton() imageRect { return imageRect{X: 470, Y: 632, W: 340, H: 60} }
+func exitButton() imageRect     { return imageRect{X: 985, Y: 632, W: 130, H: 60} }
 
 func lobbyMenuButtons() []imageRect {
-	buttons := []imageRect{startButton(), muteButton(), musicButton(), controllerDebugButton(), debugLobbyButton(), creditsButton()}
+	buttons := []imageRect{startButton(), settingsButton()}
 	if !isWeb() {
 		buttons = append(buttons, exitButton())
 	}
@@ -1088,6 +1055,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawPlay(screen)
 		return
 	}
+	if g.view == viewSettings {
+		g.drawSettings(screen)
+		return
+	}
 	if g.view == viewCredits {
 		g.drawCredits(screen)
 		return
@@ -1120,42 +1091,15 @@ func (g *Game) drawLobby(screen *ebiten.Image) {
 			drawCenteredText(screen, "TO JOIN", g.face(30), centerX, 312, white)
 		}
 	}
+	settings := settingsButton()
+	ebitenutil.DrawRect(screen, float64(settings.X), float64(settings.Y), float64(settings.W), float64(settings.H), panel)
+	drawCenteredText(screen, "SETTINGS", g.face(18), float64(settings.X+settings.W/2), float64(settings.Y+9), white)
+	drawCenteredText(screen, g.settingsStatus(), g.face(12), float64(settings.X+settings.W/2), float64(settings.Y+37), muted)
 	if !isWeb() {
 		exit := exitButton()
 		ebitenutil.DrawRect(screen, float64(exit.X), float64(exit.Y), float64(exit.W), float64(exit.H), panel)
 		drawCenteredText(screen, "EXIT", g.face(17), float64(exit.X+exit.W/2), float64(exit.Y+16), white)
 	}
-	controllers := controllerDebugButton()
-	ebitenutil.DrawRect(screen, float64(controllers.X), float64(controllers.Y), float64(controllers.W), float64(controllers.H), panel)
-	drawCenteredText(screen, "CONTROLLER DEBUG", g.face(17), float64(controllers.X+controllers.W/2), float64(controllers.Y+20), white)
-	mute := muteButton()
-	ebitenutil.DrawRect(screen, float64(mute.X), float64(mute.Y), float64(mute.W), float64(mute.H), panel)
-	muteLabel := "SOUND ON"
-	if g.sound == nil || g.sound.Muted() {
-		muteLabel = "MUTED"
-	} else if !g.sound.Ready() {
-		muteLabel = "AUDIO WAIT"
-	}
-	drawCenteredText(screen, muteLabel, g.face(16), float64(mute.X+mute.W/2), float64(mute.Y+20), white)
-	music := musicButton()
-	ebitenutil.DrawRect(screen, float64(music.X), float64(music.Y), float64(music.W), float64(music.H), panel)
-	musicLabel := "MUSIC ON"
-	if g.sound == nil || !g.sound.MusicEnabled() {
-		musicLabel = "MUSIC OFF"
-	}
-	drawCenteredText(screen, musicLabel, g.face(16), float64(music.X+music.W/2), float64(music.Y+20), white)
-	debug := debugLobbyButton()
-	debugFill := panel
-	debugLabel := "DEBUG MODE: OFF"
-	if g.debugEnabled {
-		debugFill = color.RGBA{R: 35, G: 73, B: 76, A: 255}
-		debugLabel = "DEBUG MODE: ON"
-	}
-	ebitenutil.DrawRect(screen, float64(debug.X), float64(debug.Y), float64(debug.W), float64(debug.H), debugFill)
-	drawCenteredText(screen, debugLabel, g.face(17), float64(debug.X+debug.W/2), float64(debug.Y+20), white)
-	credits := creditsButton()
-	ebitenutil.DrawRect(screen, float64(credits.X), float64(credits.Y), float64(credits.W), float64(credits.H), panel)
-	drawCenteredText(screen, "CREDITS", g.face(17), float64(credits.X+credits.W/2), float64(credits.Y+20), white)
 	r := startButton()
 	startFill, startText := accent, background
 	if !g.Lobby.CanStart() {

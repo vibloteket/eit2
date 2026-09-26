@@ -33,8 +33,17 @@ var creditLines = []struct {
 }
 
 func (g *Game) openCredits() {
+	g.creditsReturnToSettings = false
+	g.openCreditsView()
+}
+
+func (g *Game) openCreditsFromSettings() {
+	g.creditsReturnToSettings = true
+	g.openCreditsView()
+}
+
+func (g *Game) openCreditsView() {
 	g.view = viewCredits
-	g.lobbyFocus = 5
 	g.controllerDebugOpen = false
 	if g.sound != nil {
 		g.sound.Play(sound.MenuSelect)
@@ -42,8 +51,14 @@ func (g *Game) openCredits() {
 }
 
 func (g *Game) closeCredits() {
+	if g.creditsReturnToSettings {
+		g.creditsReturnToSettings = false
+		g.view = viewSettings
+		g.settingsFocus = settingsAboutIndex
+		return
+	}
 	g.view = viewLobby
-	g.lobbyFocus = 5
+	g.lobbyFocus = lobbySettingsIndex
 }
 
 func (g *Game) updateCredits() {
@@ -78,5 +93,5 @@ func (g *Game) drawCredits(screen *ebiten.Image) {
 		}
 		drawCenteredText(screen, line.Text, g.face(line.Size), logicalWidth/2, line.Y, ink)
 	}
-	drawCenteredText(screen, "Press any key or button, click, or tap to return to the lobby.", g.face(21), logicalWidth/2, 651, muted)
+	drawCenteredText(screen, "Press any key or button, click, or tap to return.", g.face(21), logicalWidth/2, 651, muted)
 }

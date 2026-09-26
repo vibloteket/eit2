@@ -1,9 +1,9 @@
 package ui
 
 import (
+	"bytes"
 	"testing"
 
-	"bytes"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/vibloteket/eit2/internal/lobby"
 	"github.com/vibloteket/eit2/internal/sound"
@@ -11,23 +11,27 @@ import (
 )
 
 func TestCreditsIsSeparateViewAndKeepsLobbyMusic(t *testing.T) {
-	g := Game{view: viewLobby, lobbyFocus: 2, controllerDebugOpen: true}
+	g := Game{view: viewLobby, lobbyFocus: lobbySettingsIndex, controllerDebugOpen: true}
 	g.Lobby.Join(lobby.Device{Kind: lobby.DeviceTouch, Name: "test player"})
-	if g.activateLobbyMenu(5) {
-		t.Fatal("Credits must not request application exit")
-	}
+	g.openSettings()
+	g.settingsFocus = settingsAboutIndex
+	g.activateSettingsItem()
 	if g.view != viewCredits || g.view == viewLobby || g.view == viewPlay {
-		t.Fatal("Credits must use its own view")
+		t.Fatal("About & Credits must use its own view")
 	}
 	if g.view.musicTrack() != sound.LobbyMusic || g.controllerDebugOpen {
 		t.Fatal("Credits must retain lobby music and hide debug overlay")
 	}
 	g.closeCredits()
-	if g.view != viewLobby || g.lobbyFocus != 5 || len(g.Lobby.Slots) != 1 {
-		t.Fatal("return must preserve players and focus Credits")
+	if g.view != viewSettings || g.settingsFocus != settingsAboutIndex || len(g.Lobby.Slots) != 1 {
+		t.Fatal("return must go back to Settings and preserve players")
 	}
-	if !isWeb() && !g.activateLobbyMenu(6) {
-		t.Fatal("native Exit must remain available after adding Credits")
+	g.closeSettings()
+	if g.view != viewLobby || g.lobbyFocus != lobbySettingsIndex {
+		t.Fatal("Settings return must focus the lobby Settings button")
+	}
+	if !isWeb() && !g.activateLobbyMenu(2) {
+		t.Fatal("native Exit must remain available after moving Credits")
 	}
 }
 
@@ -47,13 +51,13 @@ func TestCreditsTextFitsWithoutScrolling(t *testing.T) {
 	}
 }
 
-func TestCreditsButtonFitsUtilityRow(t *testing.T) {
-	debug, credits, exit := debugLobbyButton(), creditsButton(), exitButton()
-	if credits.X < debug.X+debug.W || exit.X < credits.X+credits.W || exit.X+exit.W > logicalWidth {
-		t.Fatal("Credits/Exit utility buttons overlap or leave screen")
+func TestLobbyButtonsFitUtilityRow(t *testing.T) {
+	settings, exit := settingsButton(), exitButton()
+	if settings.X < 0 || exit.X < settings.X+settings.W || exit.X+exit.W > logicalWidth {
+		t.Fatal("Settings/Exit utility buttons overlap or leave screen")
 	}
 	buttons := lobbyMenuButtons()
-	if buttons[5] != credits {
-		t.Fatal("navigation and rendered Credits positions disagree")
+	if buttons[1] != settings {
+		t.Fatal("navigation and rendered Settings positions disagree")
 	}
 }

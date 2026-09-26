@@ -46,12 +46,12 @@ This initial technical spike proves the project structure and its first targets:
   normal player and target routing;
 - short project-owned WAV effects, a full Badinerie lobby loop and separate
   four Bach/Handel/Vivaldi match loops, cycling on new matches from the lobby,
-  with persistent Mute/Music controls and Restart replaying the same track;
+  with Restart replaying the same track;
 - a short musical count-in before new matches and Restart: three wooden taps,
   visible baton beats, then simultaneous game/music start; no new count on Resume;
 - a subtle top-right Now playing label for the current lobby or match piece;
-- a dedicated Credits screen opened from the lobby, with any fresh key, button,
-  click or tap returning to the lobby without changing players or audio;
+- a Settings menu for Sound, Music, session music volume, controller/debug tools
+  and About & Credits, keeping the lobby focused on joining and Start;
 - reproducible audio sources, pinned CC0 sample hashes and a documented
   public-domain melody/source review.
 
@@ -116,11 +116,11 @@ menus are gamepad-focusable; A selects and B resumes/backtracks. No Pause button
 overlays the playfields. Debug mode supports D-pad selection (LB/RB changes
 source player), and Controller Debug closes with B.
 
-The lobby's **Controller debug** panel shows connected controller names/IDs,
+The Settings menu's **Controller debug** panel shows connected controller names/IDs,
 player assignment, standard mapping availability, axis count, SDL GUID where
 available and live pressed buttons.
 
-For gameplay testing, enable **Debug mode** in the lobby. During a match,
+For gameplay testing, enable **Debug mode** in Settings. During a match,
 open **Debug**, choose a source player and tap a special. Direct/self effects
 apply to that player while offensive effects follow that player's current
 target. The panel pauses simulation while open.

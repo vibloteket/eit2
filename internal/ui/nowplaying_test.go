@@ -2,6 +2,7 @@ package ui
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -30,6 +31,21 @@ func TestNowPlayingLabels(t *testing.T) {
 	}
 	if got := nowPlayingLabelFor(sound.MusicTrack(255), true); got != "" {
 		t.Fatal("unknown track must not claim a title")
+	}
+}
+
+func TestNowPlayingZeroVolumeIsMarkedOff(t *testing.T) {
+	manager, err := sound.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	g := Game{view: viewLobby, sound: manager}
+	if !strings.Contains(g.nowPlayingLabel(), "Bach — Badinerie") || strings.HasSuffix(g.nowPlayingLabel(), "OFF") {
+		t.Fatalf("default label = %q", g.nowPlayingLabel())
+	}
+	manager.SetMusicVolumePercent(0)
+	if !strings.HasSuffix(g.nowPlayingLabel(), " · OFF") {
+		t.Fatalf("zero-volume label = %q", g.nowPlayingLabel())
 	}
 }
 

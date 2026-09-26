@@ -1,45 +1,29 @@
-# Credits screen — introduced in v0.3.2, updated in v0.3.3
+# Credits / About screen
 
-## Scope and refinement
+## Current scope (v0.3.9)
 
-The requested workflow is explicit: a Credits button in the lobby opens a
-**separate full-screen view**, not a popup. Use static text if it fits; otherwise
-scroll. A fresh key/button press returns to the lobby. Existing players, audio
-preferences and gameplay must not change.
+Credits are reached from **Settings → About & Credits**, not from a separate
+lobby utility button. The screen remains a separate full-screen view with the
+project, music/audio, technology and license credits. Full legal/source details
+ship in `CREDITS.md`, `MUSIC-SOURCES.md`, `ASSETS.md` and `LICENSES/`.
 
-- Audience/platforms: existing TV-first keyboard, mouse, touch and gamepad users;
-  Linux/native and browser builds.
-- MVP: one static screen using the current paper palette and readable type.
-  The complete short credits fit the1280x720 design space; automated text-width
-  and vertical-bound checks prove no scrolling is needed for this version.
-- Contents: project/original game, Bach, Beethoven, project audio work, Mutopia
-  and its typesetter, VSCO recordists/sample editor, Ebitengine, Go font,
-  licenses and full-source link.
-- No new persistence, external page load, authentication, data sharing,
-  interactive links, animations or modal stack. Detailed dependency/legal
-  notices ship as `CREDITS.md`, `MUSIC-SOURCES.md` and `LICENSES/`.
-- Input: keyboard, mouse button, tap or any raw gamepad button, including an
-  unjoined controller. Analog stick movement alone is not a button press.
-- Guard: only *just-pressed* input dismisses. The held input that opened Credits
-  cannot close it immediately. The return input is consumed in the Credits
-  view and cannot join/leave a player, start a match or toggle audio.
-- Return: preserve lobby players/settings, restore focus to Credits, and keep
-  the same lobby music position throughout. No match music in Credits.
-- Layout: Credits occupies the next utility-row slot; native Exit moves right.
-  Keyboard/controller traversal follows the visible order; web cannot select
-  native Exit.
+- Settings and Credits keep the lobby music position; no match music starts.
+- Closing Credits returns to Settings with About & Credits focused. Closing
+  Settings returns to the lobby with Settings focused.
+- Only fresh key/button/pointer input dismisses Credits; the held input that
+  opened it cannot immediately close it. Return input is consumed and cannot
+  join/start/change audio.
+- Keyboard, mouse, touch and any raw gamepad button can return, including an
+  unjoined controller. Analog stick movement alone is not a press.
+- The static text must fit the 1280×720 design space without scrolling.
 
-## Acceptance / verification
+Historical note: Credits was introduced as a direct lobby button in v0.3.2.
+The move under Settings in v0.3.9 is intentional to keep the lobby focused on
+joining and Start while retaining an in-game About location.
 
-1. Credits is a distinct view with its own draw/update path; no lobby boards or
-   gameplay behind it.
-2. Button, navigation and return work with keyboard, pointer/touch and gamepad.
-3. Holding the opening button does not immediately dismiss the screen.
-4. Any fresh return press does not leak into lobby actions.
-5. Text/button bounds fit, credits are complete, and music/settings are retained.
-6. All Go tests, native/Wasm builds, browser checks and distribution notice checks
-   pass before publishing.
+## Verification
 
-Tests are in `internal/ui/credits_test.go`, `internal/ui/music_test.go` and
-`internal/controls/menu_test.go`. Browser smoke checks exercise the real view
-transitions, held input, touch and an unjoined synthetic gamepad.
+`internal/ui/credits_test.go` covers Settings→Credits→Settings return, text
+bounds and lobby button geometry. Browser smoke exercises keyboard, pointer,
+touch and synthetic gamepad paths through Settings, held-opening input, and
+return without leaking into lobby actions.

@@ -17,12 +17,14 @@ type fakeMusicPlayer struct {
 	rewinds             int
 	rewindErr           error
 	rewoundWhilePlaying bool
+	volume              float64
 }
 
-func (p *fakeMusicPlayer) Play()           { p.playing = true; p.plays++ }
-func (p *fakeMusicPlayer) Pause()          { p.playing = false; p.pauses++ }
-func (p *fakeMusicPlayer) IsPlaying() bool { return p.playing }
-func (p *fakeMusicPlayer) Close() error    { p.playing = false; return nil }
+func (p *fakeMusicPlayer) Play()                    { p.playing = true; p.plays++ }
+func (p *fakeMusicPlayer) Pause()                   { p.playing = false; p.pauses++ }
+func (p *fakeMusicPlayer) IsPlaying() bool          { return p.playing }
+func (p *fakeMusicPlayer) Close() error             { p.playing = false; return nil }
+func (p *fakeMusicPlayer) SetVolume(volume float64) { p.volume = volume }
 func (p *fakeMusicPlayer) Rewind() error {
 	p.rewinds++
 	p.rewoundWhilePlaying = p.playing
@@ -37,7 +39,7 @@ func musicTestManager() (*Manager, *fakeMusicPlayer, *fakeMusicPlayer) {
 	lobby, match := &fakeMusicPlayer{}, &fakeMusicPlayer{}
 	return &Manager{
 		music:      map[MusicTrack]musicPlayer{LobbyMusic: lobby, MatchMusic: match},
-		musicTrack: LobbyMusic, musicEnabled: true,
+		musicTrack: LobbyMusic, musicEnabled: true, musicVolume: 1,
 	}, lobby, match
 }
 

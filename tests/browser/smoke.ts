@@ -147,16 +147,33 @@ try {
   await click(1100, 50);
   await audioCheck("lobby after gesture", true);
 
-  // Establish the separate full screen and a stable empty-lobby comparison.
-  await click(890, 660);
+  async function openSettings() {
+    await click(640, 660);
+  }
+  async function openCredits() {
+    await openSettings();
+    await click(640, 512); // About & Credits
+  }
+  async function closeCreditsToSettings() {
+    await click(1100, 100);
+  }
+  async function closeSettingsToLobby() {
+    await key("Escape");
+  }
+
+  // Establish the separate About & Credits screen and a stable empty-lobby comparison.
+  await openCredits();
   const credits = await capture(),
     creditsHash = hash(credits);
   await Bun.write(output + "/credits.png", credits);
   await audioCheck("credits keeps lobby audio", true);
-  await click(1100, 100);
+  await closeCreditsToSettings();
+  await closeSettingsToLobby();
   const emptyLobbyHash = hash(await capture());
   if (emptyLobbyHash === creditsHash)
-    throw Error("Credits did not replace/return to lobby view");
+    throw Error(
+      "Credits did not replace/return through Settings to lobby view",
+    );
   await Bun.write(output + "/lobby.png", await capture());
   async function assertCredits(label: string) {
     if (hash(await capture()) !== creditsHash) throw Error(label);
@@ -167,24 +184,33 @@ try {
     checks.push(label);
   }
 
+  // Keyboard: Settings is already focused after returning. Open it, move to
+  // About, and hold Enter to prove the opening press cannot dismiss Credits.
+  await key("Enter");
+  for (let i = 0; i < 5; i++) await key("ArrowDown");
   await page.keyboard.down("Enter");
   await page.waitForTimeout(600);
   await assertCredits(
-    "keyboard opens Credits and held opening key does not dismiss",
+    "keyboard opens Credits through Settings and held Enter does not dismiss",
   );
   await page.keyboard.up("Enter");
   await page.waitForTimeout(200);
   await key("1");
-  await assertEmptyLobby("any fresh key returns without joining a player");
+  await closeSettingsToLobby();
+  await assertEmptyLobby("fresh key returns through Settings without joining");
 
-  await page.mouse.move(890, 660);
+  await openSettings();
+  await page.mouse.move(640, 512);
   await page.mouse.down();
   await page.waitForTimeout(600);
   await assertCredits("held opening mouse button does not dismiss");
   await page.mouse.up();
   await page.waitForTimeout(200);
   await key("Escape");
-  await assertEmptyLobby("Escape returns without changing lobby");
+  await closeSettingsToLobby();
+  await assertEmptyLobby(
+    "Escape returns through Settings without changing lobby",
+  );
 
   // Hold touches across several game ticks, as for the keyboard/mouse tests.
   const cdp = await page.context().newCDPSession(page);
@@ -200,13 +226,17 @@ try {
     });
     await page.waitForTimeout(500);
   }
-  await tap(890, 660);
-  await assertCredits("touch opens separate Credits view");
+  await tap(640, 660);
+  await tap(640, 512);
+  await assertCredits("touch opens separate Credits view through Settings");
   await tap(1100, 100);
-  await assertEmptyLobby("touch returns without joining a player");
+  await tap(640, 576); // Settings Back
+  await assertEmptyLobby(
+    "touch returns through Settings without joining a player",
+  );
 
   // An unjoined controller can leave Credits; stick motion alone is not a press.
-  await click(890, 660);
+  await openCredits();
   await page.evaluate(() => {
     (window as any).__testPads = [
       {
@@ -236,9 +266,6 @@ try {
     p.buttons[0] = { pressed: true, touched: true, value: 1 };
   });
   await page.waitForTimeout(500);
-  await assertEmptyLobby(
-    "unjoined gamepad button returns without joining or starting",
-  );
   await page.evaluate(() => {
     (window as any).__testPads[0].buttons[0] = {
       pressed: false,
@@ -261,13 +288,18 @@ try {
     }, button);
     await page.waitForTimeout(500);
   }
+  await padButton(1); // Credits -> Settings, without joining.
+  await assertEmptyLobby("unjoined gamepad B returns through Settings");
+
   await padButton(0); // Join only; focus moves to Start.
-  await padButton(15);
-  await padButton(15); // Start -> Debug -> Credits.
+  await padButton(15); // Start -> Settings.
   const joinedLobbyHash = hash(await capture());
+  await padButton(0); // Open Settings.
+  for (let i = 0; i < 5; i++) await padButton(13); // Down to About & Credits.
   await padButton(0);
-  await assertCredits("joined gamepad navigates to and opens Credits");
-  await padButton(1);
+  await assertCredits("joined gamepad navigates through Settings to Credits");
+  await padButton(1); // Credits -> Settings.
+  await padButton(1); // Settings -> Lobby.
   if (hash(await capture()) !== joinedLobbyHash)
     throw Error("Gamepad return leaked into lobby leave action");
   checks.push("gamepad return preserves its joined player");
@@ -276,34 +308,68 @@ try {
     (window as any).__testPads = [];
   });
   await page.waitForTimeout(300);
-  await click(890, 660);
+  await openCredits();
   await key("Escape");
+  await closeSettingsToLobby();
   await assertEmptyLobby(
     "lobby remains usable after gamepad Credits round trip",
   );
 
-  // Visible utility-row keyboard navigation must reach Credits from Debug.
-  await key("ArrowLeft");
-  await key("ArrowRight");
+  // Keyboard navigation reaches Credits through the Settings menu.
   await key("Enter");
-  await assertCredits("keyboard utility navigation reaches Credits");
+  for (let i = 0; i < 5; i++) await key("ArrowDown");
+  await key("Enter");
+  await assertCredits("keyboard utility navigation reaches Settings Credits");
   await key("Space");
-  await assertEmptyLobby("Space returns with Credits focus restored");
+  await closeSettingsToLobby();
+  await assertEmptyLobby("Space returns through Settings with focus restored");
 
-  await click(510, 660);
-  await audioCheck("music off", false);
-  await click(890, 660);
+  async function toggleSound() {
+    await openSettings();
+    await click(640, 192);
+    await closeSettingsToLobby();
+  }
+  async function toggleMusic() {
+    await openSettings();
+    await click(640, 256);
+    await closeSettingsToLobby();
+  }
+  async function openCreditsAndReturn() {
+    await openCredits();
+    await closeCreditsToSettings();
+    await closeSettingsToLobby();
+  }
+
+  await toggleMusic();
+  await audioCheck("music off from Settings", false);
+  await openCredits();
   await audioCheck("credits respects music off", false);
-  await key("Escape");
-  await click(510, 660);
-  await audioCheck("music on", true);
-  await click(350, 660);
-  await audioCheck("master mute", false);
-  await click(890, 660);
+  await closeCreditsToSettings();
+  await closeSettingsToLobby();
+  await toggleMusic();
+  await audioCheck("music on from Settings", true);
+
+  await openSettings();
+  await key("ArrowDown");
+  await key("ArrowDown");
+  for (let i = 0; i < 10; i++) await key("ArrowLeft");
+  await closeSettingsToLobby();
+  await audioCheck("music volume zero from Settings", false);
+  await openSettings();
+  await key("ArrowDown");
+  await key("ArrowDown");
+  for (let i = 0; i < 10; i++) await key("ArrowRight");
+  await closeSettingsToLobby();
+  await audioCheck("music volume restored from Settings", true);
+
+  await toggleSound();
+  await audioCheck("master mute from Settings", false);
+  await openCredits();
   await audioCheck("credits respects mute", false);
-  await key("Escape");
-  await click(350, 660);
-  await audioCheck("unmute", true);
+  await closeCreditsToSettings();
+  await closeSettingsToLobby();
+  await toggleSound();
+  await audioCheck("unmute from Settings", true);
   await key("1");
   await click(640, 580);
   await page.waitForTimeout(3200); // Let the musical count-in finish.
@@ -352,7 +418,7 @@ try {
   await page.waitForTimeout(500);
   await audioCheck("back to lobby", true);
 
-  await click(510, 660);
+  await toggleMusic();
   await audioCheck("music off before restart test", false);
   await click(640, 580);
   await page.waitForTimeout(3200); // Let the musical count-in finish.
@@ -366,7 +432,7 @@ try {
   await key("ArrowDown");
   await key("ArrowDown");
   await key("Enter");
-  await click(510, 660);
+  await toggleMusic();
   await audioCheck("music restored after disabled restart", true);
 
   // A then B were selected above. Exercise C, D, A and B with audio enabled.
