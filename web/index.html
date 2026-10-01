@@ -39,29 +39,93 @@
       >Source code (AGPL-3.0-or-later)</a
     >
     <script>
-      // Phone-sized touch screens: enter fullscreen on the first tap so the
-      // game uses the whole display, and hold landscape while fullscreen is
-      // active. The request is made synchronously in the pointerdown handler
-      // because browsers only honour it with fresh user activation; calls
-      // deferred to the game's update loop can be rejected. Desktop, TV and
-      // tablet screens (smallest side >= 600 px) and browsers without element
-      // fullscreen (iPhone Safari) are left untouched.
+      // Touch devices: enter fullscreen on the first tap so the game uses the
+      // whole display, and hold landscape while fullscreen is active. The
+      // request is made in a pointerup/click handler because browsers only
+      // honour it with fresh user activation — a completed tap always counts,
+      // while the initial press may not (and the game loop itself runs too
+      // late). Keyboard users get F11 as the equivalent toggle (the game
+      // canvas otherwise swallows every key).
+      //
+      // Notes:
+      // - The coarse-pointer + small-screen gate keeps desktop and TV browsers
+      //   untouched. window.innerWidth is included because some Android
+      //   devices report screen.width in physical pixels.
+      // - The request is retried on every tap until it succeeds.
+      // - A blocked request shows a brief on-page hint with the browser's
+      //   reason, so failures on real devices stay diagnosable.
+      // - iPhone Safari has no element fullscreen; it is skipped silently.
       (() => {
         let requested = false;
+        let inflight = false;
+        const isCoarse = () => matchMedia("(pointer: coarse)").matches;
+        const smallEnough = () =>
+          Math.min(screen.width, screen.height) < 900 ||
+          Math.min(window.innerWidth, window.innerHeight) < 900;
+        const hint = (msg) => {
+          let d = document.getElementById("fs-hint");
+          if (!d) {
+            d = document.createElement("div");
+            d.id = "fs-hint";
+            d.style.cssText =
+              "position:fixed;left:8px;bottom:8px;z-index:3;color:#e2e8f0;" +
+              "font:12px sans-serif;background:rgba(8,12,20,.85);" +
+              "padding:4px 8px;border-radius:4px";
+            document.body.appendChild(d);
+          }
+          d.textContent = msg;
+          clearTimeout(d._t);
+          d._t = setTimeout(() => d.remove(), 10000);
+        };
+        const requestOn = (el) =>
+          el && (el.requestFullscreen || el.webkitRequestFullscreen);
+        const tryFullscreen = () => {
+          // inflight guards against concurrent requests: one tap produces both
+          // pointerdown and touchstart, and multi-touch adds more pointerdowns.
+          if (requested || inflight || document.fullscreenElement) return;
+          if (!isCoarse() || !smallEnough()) return;
+          const canvas = document.querySelector("canvas");
+          const request = requestOn(canvas);
+          if (!request) return; // e.g. iPhone Safari: no element fullscreen
+          inflight = true;
+          try {
+            Promise.resolve(request.call(canvas))
+              .then(
+                () => {
+                  requested = true;
+                },
+                (err) => hint("Fullscreen blocked: " + ((err && err.message) || err)),
+              )
+              .finally(() => {
+                inflight = false;
+              });
+          } catch (err) {
+            inflight = false;
+            hint("Fullscreen blocked: " + ((err && err.message) || err));
+          }
+        };
+        window.addEventListener("pointerup", tryFullscreen, { passive: true });
+        window.addEventListener("click", tryFullscreen, { passive: true });
+
+        // F11 toggles fullscreen on the game canvas, like on ordinary pages.
         window.addEventListener(
-          "pointerdown",
-          () => {
-            if (requested || document.fullscreenElement) return;
-            if (Math.min(screen.width, screen.height) >= 600) return;
+          "keydown",
+          (e) => {
+            if (e.key !== "F11") return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (document.fullscreenElement) {
+              const exit = document.exitFullscreen || document.webkitExitFullscreen;
+              if (exit) exit.call(document);
+              return;
+            }
             const canvas = document.querySelector("canvas");
-            const request =
-              canvas && (canvas.requestFullscreen || canvas.webkitRequestFullscreen);
-            if (!request) return;
-            requested = true;
-            request.call(canvas).catch(() => {});
+            const request = requestOn(canvas);
+            if (request) request.call(canvas).catch(() => {});
           },
-          { passive: true },
+          { capture: true },
         );
+
         document.addEventListener("fullscreenchange", () => {
           const orientation = screen.orientation;
           if (!orientation || !orientation.lock) return;
