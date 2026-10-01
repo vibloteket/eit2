@@ -38,6 +38,41 @@
       "
       >Source code (AGPL-3.0-or-later)</a
     >
+    <script>
+      // Phone-sized touch screens: enter fullscreen on the first tap so the
+      // game uses the whole display, and hold landscape while fullscreen is
+      // active. The request is made synchronously in the pointerdown handler
+      // because browsers only honour it with fresh user activation; calls
+      // deferred to the game's update loop can be rejected. Desktop, TV and
+      // tablet screens (smallest side >= 600 px) and browsers without element
+      // fullscreen (iPhone Safari) are left untouched.
+      (() => {
+        let requested = false;
+        window.addEventListener(
+          "pointerdown",
+          () => {
+            if (requested || document.fullscreenElement) return;
+            if (Math.min(screen.width, screen.height) >= 600) return;
+            const canvas = document.querySelector("canvas");
+            const request =
+              canvas && (canvas.requestFullscreen || canvas.webkitRequestFullscreen);
+            if (!request) return;
+            requested = true;
+            request.call(canvas).catch(() => {});
+          },
+          { passive: true },
+        );
+        document.addEventListener("fullscreenchange", () => {
+          const orientation = screen.orientation;
+          if (!orientation || !orientation.lock) return;
+          if (document.fullscreenElement) {
+            orientation.lock("landscape").catch(() => {});
+          } else if (orientation.unlock) {
+            orientation.unlock();
+          }
+        });
+      })();
+    </script>
     <script src="wasm_exec.js"></script>
     <script>
       const go = new Go();

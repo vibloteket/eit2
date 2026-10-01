@@ -81,17 +81,19 @@ func (g *Game) updateCredits() {
 }
 
 func (g *Game) drawCredits(screen *ebiten.Image) {
+	l := g.L()
+	centerX := float64(l.cx())
 	screen.Fill(background)
-	drawPaperDoodles(screen)
-	drawCenteredText(screen, "CREDITS", g.face(52), logicalWidth/2, 36, accent)
-	drawCenteredText(screen, "EIT 2 · v"+version.Value, g.face(21), logicalWidth/2, 105, muted)
-	ebitenutil.DrawRect(screen, 140, 142, 1000, 2, panel)
+	drawPaperDoodles(screen, l.right())
+	drawCenteredText(screen, "CREDITS", g.face(52), centerX, 36, accent)
+	drawCenteredText(screen, "EIT 2 · v"+version.Value, g.face(21), centerX, 105, muted)
+	ebitenutil.DrawRect(screen, float64(l.cx()-500), 142, 1000, 2, panel)
 	for _, line := range creditLines {
 		ink := white
 		if line.Heading {
 			ink = accent
 		}
-		drawCenteredText(screen, line.Text, g.face(line.Size), logicalWidth/2, line.Y, ink)
+		drawCenteredText(screen, line.Text, g.face(line.Size), centerX, line.Y, ink)
 	}
-	drawCenteredText(screen, "Press any key or button, click, or tap to return.", g.face(21), logicalWidth/2, 651, muted)
+	drawCenteredText(screen, "Press any key or button, click, or tap to return.", g.face(21), centerX, 651, muted)
 }

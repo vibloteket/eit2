@@ -52,11 +52,12 @@ func TestCreditsTextFitsWithoutScrolling(t *testing.T) {
 }
 
 func TestLobbyButtonsFitUtilityRow(t *testing.T) {
-	settings, exit := settingsButton(), exitButton()
-	if settings.X < 0 || exit.X < settings.X+settings.W || exit.X+exit.W > logicalWidth {
+	l := layoutFor(logicalWidth)
+	settings, exit := l.settingsButton(), l.exitButton()
+	if settings.X < 0 || exit.X < settings.X+settings.W || exit.X+exit.W > l.w {
 		t.Fatal("Settings/Exit utility buttons overlap or leave screen")
 	}
-	buttons := lobbyMenuButtons()
+	buttons := l.lobbyMenuButtons()
 	if buttons[1] != settings {
 		t.Fatal("navigation and rendered Settings positions disagree")
 	}

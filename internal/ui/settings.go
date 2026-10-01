@@ -25,10 +25,6 @@ const (
 
 const settingsItemCount = 7
 
-func settingsRow(index int) imageRect {
-	return imageRect{X: 330, Y: 165 + index*64, W: 620, H: 54}
-}
-
 func (g *Game) openSettings() {
 	g.view = viewSettings
 	g.settingsFocus = settingsSoundIndex
@@ -244,8 +240,9 @@ func (g *Game) updateSettings() {
 }
 
 func (g *Game) handleSettingsPointer(x, y int) bool {
+	l := g.L()
 	for index := 0; index < settingsItemCount; index++ {
-		row := settingsRow(index)
+		row := l.settingsRow(index)
 		if !row.contains(x, y) {
 			continue
 		}
@@ -282,13 +279,14 @@ func (g *Game) settingsStatus() string {
 }
 
 func (g *Game) drawSettings(screen *ebiten.Image) {
+	l := g.L()
 	screen.Fill(background)
-	drawPaperDoodles(screen)
-	drawCenteredText(screen, "SETTINGS", g.face(52), logicalWidth/2, 36, accent)
-	drawCenteredText(screen, "Audio, controller tools and project information", g.face(20), logicalWidth/2, 104, muted)
+	drawPaperDoodles(screen, l.right())
+	drawCenteredText(screen, "SETTINGS", g.face(52), float64(l.cx()), 36, accent)
+	drawCenteredText(screen, "Audio, controller tools and project information", g.face(20), float64(l.cx()), 104, muted)
 	labels := []string{"SOUND", "MUSIC", "MUSIC VOLUME", "CONTROLLER DEBUG", "DEBUG MODE", "ABOUT & CREDITS", "BACK"}
 	for index, label := range labels {
-		row := settingsRow(index)
+		row := l.settingsRow(index)
 		ebitenutil.DrawRect(screen, float64(row.X), float64(row.Y), float64(row.W), float64(row.H), panel)
 		if g.settingsFocus == index {
 			ebitenutil.DrawRect(screen, float64(row.X-4), float64(row.Y-4), float64(row.W+8), 4, white)
@@ -302,6 +300,6 @@ func (g *Game) drawSettings(screen *ebiten.Image) {
 		width, _ := text.Measure(value, face, 0)
 		drawText(screen, value, face, float64(row.X+row.W-24)-width, float64(row.Y+16), accent)
 	}
-	drawCenteredText(screen, "Up/Down select · Left/Right adjust · A/Enter activates · B/Esc returns", g.face(17), logicalWidth/2, 650, muted)
+	drawCenteredText(screen, "Up/Down select · Left/Right adjust · A/Enter activates · B/Esc returns", g.face(17), float64(l.cx()), 650, muted)
 	g.drawControllerDebug(screen)
 }

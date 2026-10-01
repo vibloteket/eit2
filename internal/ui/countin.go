@@ -156,9 +156,9 @@ func countInAngle(c countInState) float64 {
 	return -.65 + 1.25*stroke*stroke
 }
 
-func countInTip(c countInState) (float32, float32) {
+func countInTip(c countInState, pivotX float64) (float32, float32) {
 	angle := countInAngle(c)
-	return float32(countInPivotX + countInBatonLength*math.Cos(angle)), float32(countInPivotY + countInBatonLength*math.Sin(angle))
+	return float32(pivotX + countInBatonLength*math.Cos(angle)), float32(countInPivotY + countInBatonLength*math.Sin(angle))
 }
 
 func (g *Game) drawCountIn(screen *ebiten.Image) {
@@ -167,28 +167,30 @@ func (g *Game) drawCountIn(screen *ebiten.Image) {
 	}
 	// One shared paper card is equally visible from all four couch positions.
 	// Simple batched geometry keeps the small moving marks lightweight.
-	ebitenutil.DrawRect(screen, 456, 258, 368, 188, boardInk)
-	ebitenutil.DrawRect(screen, 461, 263, 358, 178, paperLight)
+	s := float64(g.L().shift())
+	ebitenutil.DrawRect(screen, 456+s, 258, 368, 188, boardInk)
+	ebitenutil.DrawRect(screen, 461+s, 263, 358, 178, paperLight)
 	label := "READY"
 	if !g.countIn.active {
 		label = "GO!"
 	}
-	drawCenteredText(screen, label, g.face(24), 640, 272, accent)
+	drawCenteredText(screen, label, g.face(24), 640+s, 272, accent)
 	angle := countInAngle(g.countIn)
-	x, y := countInTip(g.countIn)
-	vector.StrokeLine(screen, countInPivotX-2, countInPivotY+2, x-2, y+2, 6, muted, false)
-	vector.StrokeLine(screen, countInPivotX, countInPivotY, x, y, 4, white, false)
-	vector.DrawFilledCircle(screen, countInPivotX, countInPivotY, 7, accent, false)
-	vector.StrokeLine(screen, 575, 392, 715, 392, 3, boardInk, false)
-	vector.StrokeLine(screen, 640, 392, 633, 400, 2, muted, false)
+	pivotX := countInPivotX + s
+	x, y := countInTip(g.countIn, pivotX)
+	vector.StrokeLine(screen, float32(pivotX-2), countInPivotY+2, x-2, y+2, 6, muted, false)
+	vector.StrokeLine(screen, float32(pivotX), countInPivotY, x, y, 4, white, false)
+	vector.DrawFilledCircle(screen, float32(pivotX), countInPivotY, 7, accent, false)
+	vector.StrokeLine(screen, float32(575+s), 392, float32(715+s), 392, 3, boardInk, false)
+	vector.StrokeLine(screen, float32(640+s), 392, float32(633+s), 400, 2, muted, false)
 	if angle > .20 {
 		for i := 0; i < 3; i++ {
-			sx := float32(638 + i*10)
+			sx := float32(638+i*10) + float32(s)
 			vector.StrokeLine(screen, sx, 389, sx+4, 381-float32(i%2)*4, 2, accent, false)
 		}
 	}
 	for i := 0; i < 3; i++ {
-		x := float32(596 + i*44)
+		x := float32(596+i*44) + float32(s)
 		vector.StrokeCircle(screen, x, 421, 8, 2, muted, false)
 		if i < g.countIn.strikes {
 			vector.DrawFilledCircle(screen, x, 421, 5, accent, false)

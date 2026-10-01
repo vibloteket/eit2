@@ -193,7 +193,7 @@ func TestCountInBatonRemainsOnPaperCard(t *testing.T) {
 	c.step(0)
 	for i := 0; i < 120; i++ {
 		c.step(time.Second / 60)
-		x, y := countInTip(c)
+		x, y := countInTip(c, countInPivotX)
 		if x < 580 || x > 710 || y < 309 || y > 394 {
 			t.Fatal("baton leaves its area or overlaps the READY label")
 		}

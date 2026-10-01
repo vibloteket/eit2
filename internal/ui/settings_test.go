@@ -66,10 +66,11 @@ func TestSettingsTextFits(t *testing.T) {
 		t.Fatal(err)
 	}
 	g := Game{fontSource: source}
+	l := layoutFor(logicalWidth)
 	labels := []string{"SOUND", "MUSIC", "MUSIC VOLUME", "CONTROLLER DEBUG", "DEBUG MODE", "ABOUT & CREDITS", "BACK"}
 	for index, label := range labels {
-		row := settingsRow(index)
-		if row.X < 0 || row.X+row.W > logicalWidth || row.Y < 0 || row.Y+row.H > 630 {
+		row := l.settingsRow(index)
+		if row.X < 0 || row.X+row.W > l.w || row.Y < 0 || row.Y+row.H > 630 {
 			t.Fatalf("row %d outside screen: %+v", index, row)
 		}
 		labelWidth, _ := text.Measure(label, g.face(20), 0)
@@ -78,7 +79,7 @@ func TestSettingsTextFits(t *testing.T) {
 			t.Fatalf("row %d text does not fit", index)
 		}
 	}
-	if width, _ := text.Measure(g.settingsStatus(), g.face(12), 0); width > float64(settingsButton().W-30) {
+	if width, _ := text.Measure(g.settingsStatus(), g.face(12), 0); width > float64(l.settingsButton().W-30) {
 		t.Fatal("lobby Settings status does not fit")
 	}
 }

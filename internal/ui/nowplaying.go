@@ -38,5 +38,5 @@ func (g *Game) drawNowPlaying(screen *ebiten.Image, y float64) {
 	}
 	face := g.face(16)
 	width, _ := text.Measure(label, face, 0)
-	drawText(screen, label, face, logicalWidth-40-width, y, muted)
+	drawText(screen, label, face, float64(g.L().w-40)-width, y, muted)
 }
